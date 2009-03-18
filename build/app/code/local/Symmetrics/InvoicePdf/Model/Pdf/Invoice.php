@@ -7,6 +7,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 	public $margin;
 	public $impressum;
 	public $pagecounter;
+	public $mode;
 	
 	function __construct()
 	{
@@ -21,12 +22,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		$this->margin['right'] = 540;
 		
 		$this->impressum = Mage::getModel('Symmetrics_Impressum_Block_Impressum')->getImpressumData();
+		
+		$this->setMode('invoice');
 	}
 	
     public function getPdf($invoices = array())
     {
         $this->_beforeGetPdf();
         $this->_initRenderer('invoice');
+        
+        $mode = $this->getMode();
 
         $pdf = new Zend_Pdf();
         $style = new Zend_Pdf_Style();
@@ -98,8 +103,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->insertTotals($page, $invoice);
             
             /* add note */
-            $this->insertNote($page);
-
+            if($mode == 'invoice') {            
+            	$this->insertNote($page);
+            }
         }
 
         $this->_afterGetPdf();
@@ -197,14 +203,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     {
     	$page->setFillColor($this->colors['black']);
     	
+    	$mode = $this->getMode();
+    	
     	$this->_setFontBold($page, 15);
-    	$page->drawText(Mage::helper('invoicepdf')->__('Invoice'), $this->margin['left'], $this->y, $this->encoding);
+    	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice' : 'Creditmemo' ), $this->margin['left'], $this->y, $this->encoding);
     	
     	$this->_setFontRegular($page);    	
     	
     	$this->y += 34;
     	$rightoffset = 180;
-    	$page->drawText(Mage::helper('invoicepdf')->__('Invoice number:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+    	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice number:' : 'Creditmemo number:' ), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
     	$page->drawText(Mage::helper('invoicepdf')->__('Customer number:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
@@ -336,6 +344,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     {
         $order = $source->getOrder();
         $font = $this->_setFontBold($page);
+        
+        $mode = $this->getMode();
 
         $order_subtotal = Mage::helper('invoicepdf')->__('Total');
         $page->drawText($order_subtotal, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
@@ -386,7 +396,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         if ($source->getAdjustmentPositive())
         {
             $adjustment_refund = Mage::helper('invoicepdf')->__('Adjustment Refund');
-            $page->drawText($adjustment_refund, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
+            $page->drawText($adjustment_refund, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
 
             $adjustment_refund = $order->formatPriceTxt($source->getAdjustmentPositive());
             $page->drawText($adjustment_refund, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
@@ -396,7 +406,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         if ((float) $source->getAdjustmentNegative())
         {
             $adjustment_fee = Mage::helper('invoicepdf')->__('Adjustment Fee');
-            $page->drawText($adjustment_fee, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
+            $page->drawText($adjustment_fee, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
 
             $adjustment_fee=$order->formatPriceTxt($source->getAdjustmentNegative());
             $page->drawText($adjustment_fee, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
@@ -405,7 +415,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
         $font = $this->_setFontBold($page, 12);
         $this->y -= 20;
-        $order_grandtotal = Mage::helper('invoicepdf')->__('Total amount');
+        $order_grandtotal = Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Total amount' : 'Total creditmemo') ;
         $page->drawText($order_grandtotal, $this->margin['right'] - 98 - $this->widthForStringUsingFontSize($order_grandtotal, $font, 12), $this->y, $this->encoding);
 
         $order_grandtotal = $order->formatPriceTxt($source->getGrandTotal());
@@ -454,5 +464,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $renderer->setRenderedModel($this);
 
         $renderer->draw($position);
+    }
+    
+    public function setMode($mode = 'invoice')
+    {
+    	$this->mode = $mode;
+    }
+
+    public function getMode()
+    {
+    	return $this->mode;
     }
 }
