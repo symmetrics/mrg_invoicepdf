@@ -141,7 +141,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     {
 		$page->setLineColor($this->colors['black']);
 		$page->setLineWidth(0.5);
-		$page->drawLine($this->margin['left'], $this->y - 5, $this->margin['right'], $this->y - 5);
+		$page->drawLine($this->margin['left'] - 20, $this->y - 5, $this->margin['right'] + 30, $this->y - 5);
 		
 		$this->Ln(15);
 		$this->insertFooterAddress($page);
@@ -152,7 +152,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'email' => Mage::helper('impressum')->__('E-Mail:'),
 			'web' => Mage::helper('impressum')->__('Web:')
 		);
-		$this->insertFooterBlock($page, $fields, 95, 30);
+		$this->insertFooterBlock($page, $fields, 70, 30);
 		
 		$fields = array(
 			'bankname' => Mage::helper('impressum')->__('Bank name:'),
@@ -160,7 +160,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'bankcodenumber' => Mage::helper('impressum')->__('Bank number:'),
 			'bankaccountowner' => Mage::helper('impressum')->__('Account owner:')
 		);
-		$this->insertFooterBlock($page, $fields, 238, 48);
+		$this->insertFooterBlock($page, $fields, 210, 48);
 		
 		$fields = array(
 			'taxnumber' => Mage::helper('impressum')->__('Tax number:'),
@@ -168,7 +168,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'hrb' => Mage::helper('impressum')->__('Register number:'),
 			'ceo' => Mage::helper('impressum')->__('CEO:')
 		);
-		$this->insertFooterBlock($page, $fields, 380, 55);
+		$this->insertFooterBlock($page, $fields, 350, 55);
     }    
     
     
@@ -267,7 +267,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 					continue;
 				}
 				$page->drawText($label , $this->margin['left'] + $colposition, $y, $this->encoding);
-				$page->drawText($this->impressum[$field] , $this->margin['left'] + $valposition, $y, $this->encoding);
+				$page->drawText( $this->impressum[$field], $this->margin['left'] + $valposition, $y, $this->encoding);
 				$y -= 12;
 			}
 		}
@@ -279,7 +279,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		$y = $this->y;
 		foreach (explode("\n", Mage::getStoreConfig('sales/identity/address', $store)) as $value){
 			if ($value!=='') {
-				$page->drawText(trim(strip_tags($value)), $this->margin['left'], $y, $this->encoding);
+				$page->drawText(trim(strip_tags($value)), $this->margin['left'] - 20, $y, $this->encoding);
 				$y -= 12;
 			}
 		}
