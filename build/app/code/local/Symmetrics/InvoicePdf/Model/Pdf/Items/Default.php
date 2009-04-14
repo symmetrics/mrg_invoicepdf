@@ -1,4 +1,13 @@
 <?php
+/**
+ * Symmetrics_InvoicePdf_Model_Pdf_Items_Default
+ *
+ * @category Symmetrics
+ * @package Symmetrics_InvoicePdf
+ * @author symmetrics gmbh <info@symmetrics.de>, Eugen Gitin <eg@symmetrics.de>
+ * @copyright symmetrics gmbh
+ * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Order_Pdf_Items_Invoice_Default
 {	
     public function draw($position = 1)
@@ -22,25 +31,20 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         }
 
         $options = $this->getItemOptions();
-        if(isset($options)) 
-        {
-            foreach ($options as $option) 
-            {
+
+        if (isset($options)) {
+            foreach ($options as $option) {
                 $this->_setFontItalic();
-                foreach(Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true) as $_option) 
-                {
+                foreach(Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true) as $_option) {
                     $page->drawText($_option, 35, $pdf->y - $shift[0], $pdf->encoding);
                     $shift[0] += 10;
                 }
 
                 $this->_setFontRegular();
-                if($option['value']) 
-                {
+                if ($option['value']) {
                     $values = explode(', ', strip_tags($option['value']));
-                    foreach ($values as $value) 
-                    {
-                        foreach (Mage::helper('core/string')->str_split($value, 60, true, true) as $_value) 
-                        {
+                    foreach ($values as $value) {
+                        foreach (Mage::helper('core/string')->str_split($value, 60, true, true) as $_value) {
                             $page->drawText($_value, 40, $pdf->y - $shift[0], $pdf->encoding);
                             $shift[0] += 10;
                         }
@@ -49,17 +53,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
             }
         }
 
-        foreach($this->_parseDescription() as $description)
-        {
+        foreach ($this->_parseDescription() as $description) {
             $page->drawText(strip_tags($description), 65, $pdf->y - $shift[1], $pdf->encoding);
             $shift[1] += 10;
         }
 
         /* sku */       
-        foreach (Mage::helper('core/string')->str_split($this->getSku($item), 10) as $key => $part) 
-        {
-			if ($key > 0) 
-			{
+        foreach (Mage::helper('core/string')->str_split($this->getSku($item), 10) as $key => $part) {
+			if ($key > 0) {
 				$shift[2] += 10;
             }
 			$page->drawText($part, $pdf->margin['left'] + 45, $pdf->y-$shift[2], $pdf->encoding);

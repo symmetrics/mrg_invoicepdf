@@ -1,7 +1,15 @@
 <?php
+/**
+ * Symmetrics_InvoicePdf_Model_Pdf_Invoice
+ *
+ * @category Symmetrics
+ * @package Symmetrics_InvoicePdf
+ * @author symmetrics gmbh <info@symmetrics.de>, Eugen Gitin <eg@symmetrics.de>
+ * @copyright symmetrics gmbh
+ * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf_Abstract
 {
-	
 	public $colors;
 	public $encoding;
 	public $margin;
@@ -9,7 +17,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 	public $pagecounter;
 	public $mode;
 	
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		
@@ -74,15 +82,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=20;
 
             $position = 0;
-            foreach ($invoice->getAllItems() as $item){
+            foreach ($invoice->getAllItems() as $item) {
                 if ($item->getOrderItem()->getParentItem()) {
                     continue;
                 }
                 $position++;
                 $this->_drawItem($item, $page, $order, $position);
 
-                if($this->y < 200)
-                {
+                if ($this->y < 200) {
                     $page = $pdf->newPage(Zend_Pdf_Page::SIZE_A4);
                     $pdf->pages[] = $page;
 					
@@ -96,14 +103,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 					$this->y = 800;
                     $this->_setFontRegular($page, 9);
                 }
-                
             }
 
             /* add totals */
             $this->insertTotals($page, $invoice);
             
             /* add note */
-            if($mode == 'invoice') {            
+            if ($mode == 'invoice') {            
             	$this->insertNote($page);
             }
         }
@@ -112,21 +118,22 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
         return $pdf;
     }
+
     protected function insertNote($page)
     {
 		$this->_setFontRegular($page, 10);
 
     	$maturity = Mage::helper('invoicepdf')->__('Invoice maturity: %s days', Mage::getStoreConfig('sales_pdf/invoice/maturity'));
-		if(!empty($maturity))
-		{
+
+		if (!empty($maturity)) {
 			$page->drawText($maturity, $this->margin['left'], $this->y + 50, $this->encoding);
 		}
 		
 		$this->Ln(15);
 		
 		$note = Mage::getStoreConfig('sales_pdf/invoice/note');
-		if(!empty($note))
-		{
+
+		if (!empty($note)) {
 			$page->drawText($note, $this->margin['left'], $this->y + 30, $this->encoding);
 		}
     }
@@ -170,7 +177,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		);
 		$this->insertFooterBlock($page, $fields, 350, 55);
     }    
-    
     
     protected function insertTableHeader(&$page)
     {
@@ -224,14 +230,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$this->Ln();
     	
     	$prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
-    	if(!empty($prefix))
-    	{
+
+    	if(!empty($prefix)) {
 			$customerid = $prefix.$order->getBillingAddress()->getCustomerId();	
     	}
-    	else
-    	{
+    	else {
     		$customerid = $order->getBillingAddress()->getCustomerId();	
     	}
+
     	$font = $this->_setFontRegular($page, 10);
     	$page->drawText($customerid, ($this->margin['right'] - 15 - $this->widthForStringUsingFontSize($customerid, $font, 9)), $this->y, $this->encoding);
     	$this->Ln();
@@ -244,8 +250,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		
 		$billing = $this->_formatAddress($order->getBillingAddress()->format('pdf'));
 		
-		foreach($billing as $line)
-		{
+		foreach ($billing as $line) {
 			$page->drawText(trim(strip_tags($line)), $this->margin['left'], $this->y, $this->encoding);
 			$this->Ln(12);
 		}
@@ -258,12 +263,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
 		$valposition = $colposition + $valadjust;
 		
-		if(is_array($fields))
-		{
-			foreach($fields as $field => $label)
-			{
-				if(empty($this->impressum[$field]))
-				{
+		if (is_array($fields)) {
+			foreach ($fields as $field => $label) {
+				if (empty($this->impressum[$field])) {
 					continue;
 				}
 				$page->drawText($label , $this->margin['left'] + $colposition, $y, $this->encoding);
@@ -277,7 +279,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     {    	
 		$this->_setFontRegular($page, 7);
 		$y = $this->y;
-		foreach (explode("\n", Mage::getStoreConfig('sales/identity/address', $store)) as $value){
+		foreach (explode("\n", Mage::getStoreConfig('sales/identity/address', $store)) as $value) {
 			if ($value!=='') {
 				$page->drawText(trim(strip_tags($value)), $this->margin['left'] - 20, $y, $this->encoding);
 				$y -= 12;
@@ -299,29 +301,23 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $width = $size[0];
             $height = $size[1];
             
-            if($width > $height) 
-            {
+            if ($width > $height) {
             	$ratio = $width / $height;
             }
-            elseif($height > $width) 
-            {
+            elseif ($height > $width) {
             	$ratio = $height / $width;
             }
-            else 
-            {
+            else {
             	$ratio = 1;
             }
             
-            if($height > $maxheight or $width > $maxwidth) 
-            {
-            	if($height > $maxheight)
-				{
+            if ($height > $maxheight or $width > $maxwidth) {
+            	if ($height > $maxheight) {
 					$height = $maxheight;
 					$width = round($maxheight * $ratio);
 				}
          		
-				if($width > $maxwidth)
-				{
+				if ($width > $maxwidth) {
 					$width = $maxheight;
 					$height = round($maxwidth * $ratio);
 				}
@@ -354,8 +350,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $page->drawText($order_subtotal, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
         $this->y -=15;
 
-        if ((float)$source->getDiscountAmount()) 
-        {
+        if ((float)$source->getDiscountAmount()) {
             $discount = Mage::helper('invoicepdf')->__('Discount');
             $page->drawText($discount, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($discount, $font, 9), $this->y, $this->encoding);
 
@@ -368,10 +363,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
         $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($source->getOrder())->toArray();
 
-        foreach($tax['items'] as $taxitem)
-        {
-        	if($taxitem['hidden'])
-        	{
+        foreach ($tax['items'] as $taxitem) {
+        	if ($taxitem['hidden']) {
         		continue;
         	}
 
@@ -383,8 +376,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
 
-        if ((float)$source->getShippingAmount())
-        {
+        if ((float)$source->getShippingAmount()) {
             $order_shipping = Mage::helper('invoicepdf')->__('Payment and shipping');
             $page->drawText($order_shipping, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($order_shipping, $font, 9), $this->y, $this->encoding);
 
@@ -393,8 +385,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
 
-        if ($source->getAdjustmentPositive())
-        {
+        if ($source->getAdjustmentPositive()) {
             $adjustment_refund = Mage::helper('invoicepdf')->__('Adjustment Refund');
             $page->drawText($adjustment_refund, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
 
@@ -403,8 +394,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
 
-        if ((float) $source->getAdjustmentNegative())
-        {
+        if ((float) $source->getAdjustmentNegative()) {
             $adjustment_fee = Mage::helper('invoicepdf')->__('Adjustment Fee');
             $page->drawText($adjustment_fee, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
 
@@ -428,7 +418,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	return 842 - $y;
     }
     
-    protected function Ln($height=15) {
+    protected function Ln($height=15)
+	{
     	$this->y -= $height;
     }
     
