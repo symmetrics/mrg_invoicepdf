@@ -29,7 +29,20 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		$this->margin['left'] = 45;
 		$this->margin['right'] = 540;
 		
-		$this->impressum = Mage::getModel('Symmetrics_Impressum_Block_Impressum')->getImpressumData();
+		$impressum = Mage::getConfig()->getNode('modules/Symmetrics_Impressum');
+
+		if(is_object($impressum))
+		{
+
+			if($impressum->active == 'true')
+			{
+                $this->impressum = Mage::getModel('Symmetrics_Impressum_Block_Impressum')->getImpressumData();
+			}
+		}
+		else
+		{
+			$this->impressum = false;
+		}
 		
 		$this->setMode('invoice');
 	}
@@ -59,16 +72,18 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			
 			/* add billing address */
 			$this->y = $this->cY(150);
-            #$this->insertAddress($page, $order);
             $this->insertBillingAddress($page, $order);
 
             /* add header */
 			$this->y = $this->cY(250);
 			$this->insertHeader($page, $order);
 
-            /* add footer */
-			$this->y = 110;
-			$this->insertFooter($page, $invoice);
+            /* add footer if the impressum module is installed */
+			if($this->impressum)
+			{
+                $this->y = 110;
+                $this->insertFooter($page, $invoice);
+			}
 			
 			/* add page counter */
 			$this->y = 110;
@@ -207,13 +222,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     
     protected function insertHeader(&$page, $order)
     {
+
     	$page->setFillColor($this->colors['black']);
     	
     	$mode = $this->getMode();
     	
     	$this->_setFontBold($page, 15);
+
     	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice' : 'Creditmemo' ), $this->margin['left'], $this->y, $this->encoding);
-    	
+
     	$this->_setFontRegular($page);    	
     	
     	$this->y += 34;
@@ -242,6 +259,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$page->drawText($customerid, ($this->margin['right'] - 15 - $this->widthForStringUsingFontSize($customerid, $font, 9)), $this->y, $this->encoding);
     	$this->Ln();
     	$page->drawText(Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+
     }
     
     protected function insertBillingAddress(&$page, $order)
