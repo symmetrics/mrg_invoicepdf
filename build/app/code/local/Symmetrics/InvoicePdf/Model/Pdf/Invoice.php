@@ -357,17 +357,30 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     protected function insertTotals(&$page, $source)
     {
         $order = $source->getOrder();
-        $font = $this->_setFontBold($page);
-        
+
         $mode = $this->getMode();
 
+        $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($source->getOrder())->toArray();
+
+        $total_tax = 0;
+        $shippingTaxAmount = $source->getShippingTaxAmount();
+        
+        foreach ($tax['items'] as $taxitem) {
+            if ($taxitem['hidden']) {
+                continue;
+            }
+            $total_tax += $taxitem['amount'];
+        }
+        
+        $font = $this->_setFontBold($page);
         $order_subtotal = Mage::helper('invoicepdf')->__('Total');
         $page->drawText($order_subtotal, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
 
-        $order_subtotal = $order->formatPriceTxt($source->getSubtotal());
+        $order_subtotal = $order->formatPriceTxt($source->getSubtotal() + $total_tax - $shippingTaxAmount);
         $page->drawText($order_subtotal, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
         $this->y -=15;
 
+        $font = $this->_setFontRegular($page);
         if ((float)$source->getDiscountAmount()) {
             $discount = Mage::helper('invoicepdf')->__('Discount');
             $page->drawText($discount, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($discount, $font, 9), $this->y, $this->encoding);
@@ -377,29 +390,26 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
 
-        $font = $this->_setFontRegular($page);
-
-        $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($source->getOrder())->toArray();
-
-        foreach ($tax['items'] as $taxitem) {
-        	if ($taxitem['hidden']) {
-        		continue;
-        	}
-
-            $taxratelabel = Mage::helper('invoicepdf')->__('Tax %s', $source->getStore()->roundPrice($taxitem['percent']).'%');
-            $page->drawText($taxratelabel, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($taxratelabel, $font, 9), $this->y, $this->encoding);
-            
-            $taxrate = $order->formatPriceTxt($taxitem['amount']);
-            $page->drawText($taxrate, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($taxrate, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-
         if ((float)$source->getShippingAmount()) {
             $order_shipping = Mage::helper('invoicepdf')->__('Payment and shipping');
             $page->drawText($order_shipping, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($order_shipping, $font, 9), $this->y, $this->encoding);
 
-            $order_shipping = $order->formatPriceTxt($source->getShippingAmount());
+            $order_shipping = $order->formatPriceTxt($source->getShippingAmount() + $shippingTaxAmount);
             $page->drawText($order_shipping, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_shipping, $font, 9), $this->y, $this->encoding);
+            $this->y -=15;
+        }
+        
+        foreach ($tax['items'] as $taxitem) {
+            
+            if ($taxitem['hidden']) {
+                continue;
+            }
+
+            $taxratelabel = Mage::helper('invoicepdf')->__('Incl. Tax %s', $source->getStore()->roundPrice($taxitem['percent']).'%');
+            $page->drawText($taxratelabel, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($taxratelabel, $font, 9), $this->y, $this->encoding);
+            
+            $taxrate = $order->formatPriceTxt($taxitem['amount']);
+            $page->drawText($taxrate, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($taxrate, $font, 9), $this->y, $this->encoding);
             $this->y -=15;
         }
 

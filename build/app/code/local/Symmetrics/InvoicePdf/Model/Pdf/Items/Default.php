@@ -18,10 +18,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         $page = $this->getPage();
         $shift = array(0, 10, 0);
 
-        $this->_setFontRegular();
+        $font = $this->_setFontRegular();
 
         /* position number */
-		$font = $this->_setFontBold();
         $page->drawText($position, $pdf->margin['left'] + 20 - $pdf->widthForStringUsingFontSize($position, $font, 9), $pdf->y, $pdf->encoding);
 
         /* article name, split after 35 chars */
@@ -34,21 +33,19 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
 
         if (isset($options)) {
             foreach ($options as $option) {
-                $this->_setFontItalic();
                 foreach(Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true) as $_option) {
-                    $page->drawText($_option, 35, $pdf->y - $shift[0], $pdf->encoding);
+                	$page->drawText($_option, $pdf->margin['left'] + 110, $pdf->y - $shift[0], $pdf->encoding);
                     $shift[0] += 10;
                 }
 
-                $this->_setFontRegular();
                 if ($option['value']) {
-                	
+
                     $_printValue = isset($option['print_value']) ? $option['print_value'] : strip_tags($option['value']);
                     $values = explode(', ', $_printValue);
 
                     foreach ($values as $value) {
                         foreach (Mage::helper('core/string')->str_split($value, 60, true, true) as $_value) {
-                            $page->drawText($_value, 40, $pdf->y - $shift[0], $pdf->encoding);
+                            $page->drawText($_value, $pdf->margin['left'] + 120, $pdf->y - $shift[0], $pdf->encoding);
                             $shift[0] += 10;
                         }
                     }
@@ -76,14 +73,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         /* quantity */
         $quantity = $item->getQty() * 1;
         $page->drawText($quantity, $pdf->margin['right'] - 110 - $pdf->widthForStringUsingFontSize($quantity, $font, 9), $pdf->y, $pdf->encoding);
-
-        /* row total */
-        $row_total = $order->formatPriceTxt($item->getRowTotal());
-        $page->drawText($row_total, $pdf->margin['right'] - 10 - $pdf->widthForStringUsingFontSize($row_total, $font, 9), $pdf->y, $pdf->encoding);
         
         /* tax amount */
         $tax = $order->formatPriceTxt($item->getTaxAmount());
-        $page->drawText($tax, $pdf->margin['right'] - 65 - $pdf->widthForStringUsingFontSize($tax, $font, 9), $pdf->y, 'UTF-8');
+        $page->drawText($tax, $pdf->margin['right'] - 65 - $pdf->widthForStringUsingFontSize($tax, $font, 9), $pdf->y, $pdf->encoding);
+        
+        /* row total */
+        $row_total = $order->formatPriceTxt($item->getRowTotal() + $item->getTaxAmount());
+        $page->drawText($row_total, $pdf->margin['right'] - 10 - $pdf->widthForStringUsingFontSize($row_total, $font, 9), $pdf->y, $pdf->encoding);
         
         $pdf->y -= max($shift) + 10;
     }
@@ -102,7 +99,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         return $font;
     }
 
-    protected function _setFontItalic($size = 10)
+    protected function __setFontItalic($size = 10)
     {
         $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_ITALIC);
         $this->setFont($font, $size);
