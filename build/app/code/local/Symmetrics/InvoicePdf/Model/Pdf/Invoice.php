@@ -31,16 +31,12 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		
 		$impressum = Mage::getConfig()->getNode('modules/Symmetrics_Impressum');
 
-		if(is_object($impressum))
-		{
-
-			if($impressum->active == 'true')
-			{
+		if (is_object($impressum)) {
+			if ($impressum->active == 'true') {
                 $this->impressum = Mage::getModel('Symmetrics_Impressum_Block_Impressum')->getImpressumData();
 			}
 		}
-		else
-		{
+		else {
 			$this->impressum = false;
 		}
 		
@@ -61,7 +57,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $this->pagecounter = 1;
 
         foreach ($invoices as $invoice) {
-
         	$page = $pdf->newPage(Zend_Pdf_Page::SIZE_A4);
             $pdf->pages[] = $page;
 
@@ -79,8 +74,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			$this->insertHeader($page, $order);
 
             /* add footer if the impressum module is installed */
-			if($this->impressum)
-			{
+			if ($this->impressum) {
                 $this->y = 110;
                 $this->insertFooter($page, $invoice);
 			}
@@ -222,7 +216,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     
     protected function insertHeader(&$page, $order)
     {
-
     	$page->setFillColor($this->colors['black']);
     	
     	$mode = $this->getMode();
@@ -248,7 +241,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	
     	$prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
 
-    	if(!empty($prefix)) {
+    	if (!empty($prefix)) {
 			$customerid = $prefix.$order->getBillingAddress()->getCustomerId();	
     	}
     	else {
@@ -400,7 +393,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         }
         
         foreach ($tax['items'] as $taxitem) {
-            
             if ($taxitem['hidden']) {
                 continue;
             }

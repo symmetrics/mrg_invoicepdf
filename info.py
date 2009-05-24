@@ -53,9 +53,11 @@ EXCLUDES = {
 }
 
 DEPENDS_ON_FILES = (
-    'app/code/core/Mage/Core/Helper/Abstract.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Invoice/Default.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Abstract.php',
+    'app/code/core/Mage/Sales/Model/Order/Pdf/Invoice.php',
+    'app/code/core/Mage/Sales/Model/Order/Pdf/Creditmemo.php',
+    'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Invoice/Default.php',
+    'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Creditmemo/Default.php',
 )
 
 PEAR_KEY = ''
