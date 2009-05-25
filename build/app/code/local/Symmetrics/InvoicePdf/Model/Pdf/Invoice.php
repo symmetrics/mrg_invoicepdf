@@ -357,19 +357,36 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
         $total_tax = 0;
         $shippingTaxAmount = $source->getShippingTaxAmount();
+        $groupedTax = array();
         
-        foreach ($tax['items'] as $taxitem) {
-            if ($taxitem['hidden']) {
+        foreach ($source->getAllItems() as $item) {
+            if ($item->getOrderItem()->getParentItem()) {
                 continue;
             }
-            $total_tax += $taxitem['amount'];
+            $items['items'][] = $item->getOrderItem()->toArray();
+        }
+
+        foreach ($items['items'] as $item)
+        {
+            $total_tax += $item['tax_amount'];
+
+            if(!array_key_exists($item['tax_percent'], $groupedTax))
+            {
+                $groupedTax[$item['tax_percent']] = $item['tax_amount'];
+            }
+            else
+            {
+                $groupedTax[$item['tax_percent']] += $item['tax_amount'];
+            }
         }
         
+        $groupedTax['19.0000'] += $shippingTaxAmount;
+
         $font = $this->_setFontBold($page);
         $order_subtotal = Mage::helper('invoicepdf')->__('Total');
         $page->drawText($order_subtotal, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
 
-        $order_subtotal = $order->formatPriceTxt($source->getSubtotal() + $total_tax - $shippingTaxAmount);
+        $order_subtotal = $order->formatPriceTxt($source->getSubtotal() + $total_tax);
         $page->drawText($order_subtotal, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
         $this->y -=15;
 
@@ -392,15 +409,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
         
-        foreach ($tax['items'] as $taxitem) {
-            if ($taxitem['hidden']) {
-                continue;
-            }
+        foreach ($groupedTax as $taxRate => $taxValue)
+        {
+        	if(empty($taxValue))
+        	{
+        		continue;
+        	}
 
-            $taxratelabel = Mage::helper('invoicepdf')->__('Incl. Tax %s', $source->getStore()->roundPrice($taxitem['percent']).'%');
+            $taxratelabel = Mage::helper('invoicepdf')->__('Incl. Tax %s', $source->getStore()->roundPrice(number_format($taxRate, 0)).'%');
             $page->drawText($taxratelabel, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($taxratelabel, $font, 9), $this->y, $this->encoding);
-            
-            $taxrate = $order->formatPriceTxt($taxitem['amount']);
+
+            $taxrate = $order->formatPriceTxt($taxValue);
             $page->drawText($taxrate, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($taxrate, $font, 9), $this->y, $this->encoding);
             $this->y -=15;
         }
