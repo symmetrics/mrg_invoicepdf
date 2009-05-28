@@ -304,7 +304,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$maxheight = 50;
     	
         $image = Mage::getStoreConfig('sales/identity/logo', $store);
-        if ($image) {
+        if ($image and file_exists(Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image)) 
+        {
             $image = Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image;
             
             $size = getimagesize($image);
