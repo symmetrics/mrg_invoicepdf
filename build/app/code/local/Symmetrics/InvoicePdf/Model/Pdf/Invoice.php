@@ -381,7 +381,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             }
         }
         
-        $groupedTax['19.0000'] += $shippingTaxAmount;
+        if($shippingTaxAmount)
+        {
+	        if(array_key_exists('19.0000', $groupedTax))
+	        {
+	            $groupedTax['19.0000'] += $shippingTaxAmount;        	
+	        }
+	        else
+	        {
+	        	$groupedTax['19.0000'] = $shippingTaxAmount;
+	        }
+        }
 
         $font = $this->_setFontBold($page);
         $order_subtotal = Mage::helper('invoicepdf')->__('Total');
