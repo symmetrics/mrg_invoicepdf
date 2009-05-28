@@ -45,8 +45,7 @@ NOTES = '''
 # =============================================================================
 REQUIRES = {
     'magento': '*',
-    'symmetrics_config_german': '*',
-    'symmetrics_module_impressum': '*',
+    'symmetrics_config_german': '*'
 }
 
 EXCLUDES = {
