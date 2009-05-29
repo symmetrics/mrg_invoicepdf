@@ -60,5 +60,26 @@
 				<class>Symmetrics_InvoicePdf_Helper</class>
 			</invoicepdf>
 		</helpers>
+        <resources>
+            <invoicepdf_setup>
+                <setup>
+                    <module>Symmetrics_InvoicePdf</module>
+                    <class>Mage_Eav_Model_Entity_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </invoicepdf_setup>
+            <invoicepdf_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </invoicepdf_write>
+            <invoicepdf_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </invoicepdf_read>
+        </resources>
 	</global>
 </config>

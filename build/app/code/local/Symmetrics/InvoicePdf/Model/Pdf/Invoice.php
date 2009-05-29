@@ -351,6 +351,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     protected function insertTotals(&$page, $source)
     {
         $order = $source->getOrder();
+        
+        //==================================
+        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
+        //==================================
 
         $mode = $this->getMode();
 
