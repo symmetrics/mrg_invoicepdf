@@ -352,10 +352,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     {
         $order = $source->getOrder();
         
-        //==================================
-        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
-        //==================================
-
         $mode = $this->getMode();
 
         $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($source->getOrder())->toArray();
@@ -424,6 +420,18 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
         
+        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
+        if ($add_totals) {
+            foreach ( $add_totals as $add_total) {
+                $total_title = $add_total['title'];
+                $page->drawText($total_title, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($total_title, $font, 9), $this->y, $this->encoding);
+    
+                $total_amount=$order->formatPriceTxt($add_total['amount']);
+                $page->drawText($total_amount, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($total_amount, $font, 9), $this->y, $this->encoding);
+                $this->y -=15;
+            }
+        }
+
         foreach ($groupedTax as $taxRate => $taxValue)
         {
         	if(empty($taxValue))
