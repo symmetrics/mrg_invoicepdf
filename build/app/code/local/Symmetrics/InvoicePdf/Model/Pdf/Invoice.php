@@ -367,30 +367,39 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $items['items'][] = $item->getOrderItem()->toArray();
         }
 
-        foreach ($items['items'] as $item)
-        {
-            $total_tax += $item['tax_amount'];
-
-            if(!array_key_exists($item['tax_percent'], $groupedTax))
-            {
-                $groupedTax[$item['tax_percent']] = $item['tax_amount'];
-            }
-            else
-            {
-                $groupedTax[$item['tax_percent']] += $item['tax_amount'];
+        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
+        if ($add_totals) {
+            foreach ( $add_totals as $add_total ) {
+                array_push($items['items'], array(
+                    'tax_inc_subtotal' => false,
+                    'tax_percent' => number_format($add_total['tax']['percent'], 4, '.', ''),
+                    'tax_amount' => $add_total['tax']['amount']
+                ));
             }
         }
+
+        array_push($items['items'], array(
+            'tax_inc_subtotal' => false,
+            'tax_percent' => '19.0000',
+            'tax_amount' => $shippingTaxAmount
+        ));
         
-        if($shippingTaxAmount)
+        foreach ($items['items'] as $item)
         {
-	        if(array_key_exists('19.0000', $groupedTax))
-	        {
-	            $groupedTax['19.0000'] += $shippingTaxAmount;        	
-	        }
-	        else
-	        {
-	        	$groupedTax['19.0000'] = $shippingTaxAmount;
-	        }
+            if (!array_key_exists('tax_inc_subtotal', $item) || $item['tax_inc_subtotal']) {
+                $total_tax += $item['tax_amount'];
+            }
+
+            if ($item['tax_amount']) {
+                if(!array_key_exists($item['tax_percent'], $groupedTax))
+                {
+                    $groupedTax[$item['tax_percent']] = $item['tax_amount'];
+                }
+                else
+                {
+                    $groupedTax[$item['tax_percent']] += $item['tax_amount'];
+                }
+            }
         }
 
         $font = $this->_setFontBold($page);
@@ -420,7 +429,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $this->y -=15;
         }
         
-        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
         if ($add_totals) {
             foreach ( $add_totals as $add_total) {
                 $total_title = $add_total['title'];
