@@ -4,6 +4,9 @@
 		<Symmetrics_InvoicePdf>
 			<active>true</active>
 			<codePool>local</codePool>
+            <depends>
+                <Symmetrics_TrustedShops/>
+            </depends>
 		</Symmetrics_InvoicePdf>     
 	</modules>
 </config>
