@@ -348,7 +348,141 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         }
     }
     
-    protected function insertTotals(&$page, $source)
+    protected function insertTotals($page, $source)
+    {
+
+    	$this->y -=15;
+    	
+    	$order = $source->getOrder();
+
+        $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($order)->toArray();
+
+        $total_tax = 0;
+        $shippingTaxAmount = $source->getShippingTaxAmount();
+        $groupedTax = array();
+        
+        foreach ($source->getAllItems() as $item) {
+            if ($item->getOrderItem()->getParentItem()) {
+                continue;
+            }
+            $items['items'][] = $item->getOrderItem()->toArray();
+        }
+
+        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
+        if ($add_totals) {
+            foreach ( $add_totals as $add_total ) {
+                array_push($items['items'], array(
+                    'tax_inc_subtotal' => false,
+                    'tax_percent' => number_format($add_total['tax']['percent'], 4, '.', ''),
+                    'tax_amount' => $add_total['tax']['amount']
+                ));
+            }
+        }
+
+        array_push($items['items'], array(
+            'tax_inc_subtotal' => false,
+            'tax_percent' => '19.0000',
+            'tax_amount' => $shippingTaxAmount
+        ));
+        
+        foreach ($items['items'] as $item)
+        {
+            if (!array_key_exists('tax_inc_subtotal', $item) || $item['tax_inc_subtotal']) {
+                $total_tax += $item['tax_amount'];
+            }
+
+            if ($item['tax_amount']) {
+                if(!array_key_exists($item['tax_percent'], $groupedTax))
+                {
+                    $groupedTax[$item['tax_percent']] = $item['tax_amount'];
+                }
+                else
+                {
+                    $groupedTax[$item['tax_percent']] += $item['tax_amount'];
+                }
+            }
+        }
+
+        $totals = $this->_getTotalsList($source);
+
+        $lineBlock = array(
+            'lines'  => array(),
+            'height' => 20
+        );
+        foreach ($totals as $total) 
+        {
+
+            $fontSize = (isset($total['font_size']) ? $total['font_size'] : 7);
+            $fontWeight = (isset($total['font_weight']) ? $total['font_weight'] : 'regular');
+        	
+        	switch($total['source_field'])
+        	{
+        		case 'tax_amount':
+        	        foreach ($groupedTax as $taxRate => $taxValue)
+                    {
+                        if(empty($taxValue))
+                        {
+                            continue;
+                        }
+                        
+                        $lineBlock['lines'][] = array(
+                            array(
+                                'text'      => Mage::helper('invoicepdf')->__('Additional tax %s', $source->getStore()->roundPrice(number_format($taxRate, 0)).'%'),
+                                'feed'      => $this->margin['right'] - 100,
+                                'align'     => 'right',
+                                'font_size' => $fontSize,
+                                'font'      => $fontWeight
+                            ),
+                            array(
+                                'text'      => $order->formatPriceTxt($taxValue),
+                                'feed'      => $this->margin['right'] - 10,
+                                'align'     => 'right',
+                                'font_size' => $fontSize,
+                                'font'      => $fontWeight
+                            ),
+                        );
+                    }
+                break;
+        		default:
+                    $amount = $source->getDataUsingMethod($total['source_field']);
+                    $displayZero = (isset($total['display_zero']) ? $total['display_zero'] : 0);
+
+                    if ($amount != 0 || $displayZero) 
+                    {
+                        $amount = $order->formatPriceTxt($amount);
+
+                        if (isset($total['amount_prefix']) && $total['amount_prefix']) 
+                        {
+                            $amount = "{$total['amount_prefix']}{$amount}";
+                        }
+
+                        $label = Mage::helper('sales')->__($total['title']) . ':';
+
+                        $lineBlock['lines'][] = array(
+                            array(
+                                'text'      => $label,
+                                'feed'      => $this->margin['right'] - 100,
+                                'align'     => 'right',
+                                'font_size' => $fontSize,
+                                'font'      => $fontWeight
+                            ),
+                            array(
+                                'text'      => $amount,
+                                'feed'      => $this->margin['right'] - 10,
+                                'align'     => 'right',
+                                'font_size' => $fontSize,
+                                'font'      => $fontWeight
+                            ),
+                        );
+                    }
+        	}
+        }
+        
+        $page = $this->drawLineBlocks($page, array($lineBlock));
+        return $page;
+    }
+
+    protected function _insertTotals(&$page, $source)
     {
         $order = $source->getOrder();
         
