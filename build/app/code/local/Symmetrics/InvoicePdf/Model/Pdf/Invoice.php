@@ -66,11 +66,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			$this->insertLogo($page, $invoice->getStore());
 			
 			/* add billing address */
-			$this->y = $this->cY(150);
+			$this->y = 692;
             $this->insertBillingAddress($page, $order);
 
             /* add header */
-			$this->y = $this->cY(250);
+			$this->y = 592;
 			$this->insertHeader($page, $order);
 
             /* add footer if the impressum module is installed */
@@ -85,7 +85,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			
             /* add table header */
 			$this->_setFontRegular($page, 9);
-			$this->y = $this->cY(280);
+			$this->y = 562;
 			$this->insertTableHeader($page);
 
             $this->y -=20;
@@ -228,6 +228,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	
     	$this->y += 34;
     	$rightoffset = 180;
+    	
     	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice number:' : 'Creditmemo number:' ), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
     	$page->drawText(Mage::helper('invoicepdf')->__('Customer number:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
@@ -247,11 +248,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	else {
     		$customerid = $order->getBillingAddress()->getCustomerId();	
     	}
+    	
+    	$rightoffset = 10;
 
     	$font = $this->_setFontRegular($page, 10);
-    	$page->drawText($customerid, ($this->margin['right'] - 15 - $this->widthForStringUsingFontSize($customerid, $font, 9)), $this->y, $this->encoding);
+    	$page->drawText($customerid, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($customerid, $font, 10)), $this->y, $this->encoding);
     	$this->Ln();
-    	$page->drawText(Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+    	
+    	$invoiceDate = Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false);
+    	$page->drawText($invoiceDate, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($invoiceDate, $font, 10)), $this->y, $this->encoding);
 
     }
     
@@ -339,7 +344,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
                 $image = Zend_Pdf_Image::imageWithPath($image);
                 
                 $position['x1'] = $this->margin['left'];
-                $position['y1'] = $this->cY(80);
+                $position['y1'] = 762;
                 $position['x2'] = $position['x1'] + $width;
                 $position['y2'] = $position['y1'] + $height;
                
@@ -480,146 +485,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         
         $page = $this->drawLineBlocks($page, array($lineBlock));
         return $page;
-    }
-
-    protected function _insertTotals(&$page, $source)
-    {
-        $order = $source->getOrder();
-        
-        $mode = $this->getMode();
-
-        $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($source->getOrder())->toArray();
-
-        $total_tax = 0;
-        $shippingTaxAmount = $source->getShippingTaxAmount();
-        $groupedTax = array();
-        
-        foreach ($source->getAllItems() as $item) {
-            if ($item->getOrderItem()->getParentItem()) {
-                continue;
-            }
-            $items['items'][] = $item->getOrderItem()->toArray();
-        }
-
-        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
-        if ($add_totals) {
-            foreach ( $add_totals as $add_total ) {
-                array_push($items['items'], array(
-                    'tax_inc_subtotal' => false,
-                    'tax_percent' => number_format($add_total['tax']['percent'], 4, '.', ''),
-                    'tax_amount' => $add_total['tax']['amount']
-                ));
-            }
-        }
-
-        array_push($items['items'], array(
-            'tax_inc_subtotal' => false,
-            'tax_percent' => '19.0000',
-            'tax_amount' => $shippingTaxAmount
-        ));
-        
-        foreach ($items['items'] as $item)
-        {
-            if (!array_key_exists('tax_inc_subtotal', $item) || $item['tax_inc_subtotal']) {
-                $total_tax += $item['tax_amount'];
-            }
-
-            if ($item['tax_amount']) {
-                if(!array_key_exists($item['tax_percent'], $groupedTax))
-                {
-                    $groupedTax[$item['tax_percent']] = $item['tax_amount'];
-                }
-                else
-                {
-                    $groupedTax[$item['tax_percent']] += $item['tax_amount'];
-                }
-            }
-        }
-
-        $font = $this->_setFontBold($page);
-        $order_subtotal = Mage::helper('invoicepdf')->__('Total');
-        $page->drawText($order_subtotal, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
-
-        $order_subtotal = $order->formatPriceTxt($source->getSubtotal() + $total_tax);
-        $page->drawText($order_subtotal, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_subtotal, $font, 9), $this->y, $this->encoding);
-        $this->y -=15;
-
-        $font = $this->_setFontRegular($page);
-        if ((float)$source->getDiscountAmount()) {
-            $discount = Mage::helper('invoicepdf')->__('Discount');
-            $page->drawText($discount, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($discount, $font, 9), $this->y, $this->encoding);
-
-            $discount = $order->formatPriceTxt(0.00 - $source->getDiscountAmount());
-            $page->drawText($discount, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($discount, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-
-        if ((float)$source->getShippingAmount()) {
-            $order_shipping = Mage::helper('invoicepdf')->__('Payment and shipping');
-            $page->drawText($order_shipping, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($order_shipping, $font, 9), $this->y, $this->encoding);
-
-            $order_shipping = $order->formatPriceTxt($source->getShippingAmount() + $shippingTaxAmount);
-            $page->drawText($order_shipping, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($order_shipping, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-        
-        if ($add_totals) {
-            foreach ( $add_totals as $add_total) {
-                $total_title = $add_total['title'];
-                $page->drawText($total_title, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($total_title, $font, 9), $this->y, $this->encoding);
-    
-                $total_amount=$order->formatPriceTxt($add_total['amount']);
-                $page->drawText($total_amount, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($total_amount, $font, 9), $this->y, $this->encoding);
-                $this->y -=15;
-            }
-        }
-
-        foreach ($groupedTax as $taxRate => $taxValue)
-        {
-        	if(empty($taxValue))
-        	{
-        		continue;
-        	}
-
-            $taxratelabel = Mage::helper('invoicepdf')->__('Incl. Tax %s', $source->getStore()->roundPrice(number_format($taxRate, 0)).'%');
-            $page->drawText($taxratelabel, $this->margin['right'] - 100 - $this->widthForStringUsingFontSize($taxratelabel, $font, 9), $this->y, $this->encoding);
-
-            $taxrate = $order->formatPriceTxt($taxValue);
-            $page->drawText($taxrate, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($taxrate, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-
-        if ($source->getAdjustmentPositive()) {
-            $adjustment_refund = Mage::helper('invoicepdf')->__('Adjustment Refund');
-            $page->drawText($adjustment_refund, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
-
-            $adjustment_refund = $order->formatPriceTxt($source->getAdjustmentPositive());
-            $page->drawText($adjustment_refund, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($adjustment_refund, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-
-        if ((float) $source->getAdjustmentNegative()) {
-            $adjustment_fee = Mage::helper('invoicepdf')->__('Adjustment Fee');
-            $page->drawText($adjustment_fee, $this->margin['right'] - 107 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
-
-            $adjustment_fee=$order->formatPriceTxt($source->getAdjustmentNegative());
-            $page->drawText($adjustment_fee, $this->margin['right'] - 13 - $this->widthForStringUsingFontSize($adjustment_fee, $font, 9), $this->y, $this->encoding);
-            $this->y -=15;
-        }
-
-        $font = $this->_setFontBold($page, 12);
-        $this->y -= 20;
-        $order_grandtotal = Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Total amount' : 'Total creditmemo') ;
-        $page->drawText($order_grandtotal, $this->margin['right'] - 98 - $this->widthForStringUsingFontSize($order_grandtotal, $font, 12), $this->y, $this->encoding);
-
-        $order_grandtotal = $order->formatPriceTxt($source->getGrandTotal());
-        $page->drawText($order_grandtotal, $this->margin['right'] - 9 - $this->widthForStringUsingFontSize($order_grandtotal, $font, 12), $this->y, $this->encoding);
-        $this->y -=15;
-    }
-
-    public function cY($y)
-    {
-    	return 842 - $y;
     }
     
     protected function Ln($height=15)
