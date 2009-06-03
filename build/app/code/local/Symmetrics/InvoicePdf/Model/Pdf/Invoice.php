@@ -373,7 +373,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $items['items'][] = $item->getOrderItem()->toArray();
         }
 
-        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId())->getInvoicepdfAddTotals());
+        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()
+                                      ->getItemById($order->getQuoteId())
+                                      ->getInvoicepdfAddTotals());
         if ($add_totals) {
             foreach ( $add_totals as $add_total ) {
                 array_push($items['items'], array(
@@ -416,10 +418,12 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         );
         foreach ($totals as $total) 
         {
-
             $fontSize = (isset($total['font_size']) ? $total['font_size'] : 7);
+            if ($fontSize < 9) {
+                $fontSize = 9;
+            }
             $fontWeight = (isset($total['font_weight']) ? $total['font_weight'] : 'regular');
-        	
+
         	switch($total['source_field'])
         	{
         		case 'tax_amount':
