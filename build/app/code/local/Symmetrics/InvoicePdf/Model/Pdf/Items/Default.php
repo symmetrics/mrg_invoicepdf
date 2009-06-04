@@ -37,7 +37,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         
         // draw Product name
         $lines[0][]= array(
-            'text' => Mage::helper('core/string')->str_split($item->getName(), 60, true, true),
+            'text' => Mage::helper('core/string')->str_split($item->getName(), 40, true, true),
             'feed' => $pdf->margin['left'] + 110,
             'font_size' => $fontSize
         );
