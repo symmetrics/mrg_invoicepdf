@@ -5,7 +5,7 @@
 # =============================================================================
 NAME = 'symmetrics_module_invoicepdf'
 
-TAGS = ('magento', 'module', 'symmetrics', 'germanconfig')
+TAGS = ('magento', 'module', 'symmetrics', 'germanconfig', 'locpack')
 
 LICENSE = 'AFL 3.0'
 
