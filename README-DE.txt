@@ -2,17 +2,13 @@
 Installation
 ----------------------------------------------------
 
-1. Ordner Symmetrics/InvoicePdf nach 
-app/code/local oder app/code/community kopieren.
+1. Ordner app/ in den Projekt-Root kopieren.
 
-2. Datei app/etc/modules/Symmetrics_InvoicePdf.xml
-nach app/etc/modules kopieren
+2. Cache loeschen
 
-3. Cache loeschen
+3. Backend aufrufen
 
-4. Backend aufrufen
-
-5. Fertig!
+4. Fertig!
 
 ----------------------------------------------------
 Beschreibung
