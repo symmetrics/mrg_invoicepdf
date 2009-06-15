@@ -57,8 +57,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
                 // draw options label
                 $lines[][] = array(
                     'text' => Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true),
-                    'font' => 'regular',
-                    'feed' => $pdf->margin['left']
+                    'font' => 'bold',
+                    'feed' => $pdf->margin['left'] + 110
                 );
 
                 // draw options value
