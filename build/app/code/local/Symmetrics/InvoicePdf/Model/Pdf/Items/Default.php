@@ -50,10 +50,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
             'font_size' => $fontSize
         );
 
-        if ($options = $this->getItemOptions()) 
-        {
-            foreach ($options as $option) 
-            {
+        if ($options = $this->getItemOptions()) {
+            foreach ($options as $option) {
                 // draw options label
                 $lines[][] = array(
                     'text' => Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true),

@@ -309,8 +309,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$maxheight = 50;
     	
         $image = Mage::getStoreConfig('sales/identity/logo', $store);
-        if ($image and file_exists(Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image)) 
-        {
+        if ($image and file_exists(Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image)) {
             $image = Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image;
             
             $size = getimagesize($image);
@@ -355,7 +354,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     
     protected function insertTotals($page, $source)
     {
-
     	$this->y -=15;
     	
     	$order = $source->getOrder();
@@ -416,6 +414,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             'lines'  => array(),
             'height' => 20
         );
+
         foreach ($totals as $total) 
         {
             $fontSize = (isset($total['font_size']) ? $total['font_size'] : 7);
@@ -424,13 +423,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             }
             $fontWeight = (isset($total['font_weight']) ? $total['font_weight'] : 'regular');
 
-        	switch($total['source_field'])
-        	{
+        	switch($total['source_field']) {
         		case 'tax_amount':
-        	        foreach ($groupedTax as $taxRate => $taxValue)
-                    {
-                        if(empty($taxValue))
-                        {
+        	        foreach ($groupedTax as $taxRate => $taxValue) {
+                        if(empty($taxValue)) {
                             continue;
                         }
                         
@@ -456,12 +452,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
                     $amount = $source->getDataUsingMethod($total['source_field']);
                     $displayZero = (isset($total['display_zero']) ? $total['display_zero'] : 0);
 
-                    if ($amount != 0 || $displayZero) 
-                    {
+                    if ($amount != 0 || $displayZero) {
                         $amount = $order->formatPriceTxt($amount);
 
-                        if (isset($total['amount_prefix']) && $total['amount_prefix']) 
-                        {
+                        if (isset($total['amount_prefix']) && $total['amount_prefix']) {
                             $amount = "{$total['amount_prefix']}{$amount}";
                         }
 
