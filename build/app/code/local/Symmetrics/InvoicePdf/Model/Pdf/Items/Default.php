@@ -50,7 +50,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
             'font_size' => $fontSize
         );
 
-        if ($options = $this->getItemOptions()) {
+        $options = $this->getItemOptions();
+        if ($options) {
             foreach ($options as $option) {
                 // draw options label
                 $lines[][] = array(
@@ -72,7 +73,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
                 }
             }
         }
-
+        
         // draw Price
         $lines[0][] = array(
             'text'  => $order->formatPriceTxt($item->getPrice()),
