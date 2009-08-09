@@ -372,8 +372,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         }
 
         $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()
-                                      ->getItemById($order->getQuoteId())
-                                      ->getInvoicepdfAddTotals());
+            ->getItemById($order->getQuoteId())
+            ->getInvoicepdfAddTotals());
+
         if ($add_totals) {
             foreach ( $add_totals as $add_total ) {
                 array_push($items['items'], array(
@@ -390,19 +391,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             'tax_amount' => $shippingTaxAmount
         ));
         
-        foreach ($items['items'] as $item)
-        {
+        foreach ($items['items'] as $item) {
             if (!array_key_exists('tax_inc_subtotal', $item) || $item['tax_inc_subtotal']) {
                 $total_tax += $item['tax_amount'];
             }
 
             if ($item['tax_amount']) {
-                if(!array_key_exists($item['tax_percent'], $groupedTax))
-                {
+                if(!array_key_exists($item['tax_percent'], $groupedTax)) {
                     $groupedTax[$item['tax_percent']] = $item['tax_amount'];
                 }
-                else
-                {
+                else {
                     $groupedTax[$item['tax_percent']] += $item['tax_amount'];
                 }
             }
@@ -415,8 +413,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             'height' => 20
         );
 
-        foreach ($totals as $total) 
-        {
+        foreach ($totals as $total) {
             $fontSize = (isset($total['font_size']) ? $total['font_size'] : 7);
             if ($fontSize < 9) {
                 $fontSize = 9;
