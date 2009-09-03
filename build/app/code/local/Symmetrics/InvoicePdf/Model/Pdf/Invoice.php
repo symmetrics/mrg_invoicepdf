@@ -140,6 +140,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		
 		$this->Ln(15);
 		
+		$notice = Mage::helper('invoicepdf')->__('Invoice date is equal to delivery date');
+		$page->drawText($notice, $this->margin['left'], $this->y + 50, $this->encoding);
+		
 		$note = Mage::getStoreConfig('sales_pdf/invoice/note');
 
 		if (!empty($note)) {
@@ -233,9 +236,12 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$this->Ln();
     	$page->drawText(Mage::helper('invoicepdf')->__('Customer number:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
+    	$page->drawText(Mage::helper('invoicepdf')->__('Customer IP:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+    	$this->Ln();
+
     	$page->drawText(Mage::helper('invoicepdf')->__('Invoice date:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	
-    	$this->y += 30;
+    	$this->y += 45;
     	$rightoffset = 60;
     	$page->drawText($order->getRealOrderId(), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
@@ -248,11 +254,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	else {
     		$customerid = $order->getBillingAddress()->getCustomerId();	
     	}
+    	    	
+    	$customerIP = $order->getData('remote_ip');
     	
     	$rightoffset = 10;
 
     	$font = $this->_setFontRegular($page, 10);
     	$page->drawText($customerid, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($customerid, $font, 10)), $this->y, $this->encoding);
+    	$this->Ln();
+    	$font = $this->_setFontRegular($page, 10);
+    	$page->drawText($customerIP, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($customerIP, $font, 10)), $this->y, $this->encoding);
     	$this->Ln();
     	
     	$invoiceDate = Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false);
