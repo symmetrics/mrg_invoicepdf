@@ -30,7 +30,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		$this->margin['right'] = 540;
 		
 		$impressum = Mage::getConfig()->getNode('modules/Symmetrics_Impressum');
-
+		
 		if (is_object($impressum)) {
 			if ($impressum->active == 'true') {
                 $this->impressum = Mage::getModel('Symmetrics_Impressum_Block_Impressum')->getImpressumData();
@@ -51,6 +51,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $mode = $this->getMode();
 
         $pdf = new Zend_Pdf();
+        $this->_setPdf($pdf);
+        
         $style = new Zend_Pdf_Style();
         $this->_setFontBold($style, 10);
         
@@ -95,28 +97,18 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
                 if ($item->getOrderItem()->getParentItem()) {
                     continue;
                 }
-                $position++;
-                $this->_drawItem($item, $page, $order, $position);
-
+                
                 if ($this->y < 200) {
-                    $page = $pdf->newPage(Zend_Pdf_Page::SIZE_A4);
-                    $pdf->pages[] = $page;
-					
-                    $this->y = 100;
-					$this->insertFooter($page, $invoice);
-                    
-                    $this->pagecounter++;
-					$this->y = 110;
-					$this->insertPageCounter($page);
-					
-					$this->y = 800;
-                    $this->_setFontRegular($page, 9);
+                    $page = $this->newPage(array());
                 }
+                
+                $position++;
+                $page = $this->_drawItem($item, $page, $order, $position);
             }
 
             /* add totals */
             $this->insertTotals($page, $invoice);
-            
+
             /* add note */
             if ($mode == 'invoice') {            
             	$this->insertNote($page);
@@ -156,7 +148,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     	$page->drawText(Mage::helper('invoicepdf')->__('Page').' '.$this->pagecounter, $this->margin['right'] - 23 - $this->widthForStringUsingFontSize($this->pagecounter, $font, 9), $this->y, $this->encoding);
     }
     
-    protected function insertFooter(&$page, $invoice) 
+    protected function insertFooter(&$page, $invoice = null) 
     {
 		$page->setLineColor($this->colors['black']);
 		$page->setLineWidth(0.5);
@@ -381,7 +373,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $total_tax = 0;
         $shippingTaxAmount = $source->getShippingTaxAmount();
         $groupedTax = array();
-        
+
         foreach ($source->getAllItems() as $item) {
             if ($item->getOrderItem()->getParentItem()) {
                 continue;
@@ -537,6 +529,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $renderer->setRenderedModel($this);
 
         $renderer->draw($position);
+
+        return $renderer->getPage();
     }
     
     public function setMode($mode = 'invoice')
@@ -547,5 +541,120 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     public function getMode()
     {
     	return $this->mode;
+    }
+    
+    public function newPage(array $settings = array())
+    {
+        $pdf = $this->_getPdf();
+
+        $page = $pdf->newPage(Zend_Pdf_Page::SIZE_A4);
+        $pdf->pages[] = $page;
+        
+        $this->y = 100;
+        $this->insertFooter($page);
+        
+        $this->pagecounter++;
+        $this->y = 110;
+        $this->insertPageCounter($page);
+        
+        $this->y = 800;
+        $this->_setFontRegular($page, 9);
+
+        return $page;
+    }
+    
+    public function drawLineBlocks(Zend_Pdf_Page $page, array $draw, array $pageSettings = array())
+    {
+        foreach ($draw as $itemsProp) {
+            if (!isset($itemsProp['lines']) || !is_array($itemsProp['lines'])) {
+                Mage::throwException(Mage::helper('sales')->__('Invalid draw line data. Please define "lines" array'));
+            }
+            $lines  = $itemsProp['lines'];
+            $height = isset($itemsProp['height']) ? $itemsProp['height'] : 10;
+
+            if (empty($itemsProp['shift'])) {
+                $shift = 0;
+                foreach ($lines as $line) {
+                    $maxHeight = 0;
+                    foreach ($line as $column) {
+                        $lineSpacing = !empty($column['height']) ? $column['height'] : $height;
+                        if (!is_array($column['text'])) {
+                            $column['text'] = array($column['text']);
+                        }
+                        $top = 0;
+                        foreach ($column['text'] as $part) {
+                            $top += $lineSpacing;
+                        }
+
+                        $maxHeight = $top > $maxHeight ? $top : $maxHeight;
+                    }
+                    $shift += $maxHeight;
+                }
+                $itemsProp['shift'] = $shift;
+            }
+
+            if ($this->y - $itemsProp['shift'] < 200) {
+                $page = $this->newPage($pageSettings);
+            }
+
+            foreach ($lines as $line) {
+                $maxHeight = 0;
+                foreach ($line as $column) {
+                    $fontSize  = empty($column['font_size']) ? 7 : $column['font_size'];
+                    if (!empty($column['font_file'])) {
+                        $font = Zend_Pdf_Font::fontWithPath($column['font_file']);
+                        $page->setFont($font);
+                    }
+                    else {
+                        $fontStyle = empty($column['font']) ? 'regular' : $column['font'];
+                        switch ($fontStyle) {
+                            case 'bold':
+                                $font = $this->_setFontBold($page, $fontSize);
+                                break;
+                            case 'italic':
+                                $font = $this->_setFontItalic($page, $fontSize);
+                                break;
+                            default:
+                                $font = $this->_setFontRegular($page, $fontSize);
+                                break;
+                        }
+                    }
+
+                    if (!is_array($column['text'])) {
+                        $column['text'] = array($column['text']);
+                    }
+
+                    $lineSpacing = !empty($column['height']) ? $column['height'] : $height;
+                    $top = 0;
+                    foreach ($column['text'] as $part) {
+                        $feed = $column['feed'];
+                        $textAlign = empty($column['align']) ? 'left' : $column['align'];
+                        $width = empty($column['width']) ? 0 : $column['width'];
+                        switch ($textAlign) {
+                            case 'right':
+                                if ($width) {
+                                    $feed = $this->getAlignRight($part, $feed, $width, $font, $fontSize);
+                                }
+                                else {
+                                    $feed = $feed - $this->widthForStringUsingFontSize($part, $font, $fontSize);
+                                }
+                                break;
+                            case 'center':
+                                if ($width) {
+                                    $feed = $this->getAlignCenter($part, $feed, $width, $font, $fontSize);
+                                }
+                                break;
+                        }
+                        $page->drawText($part, $feed, $this->y-$top, 'UTF-8');
+                        $top += $lineSpacing;
+                    }
+
+                    $maxHeight = $top > $maxHeight ? $top : $maxHeight;
+                }
+                $this->y -= $maxHeight;
+            }
+        }
+
+        return $page;
     }
 }

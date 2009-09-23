@@ -11,7 +11,7 @@
 <config>
 	<modules>
 		<Symmetrics_InvoicePdf>
-			<version>0.1.5</version>
+			<version>0.1.6</version>
 		</Symmetrics_InvoicePdf>
 	</modules>
 	<adminhtml>
@@ -38,10 +38,16 @@
             </totals>
         </pdf>
 		<models>
+            <bundle>
+                <rewrite>
+                    <sales_order_pdf_items_invoice>Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice</sales_order_pdf_items_invoice>
+                </rewrite>
+            </bundle>
 			<sales>
 				<rewrite>
 					<order_pdf_invoice>Symmetrics_InvoicePdf_Model_Pdf_Invoice</order_pdf_invoice>
 					<order_pdf_items_invoice_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_invoice_default>
+					<order_pdf_items_invoice_grouped>Symmetrics_InvoicePdf_Model_Pdf_Items_Grouped</order_pdf_items_invoice_grouped>
 					<order_pdf_creditmemo>Symmetrics_InvoicePdf_Model_Pdf_Creditmemo</order_pdf_creditmemo>
 					<order_pdf_items_creditmemo_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_creditmemo_default>
 				</rewrite>
