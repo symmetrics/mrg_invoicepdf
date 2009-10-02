@@ -52,6 +52,7 @@ EXCLUDES = {
 }
 
 DEPENDS_ON_FILES = (
+    'app/code/core/Mage/Bundle/Model/Sales/Order/Pdf/Items/Invoice.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Abstract.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Invoice.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Creditmemo.php',
@@ -62,5 +63,5 @@ DEPENDS_ON_FILES = (
 PEAR_KEY = ''
 
 COMPATIBLE_WITH = {
-    'magento': '1.3.2.3',
+    'magento': '1.3.2.3', '1.3.2.4'
 }

@@ -71,12 +71,20 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			$this->y = 692;
             $this->insertBillingAddress($page, $order);
 
+            /* add sender address */
+            $this->y = 705;
+            $this->insertSenderAddress($page);
+            
             /* add header */
 			$this->y = 592;
 			$this->insertHeader($page, $order);
 
-            /* add footer if the impressum module is installed */
-			if ($this->impressum) {
+            /* 
+             * add footer if the impressum module is 
+             * installed and "insert footer" switch 
+             * in configuration is enabled 
+             * */
+			if ($this->impressum && Mage::getStoreConfig('sales_pdf/invoice/showfooter') == 1) {
                 $this->y = 110;
                 $this->insertFooter($page, $invoice);
 			}
@@ -163,7 +171,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'email' => Mage::helper('impressum')->__('E-Mail:'),
 			'web' => Mage::helper('impressum')->__('Web:')
 		);
-		$this->insertFooterBlock($page, $fields, 70, 30);
+		$this->insertFooterBlock($page, $fields, 70, 40);
 		
 		$fields = array(
 			'bankname' => Mage::helper('impressum')->__('Bank name:'),
@@ -171,7 +179,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'bankcodenumber' => Mage::helper('impressum')->__('Bank number:'),
 			'bankaccountowner' => Mage::helper('impressum')->__('Account owner:')
 		);
-		$this->insertFooterBlock($page, $fields, 210, 48);
+		$this->insertFooterBlock($page, $fields, 215, 50);
 		
 		$fields = array(
 			'taxnumber' => Mage::helper('impressum')->__('Tax number:'),
@@ -179,7 +187,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 			'hrb' => Mage::helper('impressum')->__('Register number:'),
 			'ceo' => Mage::helper('impressum')->__('CEO:')
 		);
-		$this->insertFooterBlock($page, $fields, 350, 55);
+		$this->insertFooterBlock($page, $fields, 355, 60);
     }    
     
     protected function insertTableHeader(&$page)
@@ -315,7 +323,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     
     protected function insertLogo(&$page, $store = null) 
     {
-    	$maxwidth = 590;
+    	$maxwidth = 200;
     	$maxheight = 50;
     	
         $image = Mage::getStoreConfig('sales/identity/logo', $store);
@@ -352,7 +360,20 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             if (is_file($image)) {
                 $image = Zend_Pdf_Image::imageWithPath($image);
                 
-                $position['x1'] = $this->margin['left'];
+                $logoPosition = Mage::getStoreConfig('sales/identity/logoposition', $store); 
+                
+                switch($logoPosition) {
+                    case 'center':
+                        $startLogoAt = $this->margin['left'] + ( ($this->margin['right'] - $this->margin['left']) / 2 ) - $width / 2;
+                    break;
+                    case 'right':
+                        $startLogoAt = $this->margin['right'] - 200;
+                    break;
+                    default:
+                        $startLogoAt = $this->margin['left'];
+                }
+
+                $position['x1'] = $startLogoAt;
                 $position['y1'] = 762;
                 $position['x2'] = $position['x1'] + $width;
                 $position['y2'] = $position['y1'] + $height;
@@ -549,10 +570,12 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 
         $page = $pdf->newPage(Zend_Pdf_Page::SIZE_A4);
         $pdf->pages[] = $page;
-        
-        $this->y = 100;
-        $this->insertFooter($page);
-        
+
+        if ($this->impressum && Mage::getStoreConfig('sales_pdf/invoice/showfooter') == 1) {
+            $this->y = 100;
+            $this->insertFooter($page);
+        }
+
         $this->pagecounter++;
         $this->y = 110;
         $this->insertPageCounter($page);
@@ -656,5 +679,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         }
 
         return $page;
+    }
+    
+    protected function insertSenderAddress($page) 
+    {
+        if($senderAddress = Mage::getStoreConfig('sales_pdf/invoice/senderaddress')) {
+            $this->_setFontRegular($page, 7);
+            $page->drawText($senderAddress,  $this->margin['left'], $this->y, $this->encoding);
+        }
+        return;
     }
 }

@@ -11,7 +11,7 @@
 <config>
 	<modules>
 		<Symmetrics_InvoicePdf>
-			<version>0.1.6</version>
+			<version>0.1.8</version>
 		</Symmetrics_InvoicePdf>
 	</modules>
 	<adminhtml>
@@ -52,6 +52,9 @@
 					<order_pdf_items_creditmemo_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_creditmemo_default>
 				</rewrite>
 			</sales>
+            <invoicepdf>
+                <class>Symmetrics_InvoicePdf_Model</class>
+            </invoicepdf>
 		</models>
 		<customer>
 			<address>
@@ -99,4 +102,16 @@
             </invoicepdf_read>
         </resources>
 	</global>
+	<default>
+        <sales_pdf>
+            <invoice>
+                <showfooter>1</showfooter>
+            </invoice>
+        </sales_pdf>
+        <sales>
+            <identity>
+                <logoposition>left</logoposition>
+            </identity>
+        </sales>
+	</default>
 </config>
