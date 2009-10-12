@@ -392,7 +392,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
         $tax = Mage::getModel('sales/order_tax')->getCollection()->loadByOrder($order)->toArray();
 
         $total_tax = 0;
-        $shippingTaxAmount = $source->getShippingTaxAmount();
+        $shippingTaxAmount = $order->getShippingTaxAmount();
         $groupedTax = array();
 
         foreach ($source->getAllItems() as $item) {
