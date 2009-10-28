@@ -43,10 +43,10 @@ NOTES = '''
 # =============================================================================
 # relations
 # =============================================================================
-REQUIRES = {
-    'magento': '*',
-    'symmetrics_config_german': '*'
-}
+REQUIRES = [
+    {'magento': '*', 'magento_enterprise': '*'}, 
+    {'symmetrics_config_german': '*'}, 
+]
 
 EXCLUDES = {
 }
@@ -62,6 +62,8 @@ DEPENDS_ON_FILES = (
 
 PEAR_KEY = ''
 
+
 COMPATIBLE_WITH = {
     'magento': ['1.3.2.3', '1.3.2.4'],
+    'magento_enterprise': ['1.3.2.3', '1.3.2.4'],
 }
