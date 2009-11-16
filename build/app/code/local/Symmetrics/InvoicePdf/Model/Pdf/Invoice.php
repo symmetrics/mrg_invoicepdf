@@ -323,7 +323,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
     
     protected function insertLogo(&$page, $store = null) 
     {
-    	$maxwidth = 200;
+    	$maxwidth = 500;
     	$maxheight = 50;
     	
         $image = Mage::getStoreConfig('sales/identity/logo', $store);
@@ -367,7 +367,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
                         $startLogoAt = $this->margin['left'] + ( ($this->margin['right'] - $this->margin['left']) / 2 ) - $width / 2;
                     break;
                     case 'right':
-                        $startLogoAt = $this->margin['right'] - 200;
+                        $startLogoAt = $this->margin['right'] - $width;
                     break;
                     default:
                         $startLogoAt = $this->margin['left'];
