@@ -402,17 +402,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $items['items'][] = $item->getOrderItem()->toArray();
         }
 
-        $add_totals = unserialize(Mage::getModel('sales/quote')->getCollection()
-            ->getItemById($order->getQuoteId())
-            ->getInvoicepdfAddTotals());
-
-        if ($add_totals) {
-            foreach ( $add_totals as $add_total ) {
-                array_push($items['items'], array(
-                    'tax_inc_subtotal' => false,
-                    'tax_percent' => number_format($add_total['tax']['percent'], 4, '.', ''),
-                    'tax_amount' => $add_total['tax']['amount']
-                ));
+        $quote = Mage::getModel('sales/quote')->getCollection()->getItemById($order->getQuoteId());
+        if ($quote) {
+            $add_totals = unserialize($quote->getInvoicepdfAddTotals());
+            if ($add_totals) {
+                foreach ( $add_totals as $add_total ) {
+                    array_push($items['items'], array(
+                        'tax_inc_subtotal' => false,
+                        'tax_percent' => number_format($add_total['tax']['percent'], 4, '.', ''),
+                        'tax_amount' => $add_total['tax']['amount']
+                    ));
+                }
             }
         }
 
