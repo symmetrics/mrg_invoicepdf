@@ -115,11 +115,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             }
 
             /* add totals */
-            $this->insertTotals($page, $invoice);
+            $page = $this->insertTotals($page, $invoice);
 
             /* add note */
             if ($mode == 'invoice') {            
-            	$this->insertNote($page);
+            	$page = $this->insertNote($page);
             }
         }
 
@@ -148,6 +148,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		if (!empty($note)) {
 			$page->drawText($note, $this->margin['left'], $this->y + 30, $this->encoding);
 		}
+		
+		return $page;
     }
     
     protected function insertPageCounter(&$page)
