@@ -3,8 +3,9 @@
 	<modules>
 		<Symmetrics_InvoicePdf>
 			<active>true</active>
-			<codePool>local</codePool>
+			<codePool>community</codePool>
 			<depends>
+				<Mage_Core />
 				<Mage_Sales />
 			</depends>
 		</Symmetrics_InvoicePdf>     
