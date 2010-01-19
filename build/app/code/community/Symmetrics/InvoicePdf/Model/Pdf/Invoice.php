@@ -77,7 +77,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             
             /* add header */
 			$this->y = 592;
-			$this->insertHeader($page, $order);
+			$this->insertHeader($page, $order, $invoice);
 
             /* 
              * add footer if the impressum module is 
@@ -106,9 +106,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
                     continue;
                 }
                 
-                if ($this->y < 200) {
-                    $page = $this->newPage(array());
-                }
+                $this->_checkPageBreak($page);
                 
                 $position++;
                 $page = $this->_drawItem($item, $page, $order, $position);
@@ -118,14 +116,41 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
             $page = $this->insertTotals($page, $invoice);
 
             /* add note */
-            if ($mode == 'invoice') {            
+            if ($mode == 'invoice') {
+		        $this->_checkPageBreak($page);
             	$page = $this->insertNote($page);
+            }
+            if (Mage::getStoreConfig('sales_pdf/invoice/showpayment')) {
+		        $this->_checkPageBreak($page);
+                $this->_insertPayment($page, $invoice);
+            }
+            if (Mage::getStoreConfig('sales_pdf/invoice/showcarrier')) {
+		        $this->_checkPageBreak($page);
+                $this->_insertCarrier($page, $invoice);
+            }
+            if (Mage::getStoreConfig('sales_pdf/invoice/showinfotxt')) {
+		        $this->_checkPageBreak($page);
+                $this->_insertInfoTxt($page);
+            }
+            if (Mage::getStoreConfig('sales_pdf/invoice/showinfobox')) {
+		        $this->_checkPageBreak($page);
+                $this->_insertInfoBox($page);
             }
         }
 
         $this->_afterGetPdf();
 
         return $pdf;
+    }
+    
+    protected function _checkPageBreak(&$page, $border = 200, $bottom = false)
+    {
+        if ($bottom === false) {
+            $bottom = $this->y;
+        }
+        if ($bottom < $border) {
+            $page = $this->newPage(array());
+        }
     }
 
     protected function insertNote($page)
@@ -219,71 +244,177 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Mage_Sales_Model_Order_Pdf
 		$page->drawText($totalLabel, $this->margin['right'] - 10 - $this->widthForStringUsingFontSize($totalLabel, $font, 10), 	$this->y, $this->encoding);
     }
     
-    protected function insertHeader(&$page, $order)
+    protected function insertHeader(&$page, $order, $invoice)
     {
     	$page->setFillColor($this->colors['black']);
-    	
     	$mode = $this->getMode();
-    	
     	$this->_setFontBold($page, 15);
-
+        // Subject
     	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice' : 'Creditmemo' ), $this->margin['left'], $this->y, $this->encoding);
 
-    	$this->_setFontRegular($page);    	
-    	
-    	$this->y += 34;
+    	$this->_setFontRegular($page);
+    	$this->y += 64;
     	$rightoffset = 180;
     	
+    	// Invoice id label
     	$page->drawText(Mage::helper('invoicepdf')->__( ($mode == 'invoice') ? 'Invoice number:' : 'Creditmemo number:' ), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
+    	// Customer id label
     	$page->drawText(Mage::helper('invoicepdf')->__('Customer number:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
     	
     	$yPlus = 30;
     	
+    	// If show ip, draw label
     	if(Mage::getStoreConfig('sales_pdf/invoice/showcustomerip')) {
         	$page->drawText(Mage::helper('invoicepdf')->__('Customer IP:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
         	$this->Ln();
+        	$yPlus = 45; 
+    	}
+    	// if show order id, draw label
+    	if (Mage::getStoreConfig('sales_pdf/invoice/put_order_id')) {
+        	$page->drawText(Mage::helper('invoicepdf')->__('Order ID:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+        	$this->Ln();
         	$yPlus = 45;
     	}
-
+        // date label
     	$page->drawText(Mage::helper('invoicepdf')->__('Invoice date:'), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	
     	$this->y += $yPlus;
-    	$rightoffset = 60;
-    	$page->drawText($order->getRealOrderId(), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
+    	$rightoffset = 60;    	
+    	
+    	// Invoice id
+    	$page->drawText($invoice->getIncrementId(), ($this->margin['right'] - $rightoffset), $this->y, $this->encoding);
     	$this->Ln();
     	
     	$prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
 
     	if (!empty($prefix)) {
-			$customerid = $prefix.$order->getBillingAddress()->getCustomerId();	
-    	}
-    	else {
+			$customerid = $prefix . $order->getBillingAddress()->getCustomerId();	
+    	} else {
     		$customerid = $order->getBillingAddress()->getCustomerId();	
     	}
     	
     	$rightoffset = 10;
-
+        // customer id
     	$font = $this->_setFontRegular($page, 10);
     	$page->drawText($customerid, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($customerid, $font, 10)), $this->y, $this->encoding);
     	$this->Ln();
+    	// customer IP
     	if(Mage::getStoreConfig('sales_pdf/invoice/showcustomerip')) {
     		$customerIP = $order->getData('remote_ip');
         	$font = $this->_setFontRegular($page, 10);
         	$page->drawText($customerIP, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($customerIP, $font, 10)), $this->y, $this->encoding);
         	$this->Ln();
     	}
-    	
+    	// order ID
+    	if (Mage::getStoreConfig('sales_pdf/invoice/put_order_id')) {
+        	$rightoffset = 10;
+        	$font = $this->_setFontRegular($page, 10);
+        	$orderid = $order->getRealOrderId();
+        	$page->drawText(
+        	    $orderid,
+        	    ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($orderid, $font, 10)),
+        	    $this->y,
+        	    $this->encoding
+        	);
+        	$this->Ln();
+    	}
+    	// invoice date
     	$invoiceDate = Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false);
     	$page->drawText($invoiceDate, ($this->margin['right'] - $rightoffset - $this->widthForStringUsingFontSize($invoiceDate, $font, 10)), $this->y, $this->encoding);
-
     }
     
+    protected function _lineSplit($text)
+    {
+        $text = trim($text);
+        $splitted = array();
+		if (!empty($text)) {
+		    $text = str_replace("\r\n", "\n", $text);
+		    $text = str_replace("\r", "\n", $text);
+		    $splitted = explode("\n", $text);
+	    }
+        return $splitted;
+    }
+    
+    protected function _insertInfoTxt($page)
+    {
+		$this->_setFontRegular($page, 10);
+        $infoTxt = Mage::getStoreConfig('sales_pdf/invoice/infotxt');
+		$this->Ln();
+		$this->Ln();
+		foreach ($this->_lineSplit($infoTxt) as $infoTxtLine) {
+			$page->drawText($infoTxtLine, $this->margin['left'], $this->y, $this->encoding);
+			$this->Ln();
+			$this->_checkPageBreak($page);
+		}
+		return $page;
+    }
+    
+    protected function _insertInfoBox($page)
+    {
+        $fontSize = 10;
+        $infoBox = Mage::getStoreConfig('sales_pdf/invoice/infobox');
+        $infoBoxHl = Mage::getStoreConfig('sales_pdf/invoice/infoboxhl');
+        $infoBoxLines = $this->_lineSplit($infoBox);
+        $calculatedBoxHeight = (count($infoBoxLines) * ($fontSize * 1.44)) + 100;
+        $calculatedEnd = $this->y - $calculatedBoxHeight;
+        $this->_checkPageBreak($page, 80, $calculatedEnd);
+        $calculatedEnd = $this->y - $calculatedBoxHeight;
+        
+        // Draw recangle (box)
+        $x1 = $this->margin['left'];
+        $x2 = $this->margin['right'];
+        $y1 = $this->y - 10;
+        $y2 = $this->y - $calculatedBoxHeight + 40;
+        $textX = $this->margin['left'] + 20;
+        $black = new Zend_Pdf_Color_GrayScale(0);
+        $page = $page->setLineColor($black);
+        $page = $page->setLineWidth(1);
+        $page = $page->drawRectangle($x1, $y1, $x2, $y2, Zend_Pdf_Page::SHAPE_DRAW_STROKE);
+        
+        $this->y -= 30;
+		
+		$this->_setFontBold($page, $fontSize + 2);
+		$page->drawText($infoBoxHl, $textX, $this->y, $this->encoding);
+        $this->y -= 24;
+        
+
+		$this->_setFontBold($page, $fontSize);
+		foreach ($infoBoxLines as $infoBoxLine) {
+			$page->drawText($infoBoxLine, $textX, $this->y, $this->encoding);
+			$this->Ln();
+		}
+		
+		return $page;
+    }
+    
+    protected function _insertPayment($page, $invoice)
+    {
+        $paymentMethod = $invoice
+            ->getorder()
+            ->getPayment()
+            ->getMethodInstance()
+            ->getTitle();
+        $paymentMethod = Mage::helper('invoicepdf')->__('Payment method: %s', $paymentMethod);
+        $page->drawText($paymentMethod, $this->margin['left'], $this->y, $this->encoding);
+		$this->Ln();
+		return $page;
+    }
+    
+    protected function _insertCarrier($page, $invoice)
+    {
+        $order = $invoice->getorder();
+        $carrier = $order->getShippingDescription();
+        $carrier = Mage::helper('invoicepdf')->__('Shipping method: %s', $carrier);
+        $page->drawText($carrier, $this->margin['left'], $this->y, $this->encoding);
+		$this->Ln();
+		return $page;
+    }
+
     protected function insertBillingAddress(&$page, $order)
     {
 		$this->_setFontRegular($page, 9);
-		
 		$billing = $this->_formatAddress($order->getBillingAddress()->format('pdf'));
 		
 		foreach ($billing as $line) {
