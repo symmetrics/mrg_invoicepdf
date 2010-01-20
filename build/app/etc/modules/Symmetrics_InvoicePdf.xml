@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <config>
-	<modules>
-		<Symmetrics_InvoicePdf>
-			<active>true</active>
-			<codePool>community</codePool>
-			<depends>
-				<Mage_Core />
-				<Mage_Sales />
-			</depends>
-		</Symmetrics_InvoicePdf>     
-	</modules>
+    <modules>
+        <Symmetrics_InvoicePdf>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Core />
+                <Mage_Sales />
+            </depends>
+        </Symmetrics_InvoicePdf>     
+    </modules>
 </config>

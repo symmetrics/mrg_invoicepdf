@@ -1,43 +1,87 @@
 <?php
 /**
- * Symmetrics_InvoicePdf_Model_Pdf_Items_Default
+ * Magento
  *
- * @category Symmetrics
- * @package Symmetrics_InvoicePdf
- * @author symmetrics gmbh <info@symmetrics.de>, Eugen Gitin <eg@symmetrics.de>
- * @copyright symmetrics gmbh
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @category  Symmetrics
+ * @package   Symmetrics_InvoicePdf
+ * @author    Symmetrics GmbH <info@symmetrics.de>
+ * @author    Eugen Gitin <eg@symmetrics.de>
+ * @author    Eric Reiche <er@symmetrics.de>
+ * @copyright 2009 Symmetrics GmbH
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @link      http://www.symmetrics.de/
  */
-class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Order_Pdf_Items_Invoice_Default
+/**
+ * Class for drawing default/simple products in invocie pdf
+ * 
+ * @category  Symmetrics
+ * @package   Symmetrics_InvoicePdf
+ * @author    Symmetrics GmbH <info@symmetrics.de>
+ * @author    Eugen Gitin <eg@symmetrics.de>
+ * @author    Eric Reiche <er@symmetrics.de>
+ * @copyright 2009 Symmetrics GmbH
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @link      http://www.symmetrics.de/
+ */
+class Symmetrics_InvoicePdf_Model_Pdf_Items_Default
+    extends Mage_Sales_Model_Order_Pdf_Items_Invoice_Default
 {
+    /**
+     * Draw default product
+     * 
+     * @param int $position position on invoice
+     * 
+     * @return Zend_Pdf_Page
+     */
     public function draw($position = 1)
     {
-        $order  = $this->getOrder();
-        $item   = $this->getItem();
-        $pdf    = $this->getPdf();
-        $page   = $this->getPage();
-        $lines  = array();
+        $order = $this->getOrder();
+        $item = $this->getItem();
+        $pdf = $this->getPdf();
+        $page = $this->getPage();
+        $lines = array();
         
         $fontSize = 9;
 
         // draw Position Number
-        $lines[0]= array(array(
+        $lines[0]= array();
+        $lines[0][] = array(
             'text'  => $position,
             'feed'  => $pdf->margin['left'] + 20,
             'align' => 'right',
             'font_size' => $fontSize
-        ));
+        );
         
         // draw SKU
+        $splitSku = Mage::helper('core/string')->str_split(
+            $this->getSku($item),
+            10
+        );
         $lines[0][] = array(
-            'text'  => Mage::helper('core/string')->str_split($this->getSku($item), 10),
+            'text'  => $splitSku,
             'feed'  => $pdf->margin['left'] + 45,
             'font_size' => $fontSize
         );
         
         // draw Product name
+        $splitName = Mage::helper('core/string')->str_split(
+            $item->getName(),
+            40,
+            true,
+            true
+        );
         $lines[0][]= array(
-            'text' => Mage::helper('core/string')->str_split($item->getName(), 40, true, true),
+            'text' => $splitName,
             'feed' => $pdf->margin['left'] + 110,
             'font_size' => $fontSize
         );
@@ -54,19 +98,35 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
         if ($options) {
             foreach ($options as $option) {
                 // draw options label
+                $splitLabel = Mage::helper('core/string')->str_split(
+                    strip_tags($option['label']),
+                    40,
+                    false,
+                    true
+                );
                 $lines[][] = array(
-                    'text' => Mage::helper('core/string')->str_split(strip_tags($option['label']), 40, false, true),
+                    'text' => $splitLabel,
                     'font' => 'bold',
                     'feed' => $pdf->margin['left'] + 110
                 );
 
                 // draw options value
                 if ($option['value']) {
-                    $_printValue = isset($option['print_value']) ? $option['print_value'] : strip_tags($option['value']);
+                    if (isset($option['print_value'])) {
+                        $_printValue = $option['print_value'];
+                    } else {
+                        $_printValue = strip_tags($option['value']);
+                    }
                     $values = explode(', ', $_printValue);
                     foreach ($values as $value) {
+                        $splitValue = Mage::helper('core/string')->str_split(
+                            $value,
+                            60,
+                            true,
+                            true
+                        );
                         $lines[][] = array(
-                            'text' => Mage::helper('core/string')->str_split($value, 60, true, true),
+                            'text' => $splitValue,
                             'feed' => $pdf->margin['left'] + 120
                         );
                     }
@@ -103,7 +163,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Default extends Mage_Sales_Model_Ord
             'height' => 15
         );
 
-        $page = $pdf->drawLineBlocks($page, array($lineBlock), array('table_header' => true));
+        $page = $pdf->drawLineBlocks(
+            $page,
+            array($lineBlock),
+            array('table_header' => true)
+        );
         $this->setPage($page);
     }
 }
