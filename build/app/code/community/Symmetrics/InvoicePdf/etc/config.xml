@@ -41,6 +41,17 @@
         </translate>
     </adminhtml>
     <global>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <symmetrics_invoicepdf_model_observer>
+                        <type>singleton</type>
+                        <class>Symmetrics_InvoicePdf_Model_Observer</class>
+                        <method>createInvoice</method>
+                    </symmetrics_invoicepdf_model_observer>
+                </observers>
+            </sales_order_place_after>
+        </events>
         <pdf>
             <totals>
                 <tax>
