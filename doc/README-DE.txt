@@ -1,57 +1,64 @@
-----------------------------------------------------
-Installation
-----------------------------------------------------
+* DOCUMENTATION
 
-1. Ordner app/ in den Projekt-Root kopieren.
+** INSTALLATION
+Extrahieren Sie den Inhalt dieses Archivs in Ihr Magento Verzeichnis. Die Verzeichnisstruktur ist bereits auf die des Magentoverzeichnisses angepasst.
+Auch die benötigte Konfigurationsdatei um das Modul zu aktivieren ist bereits in diesem Archiv enthalten.
+Ggf. ist das Leeren/Auffrischen des Magento-Caches notwendig.
+Setzen Sie dann die Einstellungen in der System/Konfiguration
 
-2. Cache loeschen
+** USAGE
+Das Modul Symmetrics_InvoicePdf verändert die Standard
+PDF-Vorlage für Rechnungen. 
 
-3. Backend aufrufen
+** FUNCTIONALITY
+*** A: Modifiziert die PDF-Vorlage für Rechnungen so, dass
+	die Rechnungen rechtlich konform und wie in Deutschland
+	üblich aussehen. 
+*** B: Zusätzliche Felder: (befinden sich unter
+	"Configuration -> Sales -> PDF-Print-outs" )
+	- Kundennummer-Präfix (Dafuer haben wir im Backend ein Modul
+	geschaffen, welches das Setzen des Prefixes frei erlaubt,
+	je nach Anforderungen)
+	- Fälligkeit der Rechnung
+	- Notiz
+*** C: Wenn das Modul Symmetrics_Impressum installiert ist
+	werden im Footer alle Betreiberinformationen angezeigt:
+		- Vollständige Anschrift
+		- Kommunikationsdaten wie Telefon, Fax, E-Mail usw.
+		- Vollständige Kontoverbindung
+		- Vollständige Steuerinformationen
+*** D: Neu: Rechnungen können per Option in der Sytemkonfiguration
+	automatisch erzeugt und verschickt werden, wenn eine Bestellung
+	eingeht.
+*** E: Neu: Es kann eine Infobox und ein Infotext auf der Rechnung
+	angezeigt werden. Konfiguration wie üblich in der System
+	Konfiguration.
+*** F: Neu: Es werden Versandmethode und Zahlungsmethode optional angezeigt.
+*** G: Das Modul benutzt ein Logo, welches im Backend unter
+	Configuration -> Sales -> Sales -> Invoice and Packing
+	Slip Design" geändert werden kann.
 
-4. Fertig!
+** TECHNINCAL
 
-----------------------------------------------------
-Beschreibung
-----------------------------------------------------
+** PROBLEMS
 
-Das Modul Symmetrics_InvoicePdf veraendert die Standard
-PDF-Vorlage fuer Rechnungen. 
+* TESTCASES
+** BASIC
+*** A: Prüfen Sie, ob die Rechnung wie eine normale deutsche Rechnung aussieht
+		Sie finden 2 Beispiele im [examples] Ordner
+*** B: Prüfen Sie, ob die Felder auf der Rechnung angezeigt werden
+*** C: Installieren Sie das Impressum Modul und tragen Sie die Daten in der
+		System Konfiguration ein. Prüfen Sie, ob die Daten so auf der Rechnung
+		auftauchen.
+*** D: Geben Sie 4 Bestellungen auf und ändern Sie nach jeder Bestellung die beiden
+		Felder "Automatisch erzeugen" und "Automatisch verschicken", so dass alle 
+		Kombinationen getestet werden.
+*** E: Füllen Sie die 5 Felder für die Infoboxen und Felder aus und prüfen Sie,
+		ob sich die Rechnung entsprechend verändert.
+*** F: Ändern Sie die Optionen und prüfen Sie, ob die Zahlungsmethode bzw. Versandmethode
+		auf der Rechnung angezeigt werden.
+*** G: Laden Sie ein Logo hoch und prüfen Sie, ob es auf der Rechnung erscheint.
 
-Features:
+** CATCHABLE
 
-- Modifiziert die PDF-Vorlage fuer Rechnungen so, dass
-die Rechnungen rechtlich konform und wie in Deutschland
-ueblich aussehen.
-
-- Zeigt im Footer der Rechnung alle Betreiberinformationen
-wenn das Modul Symmetrics_Impressum installiert ist.
-
-----------------------------------------------------
-Funktonalitaet und Besonderheiten
-----------------------------------------------------
-
-Symmetrics_InvoicePdf ersetzt die Standard-Vorlage 
-fuer PDF-Rechnungen und fuegt neue Informationen in
-die Rechnung hinzu.
-
-Neue Felder:
-
-- Kundennummer-Praefix (Dafuer haben wir im Backend ein Modul geschaffen, welches das Setzen des Prefixes frei erlaubt, je nach Anforderungen)
-- Faelligkeit der Rechnung
-- Notiz
-
-Diese Daten koennen im Backend unter 
-"Configuration -> Sales -> PDF-Print-outs" 
-geaendert werden.
-
-Das Modul benutzt ein Logo, welches im Backend unter
-Configuration -> Sales -> Sales -> Invoice and Packing
-Slip Design" geaendert werden kann.
- 
-Wenn das Modul Symmetrics_Impressum installiert ist
-werden im Footer alle Betreiberinformationen angezeigt:
-
-- Vollstaendige Anschrift
-- Kommunikationsdaten wie Telefon, Fax, E-Mail usw.
-- Vollstaendige Kontoverbindung
-- Vollstaendige Steuerinformationen
+** STRESS
