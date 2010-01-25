@@ -4,11 +4,12 @@
 Extrahieren Sie den Inhalt dieses Archivs in Ihr Magento Verzeichnis. Die Verzeichnisstruktur ist bereits auf die des Magentoverzeichnisses angepasst.
 Auch die benötigte Konfigurationsdatei um das Modul zu aktivieren ist bereits in diesem Archiv enthalten.
 Ggf. ist das Leeren/Auffrischen des Magento-Caches notwendig.
-Setzen Sie dann die Einstellungen in der System/Konfiguration
+Setzen Sie dann die Einstellungen in der System/Konfiguration.
 
 ** USAGE
 Das Modul Symmetrics_InvoicePdf verändert die Standard
-PDF-Vorlage für Rechnungen. 
+PDF-Vorlage für Rechnungen, um sie in Deutschland rechtsgültig
+zu machen.
 
 ** FUNCTIONALITY
 *** A: Modifiziert die PDF-Vorlage für Rechnungen so, dass
@@ -16,11 +17,12 @@ PDF-Vorlage für Rechnungen.
 	üblich aussehen. 
 *** B: Zusätzliche Felder: (befinden sich unter
 	"Configuration -> Sales -> PDF-Print-outs" )
-	- Kundennummer-Präfix (Dafuer haben wir im Backend ein Modul
-	geschaffen, welches das Setzen des Prefixes frei erlaubt,
-	je nach Anforderungen)
-	- Fälligkeit der Rechnung
-	- Notiz
+**** a: Kundennummer-Präfix (Dafür haben wir im Backend ein Modul
+	    geschaffen, welches das Setzen des Prefixes frei erlaubt,
+	    je nach Anforderungen)
+**** b: Fälligkeit der Rechnung
+**** c: Notiz
+**** d: mehr siehe D - G
 *** C: Wenn das Modul Symmetrics_Impressum installiert ist
 	werden im Footer alle Betreiberinformationen angezeigt:
 		- Vollständige Anschrift
@@ -37,10 +39,13 @@ PDF-Vorlage für Rechnungen.
 *** G: Das Modul benutzt ein Logo, welches im Backend unter
 	Configuration -> Sales -> Sales -> Invoice and Packing
 	Slip Design" geändert werden kann.
+*** H: Wenn attach invoice installiert ist, werden die automatisch generierten
+        Rechnungen auch an die Benachrichtigungs-Emails angehangen.
 
 ** TECHNINCAL
 
 ** PROBLEMS
+Rechnungen werden nach manueller Generierung nicht automatisch verschickt
 
 * TESTCASES
 ** BASIC
