@@ -36,11 +36,46 @@
 class Symmetrics_InvoicePdf_Model_Pdf_Invoice
     extends Mage_Sales_Model_Order_Pdf_Abstract
 {
+    /**
+     * multiple color objects
+     * 
+     * @var array
+     */
     public $colors;
+    
+    /**
+     * Encoding (utf-8)
+     * 
+     * @var string
+     */
     public $encoding;
+    
+    /**
+     * dots from left and right border
+     * 
+     * @var array
+     */
     public $margin;
+    
+    /**
+     * Symmetrics_Impressum data
+     * 
+     * @var array
+     */
     public $impressum;
+    
+    /**
+     * current page number
+     * 
+     * @var int
+     */
     public $pagecounter;
+    
+    /**
+     * invoice or memo
+     * 
+     * @var string
+     */
     public $mode;
     
     /**
@@ -403,7 +438,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->encoding
             );
             $this->Ln();
-            $yPlus = 45; 
+            $yPlus += 15;
         }
         // if show order id, draw label
         if (Mage::getStoreConfig('sales_pdf/invoice/put_order_id')) {
@@ -414,7 +449,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->encoding
             );
             $this->Ln();
-            $yPlus = 45;
+            $yPlus += 15;
         }
         // date label
         $page->drawText(

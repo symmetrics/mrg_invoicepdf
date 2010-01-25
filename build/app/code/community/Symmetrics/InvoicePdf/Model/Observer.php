@@ -38,7 +38,7 @@ class Symmetrics_InvoicePdf_Model_Observer extends Varien_Object
     /**
      * Create invoice after order was completed
      * 
-     * @param Mage_Sales_Model_Order $order order object
+     * @param Varien_Observer $observer observer object
      * 
      * @return void
      */
