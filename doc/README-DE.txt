@@ -1,10 +1,12 @@
 * DOCUMENTATION
 
 ** INSTALLATION
-Extrahieren Sie den Inhalt dieses Archivs in Ihr Magento Verzeichnis. Die Verzeichnisstruktur ist bereits auf die des Magentoverzeichnisses angepasst.
-Auch die benötigte Konfigurationsdatei um das Modul zu aktivieren ist bereits in diesem Archiv enthalten.
+Extrahieren Sie den Inhalt dieses Archivs in Ihr Magento Verzeichnis.
 Ggf. ist das Leeren/Auffrischen des Magento-Caches notwendig.
 Setzen Sie dann die Einstellungen in der System/Konfiguration.
+Wenn noch eine alte Version installiert ist, sollten die Dateien unter
+app/code/local/Symmetrics/InvoicePdf entfernt werden, bevor die neue Version
+installiert wird.
 
 ** USAGE
 Das Modul Symmetrics_InvoicePdf verändert die Standard

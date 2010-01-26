@@ -25,7 +25,9 @@ MAINTAINER = {
 }
 
 AUTHORS = {
-    'Eugen Gitin': 'eg@symmetrics.de'
+    'Eugen Gitin': 'eg@symmetrics.de',
+    'Eric Reiche': 'er@symmetrics.de',
+    'Torsten Walluhn': 'tw@symmetrics.de'
 }
 
 # =============================================================================
@@ -38,6 +40,9 @@ SUMMARY = '''
 '''
 
 NOTES = '''
+Wenn noch eine alte Version installiert ist, sollten die Dateien unter
+app/code/local/Symmetrics/InvoicePdf entfernt werden, bevor die neue Version
+installiert wird.
 '''
 
 # =============================================================================
