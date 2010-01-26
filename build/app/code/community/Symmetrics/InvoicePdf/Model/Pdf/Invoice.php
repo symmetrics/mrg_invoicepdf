@@ -209,7 +209,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
      * 
      * @return void
      */
-    protected function _checkPageBreak(&$page, $border = 200, $bottom = false)
+    protected function _checkPageBreak(&$page, $border = 170, $bottom = false)
     {
         if ($bottom === false) {
             $bottom = $this->y;
@@ -217,6 +217,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         if ($bottom < $border) {
             $page = $this->newPage(array());
         }
+        return $page;
     }
 
     /**
@@ -470,13 +471,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $this->encoding
         );
         $this->Ln();
-        $prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
-        if (!empty($prefix)) {
-            $customerid = $prefix . $order->getBillingAddress()->getCustomerId();   
+        $customerid = $order->getBillingAddress()->getCustomerId();
+        if (!empty($customerid)) {
+            $prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
+            if (!empty($prefix)) {
+                $customerid = $prefix . $customerid;   
+            }
         } else {
-            $customerid = $order->getBillingAddress()->getCustomerId(); 
+            $customerid = '-';
         }
-        
         $rightoffset = 10;
         // customer id
         $font = $this->_setFontRegular($page, 10);
@@ -544,32 +547,40 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
     /**
      * Insert info text below invoice
      * 
-     * @param Zend_Pdf_Page $page page object
+     * @param Zend_Pdf_Page &$page page object
      * 
      * @return Zend_Pdf_Page
      */
-    protected function _insertInfoTxt($page)
+    protected function _insertInfoTxt(&$page)
     {
-        $this->_setFontRegular($page, 10);
+        $fontSize = 10;
+        $this->_setFontRegular($page, $fontSize);
         $infoTxt = Mage::getStoreConfig('sales_pdf/invoice/infotxt');
+        
+        $infoTxtLines = $this->_lineSplit($infoTxt);
+        $calculatedHeight = (count($infoTxtLines) * ($fontSize * 1.44)) + 20;
+        $calculatedEnd = $this->y - $calculatedHeight;
+        $this->_checkPageBreak($page, 80, $calculatedEnd);
+        $calculatedEnd = $this->y - $calculatedHeight;
         $this->Ln();
         $this->Ln();
-        foreach ($this->_lineSplit($infoTxt) as $infoTxtLine) {
+        
+        foreach ($infoTxtLines as $infoTxtLine) {
+            $this->_setFontRegular($page, $fontSize);
             $page->drawText($infoTxtLine, $this->margin['left'], $this->y, $this->encoding);
             $this->Ln();
             $this->_checkPageBreak($page);
         }
-        return $page;
     }
     
     /**
      * Insert info box at the bottom
      * 
-     * @param Zend_Pdf_Page $page page object
+     * @param Zend_Pdf_Page &$page page object
      * 
      * @return Zend_Pdf_Page
      */
-    protected function _insertInfoBox($page)
+    protected function _insertInfoBox(&$page)
     {
         $fontSize = 10;
         $infoBox = Mage::getStoreConfig('sales_pdf/invoice/infobox');
@@ -603,8 +614,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $page->drawText($infoBoxLine, $textX, $this->y, $this->encoding);
             $this->Ln();
         }
-        
-        return $page;
     }
     
     /**
@@ -625,7 +634,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $paymentMethod = Mage::helper('invoicepdf')->__('Payment method: %s', $paymentMethod);
         $page->drawText($paymentMethod, $this->margin['left'], $this->y, $this->encoding);
         $this->Ln();
-        return $page;
     }
     
     /**
@@ -643,18 +651,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $carrier = Mage::helper('invoicepdf')->__('Shipping method: %s', $carrier);
         $page->drawText($carrier, $this->margin['left'], $this->y, $this->encoding);
         $this->Ln();
-        return $page;
     }
 
     /**
      * Insert billing address
      * 
-     * @param Zend_Pdf_Page          &$page page object
+     * @param Zend_Pdf_Page          $page  page object
      * @param Mage_Sales_Model_Order $order order object
      * 
      * @return void
      */
-    protected function insertBillingAddress(&$page, $order)
+    protected function insertBillingAddress($page, $order)
     {
         $this->_setFontRegular($page, 9);
         $billing = $this->_formatAddress($order->getBillingAddress()->format('pdf'));
@@ -1003,7 +1010,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
      * Draw product
      * 
      * @param Varien_Object          $item     product object
-     * @param Zend_Pdf_Page          $page     page object
+     * @param Zend_Pdf_Page          $page    page object
      * @param Mage_Sales_Model_Order $order    order object
      * @param int                    $position product position on invoice
      * 

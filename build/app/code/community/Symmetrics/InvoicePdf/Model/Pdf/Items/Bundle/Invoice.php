@@ -189,8 +189,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     );
                     $lines[][] = array(
                         'text'  => $optionLabel,
-                        'font'  => 'italic',
-                        'feed'  => 35
+                        'font'  => 'bold',
+                        'feed'  => $pdf->margin['left'] + 110,
+                        'font_size' => $fontSize
                     );
 
                     if ($option['value']) {
@@ -217,7 +218,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
 
                         $lines[][] = array(
                             'text'  => $text,
-                            'feed'  => 40
+                            'feed'  => $pdf->margin['left'] + 110,
+                            'font_size' => $fontSize
                         );
                     }
                     $drawItems[] = array(
