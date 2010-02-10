@@ -26,7 +26,7 @@
 <config>
     <modules>
         <Symmetrics_InvoicePdf>
-            <version>0.1.15</version>
+            <version>0.2.0</version>
         </Symmetrics_InvoicePdf>
     </modules>
     <adminhtml>
@@ -56,9 +56,18 @@
             <totals>
                 <tax>
                     <sort_order>550</sort_order>
+                    <font_size>7</font_size>
+                    <font_weight>regular</font_weight>
                 </tax>
+                <subtotal>
+                    <font_size>10</font_size>
+                    <font_weight>regular</font_weight>
+                </subtotal>
+                <shipping>
+                    <font_size>10</font_size>
+                </shipping>
                 <grand_total>
-                    <font_size>12</font_size>
+                    <font_size>11</font_size>
                     <font_weight>bold</font_weight>
                 </grand_total>
             </totals>
@@ -78,6 +87,11 @@
                     <order_pdf_items_creditmemo_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_creditmemo_default>
                 </rewrite>
             </sales>
+            <tax>
+                <rewrite>
+                    <sales_pdf_grandtotal>Symmetrics_InvoicePdf_Model_Tax_Pdf_Grandtotal</sales_pdf_grandtotal>
+                </rewrite>
+            </tax>
             <invoicepdf>
                 <class>Symmetrics_InvoicePdf_Model</class>
             </invoicepdf>
