@@ -63,12 +63,13 @@ DEPENDS_ON_FILES = (
     'app/code/core/Mage/Sales/Model/Order/Pdf/Creditmemo.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Invoice/Default.php',
     'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Creditmemo/Default.php',
+    'app/code/core/Mage/Tax/Model/Sales/Pdf/Grandtotal.php',
 )
 
 PEAR_KEY = ''
 
 
 COMPATIBLE_WITH = {
-    'magento': ['1.3.2.3', '1.3.2.4'],
-    'magento_enterprise': ['1.3.2.3', '1.3.2.4', '1.7.0.0'],
+    'magento': ['1.4.0.0'],
+    'magento_enterprise': ['1.7.0.0-rc1'],
 }
