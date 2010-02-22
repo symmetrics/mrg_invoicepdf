@@ -143,10 +143,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             // draw prices
             if ($this->canShowPriceInfo($_item)) {
                 
-                if (Mage::getStoreConfig('tax/sales_display/price') == 2 || Mage::getStoreConfig('tax/sales_display/price') == 3) {
+                $taxPrice = Mage::getStoreConfig('tax/sales_display/price');
+                if ($taxPrice == 2 || $taxPrice == 3) {
                     $itemPrice = $item->getPriceInclTax(); 
-                }
-                else {
+                } else {
                     $itemPrice = $item->getPrice();
                 }
                 
@@ -172,10 +172,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     'font_size' => $fontSize
                 );
 
-                if (Mage::getStoreConfig('tax/sales_display/subtotal') == 2 || Mage::getStoreConfig('tax/sales_display/subtotal') == 3) {
+                $taxSubTotal = Mage::getStoreConfig('tax/sales_display/subtotal');
+                if ($taxSubTotal == 2 || $taxSubTotal == 3) {
                     $itemSubtotal = $item->getRowTotal() + $item->getTaxAmount(); 
-                }
-                else {
+                } else {
                     $itemSubtotal = $item->getRowTotal();
                 }
 

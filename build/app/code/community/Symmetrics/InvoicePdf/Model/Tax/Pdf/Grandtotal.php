@@ -1,6 +1,6 @@
 <?php
 /**
- * Magento
+ * MAGENTO
  *
  * NOTICE OF LICENSE
  *
@@ -20,6 +20,7 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
+
 /**
  * Modified grandtotal and tax for Germany 
  * 
@@ -32,9 +33,10 @@
  * @link      http://www.symmetrics.de/
  */
 
- class Symmetrics_InvoicePdf_Model_Tax_Pdf_Grandtotal extends Mage_Tax_Model_Sales_Pdf_Grandtotal
- {
-     /**
+class Symmetrics_InvoicePdf_Model_Tax_Pdf_Grandtotal
+    extends Mage_Tax_Model_Sales_Pdf_Grandtotal
+{
+    /**
      * Return modified array for rendering
      * 
      * @return array
@@ -95,5 +97,4 @@
         
         return $totals;
     }
- }
- 
+}

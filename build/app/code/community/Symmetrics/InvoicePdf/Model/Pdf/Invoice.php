@@ -238,7 +238,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         if (!empty($maturity)) {
             $page->drawText($maturity, $this->margin['left'], $this->y + 50, $this->encoding);
         }
-        $this->_Ln(15);
+        $this->_ln(15);
         $notice = Mage::helper('invoicepdf')->__('Invoice date is equal to delivery date');
         $page->drawText($notice, $this->margin['left'], $this->y + 50, $this->encoding);
         
@@ -284,7 +284,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $page->setLineWidth(0.5);
         $page->drawLine($this->margin['left'] - 20, $this->y - 5, $this->margin['right'] + 30, $this->y - 5);
         
-        $this->_Ln(15);
+        $this->_ln(15);
         $this->_insertFooterAddress($page);
 
         $fields = array(
@@ -420,7 +420,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $this->y,
             $this->encoding
         );
-        $this->_Ln();
+        $this->_ln();
         // Customer id label
         $page->drawText(
             Mage::helper('invoicepdf')->__('Customer number:'),
@@ -428,7 +428,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $this->y,
             $this->encoding
         );
-        $this->_Ln();
+        $this->_ln();
         $yPlus = 30;
         // If show ip, draw label
         if (Mage::getStoreConfig('sales_pdf/invoice/showcustomerip')) {
@@ -438,7 +438,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->y,
                 $this->encoding
             );
-            $this->_Ln();
+            $this->_ln();
             $yPlus += 15;
         }
         // if show order id, draw label
@@ -449,7 +449,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->y,
                 $this->encoding
             );
-            $this->_Ln();
+            $this->_ln();
             $yPlus += 15;
         }
         // date label
@@ -470,7 +470,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $this->y,
             $this->encoding
         );
-        $this->_Ln();
+        $this->_ln();
         $customerid = $order->getBillingAddress()->getCustomerId();
         if (!empty($customerid)) {
             $prefix = Mage::getStoreConfig('sales_pdf/invoice/customeridprefix');
@@ -489,7 +489,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             $this->y,
             $this->encoding
         );
-        $this->_Ln();
+        $this->_ln();
         // customer IP
         if (Mage::getStoreConfig('sales_pdf/invoice/showcustomerip')) {
             $customerIP = $order->getData('remote_ip');
@@ -500,7 +500,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->y,
                 $this->encoding
             );
-            $this->_Ln();
+            $this->_ln();
         }
         // order ID
         if (Mage::getStoreConfig('sales_pdf/invoice/put_order_id')) {
@@ -513,7 +513,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                 $this->y,
                 $this->encoding
             );
-            $this->_Ln();
+            $this->_ln();
         }
         // invoice date
         $invoiceDate = Mage::helper('core')->formatDate($order->getCreatedAtDate(), 'medium', false);
@@ -562,13 +562,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $calculatedEnd = $this->y - $calculatedHeight;
         $this->_checkPageBreak($page, 80, $calculatedEnd);
         $calculatedEnd = $this->y - $calculatedHeight;
-        $this->_Ln();
-        $this->_Ln();
+        $this->_ln();
+        $this->_ln();
         
         foreach ($infoTxtLines as $infoTxtLine) {
             $this->_setFontRegular($page, $fontSize);
             $page->drawText($infoTxtLine, $this->margin['left'], $this->y, $this->encoding);
-            $this->_Ln();
+            $this->_ln();
             $this->_checkPageBreak($page);
         }
     }
@@ -612,7 +612,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $this->_setFontBold($page, $fontSize);
         foreach ($infoBoxLines as $infoBoxLine) {
             $page->drawText($infoBoxLine, $textX, $this->y, $this->encoding);
-            $this->_Ln();
+            $this->_ln();
         }
     }
     
@@ -633,7 +633,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
             ->getTitle();
         $paymentMethod = Mage::helper('invoicepdf')->__('Payment method: %s', $paymentMethod);
         $page->drawText($paymentMethod, $this->margin['left'], $this->y, $this->encoding);
-        $this->_Ln();
+        $this->_ln();
     }
     
     /**
@@ -650,7 +650,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         $carrier = $order->getShippingDescription();
         $carrier = Mage::helper('invoicepdf')->__('Shipping method: %s', $carrier);
         $page->drawText($carrier, $this->margin['left'], $this->y, $this->encoding);
-        $this->_Ln();
+        $this->_ln();
     }
 
     /**
@@ -668,7 +668,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
         
         foreach ($billing as $line) {
             $page->drawText(trim(strip_tags($line)), $this->margin['left'], $this->y, $this->encoding);
-            $this->_Ln(12);
+            $this->_ln(12);
         }
     }
     
@@ -827,8 +827,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                     // get font size
                     if ($totalData['font_size']) {
                         $fontSize = $totalData['font_size'];
-                    }
-                    else {
+                    } else {
                         $fontSize = 10;
                     }
                     
@@ -840,8 +839,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
                     // get font weight
                     if (array_key_exists('font_weight', $totalData) && $totalData['font_weight']) {
                         $fontWeight = $totalData['font_weight'];
-                    }
-                    else {
+                    } else {
                         $fontWeight = 'regular';   
                     }
                     
@@ -869,14 +867,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
     }
     
     /**
-    /**
      * Create line break
      * 
      * @param int $height distance to add
      * 
      * @return void
      */
-    protected function _Ln($height = 15)
+    protected function _ln($height = 15)
     {
         $this->y -= $height;
     }
@@ -930,7 +927,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
      * Draw product
      * 
      * @param Varien_Object          $item     product object
-     * @param Zend_Pdf_Page          $page    page object
+     * @param Zend_Pdf_Page          $page     page object
      * @param Mage_Sales_Model_Order $order    order object
      * @param int                    $position product position on invoice
      * 
