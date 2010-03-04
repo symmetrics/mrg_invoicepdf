@@ -230,11 +230,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice
     protected function _insertNote($page)
     {
         $this->_setFontRegular($page, 10);
-
-        $maturity = Mage::helper('invoicepdf')->__(
-            'Invoice maturity: %s days',
-            Mage::getStoreConfig('sales_pdf/invoice/maturity')
-        );
+        
+        $maturitySetting = Mage::getStoreConfig('sales_pdf/invoice/maturity');
+        if ($maturitySetting != 0) {
+            $maturity = Mage::helper('invoicepdf')->__('Invoice maturity: %s days', $maturitySetting);
+        } else {
+            $maturity = Mage::helper('invoicepdf')->__('Invoice maturity: immediatly');
+        }
+        
         if (!empty($maturity)) {
             $page->drawText($maturity, $this->margin['left'], $this->y + 50, $this->encoding);
         }
