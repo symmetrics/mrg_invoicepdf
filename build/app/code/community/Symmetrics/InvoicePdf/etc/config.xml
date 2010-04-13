@@ -144,6 +144,17 @@
             </invoicepdf_read>
         </resources>
     </global>
+    <admin>
+        <routers>
+            <invoicepdf>
+                <use>admin</use>
+                <args>
+                    <module>Symmetrics_InvoicePdf</module>
+                    <frontName>admin</frontName>
+                </args>
+            </invoicepdf>
+        </routers>
+    </admin>
     <default>
         <sales_pdf>
             <invoice>
