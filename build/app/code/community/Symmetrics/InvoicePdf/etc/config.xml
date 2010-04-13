@@ -26,7 +26,7 @@
 <config>
     <modules>
         <Symmetrics_InvoicePdf>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
         </Symmetrics_InvoicePdf>
     </modules>
     <adminhtml>
@@ -73,6 +73,7 @@
             </totals>
         </pdf>
         <models>
+            <!--
             <bundle>
                 <rewrite>
                     <sales_order_pdf_items_invoice>Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice</sales_order_pdf_items_invoice>
@@ -91,7 +92,8 @@
                 <rewrite>
                     <sales_pdf_grandtotal>Symmetrics_InvoicePdf_Model_Tax_Pdf_Grandtotal</sales_pdf_grandtotal>
                 </rewrite>
-            </tax>
+            </tax> 
+            -->
             <invoicepdf>
                 <class>Symmetrics_InvoicePdf_Model</class>
             </invoicepdf>
