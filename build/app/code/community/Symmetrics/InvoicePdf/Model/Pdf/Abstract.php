@@ -22,7 +22,7 @@
  */
 
 /**
- * Encashment Adminhtml Controller
+ * Abstract Pdf Rendering class
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -32,32 +32,13 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
-class Symmetrics_InvoicePdf_InvoicePdfController 
-    extends Mage_Adminhtml_Controller_Action
-{
+ 
+ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
+ {
     /**
-     * Action to print invoice as PDF
+     * Zend PDF object
      *
-     * @return void
+     * @var Zend_Pdf
      */
-    public function printAction()
-    {
-        if ($invoiceId = $this->getRequest()->getParam('invoice_id')) {
-            if ($invoice = Mage::getModel('sales/order_invoice')->load($invoiceId)) {
-                if ($invoice->getStoreId()) {
-                    Mage::app()->setCurrentStore($invoice->getStoreId());
-                }
-                
-                $pdf = Mage::getModel('sales/order_pdf_invoice')->getPdf(array($invoice));
-
-                $this->_prepareDownloadResponse(
-                    'invoice' . Mage::getSingleton('core/date')->date('Y-m-d_H-i-s') . '.pdf', 
-                    $pdf->render(), 
-                    'application/pdf'
-                );
-            }
-        } else {
-            $this->_forward('noRoute');
-        }
-    }
-}
+    protected $_pdf;
+ }
