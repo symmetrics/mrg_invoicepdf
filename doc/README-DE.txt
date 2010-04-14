@@ -25,7 +25,7 @@ zu machen.
 **** b: Fälligkeit der Rechnung
 **** c: Notiz
 **** d: mehr siehe D - G
-*** C: Wenn das Modul Symmetrics_Impressum installiert ist
+*** C: Wenn das Modul Symmetrics_Imprint installiert ist
 	werden im Footer alle Betreiberinformationen angezeigt:
 		- Vollständige Anschrift
 		- Kommunikationsdaten wie Telefon, Fax, E-Mail usw.

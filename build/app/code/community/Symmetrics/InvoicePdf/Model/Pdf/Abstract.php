@@ -218,7 +218,7 @@
      */
     protected function insertAddressFooter(&$page, $store = null)
     {
-        $isImprint = false;
+        $config = false;
         $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
         $this->_setFontRegular($page, 5);
 
@@ -233,6 +233,7 @@
         
         $page->setLineWidth(0);
         
+        /* if Symmetrics_Imprint - Modul is installed, get data from there */
         if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
             $data = Mage::getStoreConfig('general/imprint', $store);
             $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
