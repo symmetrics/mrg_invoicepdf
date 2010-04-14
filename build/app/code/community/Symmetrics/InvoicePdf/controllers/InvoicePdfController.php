@@ -48,8 +48,10 @@ class Symmetrics_InvoicePdf_InvoicePdfController
                     Mage::app()->setCurrentStore($invoice->getStoreId());
                 }
                 
-                $pdf = Mage::getModel('sales/order_pdf_invoice')->getPdf(array($invoice));
+                $pdf = Mage::getModel('invoicepdf/pdf_invoice')->getPdf(array($invoice));
 
+                // var_dump($pdf);
+//                die();
                 $this->_prepareDownloadResponse(
                     'invoice' . Mage::getSingleton('core/date')->date('Y-m-d_H-i-s') . '.pdf', 
                     $pdf->render(), 
