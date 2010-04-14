@@ -47,12 +47,15 @@
     protected $_width;
     
     
-    const XML_PATH_SALES_PDF_INVOICE_PUT_ORDER_ID = 'sales_pdf/invoice/put_order_id';
-    const XML_PATH_SALES_PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
-    const XML_PATH_SALES_PDF_CREDITMEMO_PUT_ORDER_ID = 'sales_pdf/creditmemo/put_order_id';
-    
+    const PDF_INVOICE_PUT_ORDER_ID = 'put_order_id';
+    const PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
+    const PDF_CREDITMEMO_PUT_ORDER_ID = 'sales_pdf/creditmemo/put_order_id';
+
     const PAGE_POSITION_LEFT = 40;
     const PAGE_POSITION_RIGHT = 555;
+    const PAGE_POSITION_TOP = 800;
+    const PAGE_POSITION_BOTTOM = 47;
+    
     
     abstract public function getPdf();
     
@@ -63,8 +66,8 @@
     protected function _construct()
     {
         $this->_setPdf(new Zend_Pdf());
-        $this->_height = 0;
-        $this->_width = 0;
+        $this->_height = self::PAGE_POSITION_TOP;
+        $this->_width = self::PAGE_POSITION_LEFT;
     }
     
     /**
@@ -94,6 +97,23 @@
         $stringWidth = (array_sum($widths) / $font->getUnitsPerEm()) * $fontSize;
         return $stringWidth;
 
+    }
+
+    /**
+     * Returns the total height in points of the font using the specified font and
+     * size.
+     *
+     * @param string $string
+     * @param Zend_Pdf_Resource_Font $font
+     * @param float $fontSize Font size in points
+     * @return float
+     */
+    public function heightForFontUsingFontSize($font, $fontSize)
+    {
+        $height = $font->getLineHeight();
+        $stringHeight = ($height / $font->getUnitsPerEm()) * $fontSize;
+        
+        return $stringHeight;
     }
 
     /**
@@ -146,7 +166,15 @@
 
         return $this->_pdf;
     }
-    
+
+    protected function _newLine($font, $fontSize, $invert = false, $spacingSize = 1.2)
+    {
+        if ($invert) {
+            $this->_height += $this->heightForFontUsingFontSize($font, $fontSize) * $spacingSize;
+        } else {
+            $this->_height -= $this->heightForFontUsingFontSize($font, $fontSize) * $spacingSize;
+        }
+    }
 
     protected function _setFontRegular($object, $size = 10)
     {
@@ -181,8 +209,19 @@
         $pageSize = ($settings->hasPageSize()) ? $settings->getPageSize() : Zend_Pdf_Page::SIZE_A4;
         $page = $this->_getPdf()->newPage($pageSize);
         $this->insertAddressFooter($page, $settings->getStore());
-        $this->_getPdf()->pages[] = $page;
-        // $this->y = 800;
+        $pdf = $this->_getPdf();
+
+        $this->_height = self::PAGE_POSITION_TOP;
+        /* @var $pdf Zend_Pdf */
+        $pdf->pages[] = $page;
+        if (count($pdf->pages) > 1) {
+            $this->insertTableHeader($page);
+        }
+
+        $foldMarkHeight = $page->getHeight() / 3;
+        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
+        $foldMarkHeight *= 2;
+        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
 
         return $page;
     }
@@ -209,6 +248,36 @@
     }
 
     /**
+     * insert a address footer item
+     *
+     * @param Zend_Pdf_Page $page
+     * @param string        $key
+     * @param string        $value
+     */
+    protected function _insertAddressFooterItem($page, $key, $value = null)
+    {
+        $fontSize = 5;
+        $font = $this->_setFontRegular($page, $fontSize);
+        $this->_newLine($font, 5);
+        
+        $page->drawText(
+            $key,
+            $this->_width,
+            $this->_height,
+            'UTF-8'
+        );
+        
+        if ($value) {
+            $page->drawText(
+                $value,
+                $this->_width + 40,
+                $this->_height,
+                'UTF-8'
+            );
+        }
+    }
+
+    /**
      * Insert the store address to the Pdf
      *
      * @param &$page Zend_Pdf_Page Page to insert address
@@ -218,34 +287,29 @@
      */
     protected function insertAddressFooter(&$page, $store = null)
     {
-        $config = false;
         $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-        $this->_setFontRegular($page, 5);
 
-        $footerLinePos = 47;
-        
+        $this->_height = self::PAGE_POSITION_BOTTOM;
+        $this->_width = 20;
         $heightCount = 0;
-        $lineSpacing = 6;
-        $width = 20;
         
         $page->setLineWidth(0.4);
-        $page->drawLine($width, $footerLinePos, $page->getWidth() - $width, $footerLinePos);
-        
+        $page->drawLine($this->_width, $this->_height, $page->getWidth() - $this->_width, $this->_height);
         $page->setLineWidth(0);
-        
-        /* if Symmetrics_Imprint - Modul is installed, get data from there */
+
+        $config = null;
         if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
             $data = Mage::getStoreConfig('general/imprint', $store);
             $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
         } else {
-            $data = explode('\n', Mage::getStoreConfig('sales/identity/address', $store));
+            $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
         }
+        
         
         foreach ($data as $key => $value){
             if ($value == '') {
                 continue;
             } else {
-                $height = 40 - $lineSpacing * $heightCount;
                 
                 if ($config) {
                     /* get labels from fields in system.xml */
@@ -257,22 +321,29 @@
                         continue;
                     } else {
                         /* TODO: translate */
-                        $label = Mage::helper('imprint')->__($elementData['label']);
-                        $value = $label . ': ' . $value;
+                        $label = Mage::helper('imprint')->__($elementData['label']) . ':';
+                        $this->_insertAddressFooterItem(
+                            $page,
+                            trim(strip_tags($label)),
+                            trim(strip_tags($value))
+                        );
                     }
+
+                } else {
+                    $this->_insertAddressFooterItem($page, trim(strip_tags($value)));
                 }
-                $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
+                // $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
                 
                 $heightCount++;                
                 if ($heightCount == 4) {
-                    $width += 100;
+                    $this->_width += 100;
+                    $this->_height = self::PAGE_POSITION_BOTTOM;
                     $heightCount = 0;
                 }
             }
         }
-        
         $this->_setFontRegular($page);
-        
+        $this->_width = self::PAGE_POSITION_LEFT;
         return $page;
     }
 
@@ -295,15 +366,23 @@
         }
         return $return;
     }
-    
+
+    /**
+     * Insert a Order information row
+     *
+     * @param Zend_Pdf_Page $page  given Page to insert row
+     * @param string        $key   key to write
+     * @param string        $value value to write
+     *
+     * @return void
+     */
     protected function _insertOrderInfoRow(&$page, $key, $value)
     {
-        $width = $page->getWidth() - 40;
         $font = $this->_setFontRegular($page, 8);
         
         $page->drawText(
             $key, 
-            $width - 135, 
+            self::PAGE_POSITION_RIGHT - 170,
             $this->_height, 
             'UTF-8'
         );
@@ -313,28 +392,39 @@
                 $valueRow  = trim($valueRow);
                 $page->drawText(
                     $valueRow, 
-                    $width - 10 - $this->widthForStringUsingFontSize($valueRow, $font, 8),
+                    self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($valueRow, $font, 8),
                     $this->_height, 
                     'UTF-8'
                 );
-                $this->_height += 14;
+                $this->_newLine($font, 8, true);
             }
         } else { 
             $page->drawText(
                 $value, 
-                $width - 10 - $this->widthForStringUsingFontSize($value, $font, 8),
-                $this->_height, 
+                self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($value, $font, 8),
+                $this->_height,
                 'UTF-8'
             );
-            $this->_height += 14;
+            $this->_newLine($font, 8, true);
         }
         
     }
-    
+
+    /**
+     * Inserts the Order Information to given page
+     *
+     * @param Zend_Pdf_Page          $page       given page to insert order info
+     * @param Mage_Sales_Model_Order $order      order to get info from
+     * @param boolean                $putOrderId print order id
+     */
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
-        $this->_height = 600;
-        
+        $this->_height = 570;
+        $storeId = $order->getStoreId();
+
+        /* @var $helper Symmetrics_InvoicePdf_Helper_Data */
+        $helper = Mage::helper('invoicepdf'); //->getSalesPdfInvoiceConfig($order->getStoreId());
+
         $this->_insertOrderInfoRow(
             $page,
             Mage::helper('sales')->__('Order Date: '),
@@ -344,42 +434,90 @@
                 false
             )
         );
+        
+        $customerid = $order->getBillingAddress()->getCustomerId();
+        if (!empty($customerid)) {
+            $customerid = $helper->getSalesPdfInvoiceConfigKey('customeridprefix', $storeId) . $customerid;
+        } else {
+            $customerid = '-';
+        }
+        $this->_insertOrderInfoRow(
+            $page,
+            $helper->__('Customer number:'),
+            $customerid
+        );
 
-        if ($putOrderId) {
+        if ($helper->getSalesPdfInvoiceConfigFlag('showcustomerip', $storeId)) {
             $this->_insertOrderInfoRow(
                 $page,
-                Mage::helper('sales')->__('Order # '),
-                $order->getRealOrderId()
+                $helper->__('Customer IP:'),
+                $order->getRemoteIp()
             );
         }
         
         /* Payment */
-        $paymentInfo = Mage::helper('payment')->getInfoBlock($order->getPayment())
-            ->setIsSecureMode(true)
-            ->toPdf();
+        if ($helper->getSalesPdfInvoiceConfigFlag('showpayment', $storeId)) {
+            $paymentInfo = Mage::helper('payment')->getInfoBlock($order->getPayment())
+                ->setIsSecureMode(true)
+                ->toPdf();
 
-        $payment = explode('{{pdf_row_separator}}', $paymentInfo);
-        foreach ($payment as $key => $value){
-            if (strip_tags(trim($value)) == ''){
-                unset($payment[$key]);
+            $payment = explode('{{pdf_row_separator}}', $paymentInfo);
+            foreach ($payment as $key => $value){
+                if (strip_tags(trim($value)) == ''){
+                    unset($payment[$key]);
+                }
             }
+            reset($payment);
+
+            $this->_insertOrderInfoRow(
+                $page,
+                Mage::helper('sales')->__('Payment Method:'),
+                $payment
+            );
         }
-        reset($payment);
-        
-        $this->_insertOrderInfoRow(
-            $page,
-            Mage::helper('sales')->__('Payment Method:'),
-            $payment
-        );
-        
+
+        if ($helper->getSalesPdfInvoiceConfigFlag('showcarrier', $storeId)) {
+            $this->_insertOrderInfoRow(
+                $page,
+                $helper->__('Shipping method:'),
+                $order->getShippingDescription()
+            );
+        }
+
+        if ($putOrderId) {
+            $this->_insertOrderInfoRow(
+                $page,
+                $helper->__('Order # '),
+                $order->getRealOrderId()
+            );
+        }
     }
     
     protected function _insertBillingAddress(&$page, $billingAddress)
     {
         $billingAddress = $this->_formatAddress($billingAddress->format('pdf'));
-        $this->_height = 725;
-        $this->_width = 40;
-        $font = $this->_setFontRegular($page, 10);
+
+        $font = $this->_setFontRegular($page, 7);
+        $greyScale9 = new Zend_Pdf_Color_GrayScale(0.5);
+        $page->setFillColor($greyScale9);
+
+        $this->_height = 675;
+        $this->_width = self::PAGE_POSITION_LEFT;
+        $senderAddress = Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigKey('senderaddress', null);
+        if ($senderAddress) {
+            $page->drawText(
+                $senderAddress,
+                $this->_width,
+                $this->_height,
+                'UTF-8'
+            );
+            // $this->_height -= 15;
+            $this->_newLine($font, 7, false, 1.8);
+        }
+        
+        $font = $this->_setFontRegular($page, 9);
+        $black = new Zend_Pdf_Color_GrayScale(0);
+        $page->setFillColor($black);
         
         foreach ($billingAddress as $addressItem) {
             $page->drawText(
@@ -389,17 +527,21 @@
                 'UTF-8'
             );
             
-            $this->_height -= 14;
+            //$this->_height -= 12;
+            $this->_newLine($font, 9);
         }
     }
     
     protected function setSubject(&$page, $title)
     {
         $this->_setFontBold($page, 16);
+        $black = new Zend_Pdf_Color_GrayScale(0);
+        $page->setFillColor($black);
+
         $page->drawText(
             $title,
-            40,
-            600,
+            self::PAGE_POSITION_LEFT,
+            535,
             'UTF-8'
         );
         $this->_setFontRegular($page);
@@ -415,150 +557,78 @@
         $this->_insertBillingAddress($page, $order->getBillingAddress());
 
         
-        /* Shipping Address and Method */
-/*        if (!$order->getIsVirtual()) {
-            /* Shipping Address */
-/*            $shippingAddress = $this->_formatAddress($order->getShippingAddress()->format('pdf'));
-
-            $shippingMethod  = $order->getShippingDescription();
-        }
-
-        $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-        $this->_setFontRegular($page);
-        $page->drawText(Mage::helper('sales')->__('SOLD TO:'), 35, 740 , 'UTF-8');
-
-        if (!$order->getIsVirtual()) {
-            $page->drawText(Mage::helper('sales')->__('SHIP TO:'), 285, 740 , 'UTF-8');
-        }
-        else {
-            $page->drawText(Mage::helper('sales')->__('Payment Method:'), 285, 740 , 'UTF-8');
-        }
-
-        if (!$order->getIsVirtual()) {
-            $y = 730 - (max(count($billingAddress), count($shippingAddress)) * 10 + 5);
-        }
-        else {
-            $y = 730 - (count($billingAddress) * 10 + 5);
-        }
-
-        $page->setFillColor(new Zend_Pdf_Color_GrayScale(1));
-        $page->drawRectangle(25, 730, 570, $y);
-        $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-        $this->_setFontRegular($page);
-        $this->y = 720;
-
-        foreach ($billingAddress as $value){
-            if ($value!=='') {
-                $page->drawText(strip_tags(ltrim($value)), 35, $this->y, 'UTF-8');
-                $this->y -=10;
-            }
-        }
-
-        if (!$order->getIsVirtual()) {
-            $this->y = 720;
-            foreach ($shippingAddress as $value){
-                if ($value!=='') {
-                    $page->drawText(strip_tags(ltrim($value)), 285, $this->y, 'UTF-8');
-                    $this->y -=10;
-                }
-
-            }
-
-            $page->setFillColor(new Zend_Pdf_Color_Rgb(0.93, 0.92, 0.92));
-            $page->setLineWidth(0.5);
-            $page->drawRectangle(25, $this->y, 275, $this->y-25);
-            $page->drawRectangle(275, $this->y, 570, $this->y-25);
-
-            $this->y -=15;
-            $this->_setFontBold($page);
-            $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-            $page->drawText(Mage::helper('sales')->__('Payment Method'), 35, $this->y, 'UTF-8');
-            $page->drawText(Mage::helper('sales')->__('Shipping Method:'), 285, $this->y , 'UTF-8');
-
-            $this->y -=10;
-            $page->setFillColor(new Zend_Pdf_Color_GrayScale(1));
-
-            $this->_setFontRegular($page);
-            $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-
-            $paymentLeft = 35;
-            $yPayments   = $this->y - 15;
-        }
-        else {
-            $yPayments   = 720;
-            $paymentLeft = 285;
-        }
-
-        foreach ($payment as $value){
-            if (trim($value)!=='') {
-                $page->drawText(strip_tags(trim($value)), $paymentLeft, $yPayments, 'UTF-8');
-                $yPayments -=10;
-            }
-        }
-
-        if (!$order->getIsVirtual()) {
-            $this->y -=15;
-
-            $page->drawText($shippingMethod, 285, $this->y, 'UTF-8');
-
-            $yShipments = $this->y;
-
-
-            $totalShippingChargesText = "(" . Mage::helper('sales')->__('Total Shipping Charges') . " " . $order->formatPriceTxt($order->getShippingAmount()) . ")";
-
-            $page->drawText($totalShippingChargesText, 285, $yShipments-7, 'UTF-8');
-            $yShipments -=10;
-            $tracks = $order->getTracksCollection();
-            if (count($tracks)) {
-                $page->setFillColor(new Zend_Pdf_Color_Rgb(0.93, 0.92, 0.92));
-                $page->setLineWidth(0.5);
-                $page->drawRectangle(285, $yShipments, 510, $yShipments - 10);
-                $page->drawLine(380, $yShipments, 380, $yShipments - 10);
-                //$page->drawLine(510, $yShipments, 510, $yShipments - 10);
-
-                $this->_setFontRegular($page);
-                $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-                //$page->drawText(Mage::helper('sales')->__('Carrier'), 290, $yShipments - 7 , 'UTF-8');
-                $page->drawText(Mage::helper('sales')->__('Title'), 290, $yShipments - 7, 'UTF-8');
-                $page->drawText(Mage::helper('sales')->__('Number'), 385, $yShipments - 7, 'UTF-8');
-
-                $yShipments -=17;
-                $this->_setFontRegular($page, 6);
-                foreach ($order->getTracksCollection() as $track) {
-
-                    $CarrierCode = $track->getCarrierCode();
-                    if ($CarrierCode!='custom')
-                    {
-                        $carrier = Mage::getSingleton('shipping/config')->getCarrierInstance($CarrierCode);
-                        $carrierTitle = $carrier->getConfigData('title');
-                    }
-                    else
-                    {
-                        $carrierTitle = Mage::helper('sales')->__('Custom Value');
-                    }
-
-                    //$truncatedCarrierTitle = substr($carrierTitle, 0, 35) . (strlen($carrierTitle) > 35 ? '...' : '');
-                    $truncatedTitle = substr($track->getTitle(), 0, 45) . (strlen($track->getTitle()) > 45 ? '...' : '');
-                    //$page->drawText($truncatedCarrierTitle, 285, $yShipments , 'UTF-8');
-                    $page->drawText($truncatedTitle, 300, $yShipments , 'UTF-8');
-                    $page->drawText($track->getNumber(), 395, $yShipments , 'UTF-8');
-                    $yShipments -=7;
-                }
-            } else {
-                $yShipments -= 7;
-            }
-
-            $currentY = min($yPayments, $yShipments);
-
-            // replacement of Shipments-Payments rectangle block
-            $page->drawLine(25, $this->y + 15, 25, $currentY);
-            $page->drawLine(25, $currentY, 570, $currentY);
-            $page->drawLine(570, $currentY, 570, $this->y + 15);
-
-            $this->y = $currentY;
-            $this->y -= 15;
-        }
-        */
+        $this->_height = 525;
+        $this->_width = 40;
+        $this->insertTableHeader($page);
     }
+    
+    protected function insertTableHeader(&$page)
+    {
+        
+        $fontSize = 9;
+        $font = $this->_setFontRegular($page, $fontSize);
+        $fontHeight = $this->heightForFontUsingFontSize($font, $fontSize);
 
+        $columHeight = $fontHeight + 5;
+        $greyScale9 = new Zend_Pdf_Color_GrayScale(0.9);
+        $fillType = Zend_Pdf_Page::SHAPE_DRAW_FILL;
+        
+        $page->setFillColor($greyScale9);
+        $page->drawRectangle($this->_width ,$this->_height, self::PAGE_POSITION_RIGHT, $this->_height - $columHeight, $fillType);
+
+        $this->_newLine($font, $fontSize, false, 1);
+        $black = new Zend_Pdf_Color_GrayScale(0);
+        $page->setFillColor($black);
+
+        $page->drawText(
+            Mage::helper('invoicepdf')->__('Pos'),
+            $this->_width + 3,
+            $this->_height,
+            'UTF-8'
+        );
+        $page->drawText(
+            Mage::helper('invoicepdf')->__('No.'),
+            $this->_width + 45,
+            $this->_height,
+            'UTF-8'
+        );
+        $page->drawText(
+            Mage::helper('invoicepdf')->__('Description'),
+            $this->_width + 110,
+            $this->_height,
+            'UTF-8'
+        );
+         
+        $singlePrice = Mage::helper('invoicepdf')->__('Price');
+        $page->drawText(
+            $singlePrice,
+            self::PAGE_POSITION_RIGHT - 160 - $this->widthForStringUsingFontSize($singlePrice, $font, $fontSize),
+            $this->_height,
+            'UTF-8'
+        );
+
+        $amountLabel = Mage::helper('invoicepdf')->__('Amount');
+        $page->drawText(
+            $amountLabel,
+            self::PAGE_POSITION_RIGHT - 110 - $this->widthForStringUsingFontSize($amountLabel, $font, $fontSize),
+            $this->_height,
+            'UTF-8'
+        );
+        
+        $taxLabel = Mage::helper('invoicepdf')->__('Tax');
+        $page->drawText(
+            $taxLabel,
+            self::PAGE_POSITION_RIGHT - 60 - $this->widthForStringUsingFontSize($taxLabel, $font, $fontSize),
+            $this->_height,
+            'UTF-8'
+        ); 
+
+        $totalLabel = Mage::helper('invoicepdf')->__('Total');
+        $page->drawText(
+            $totalLabel,
+            self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($totalLabel, $font, $fontSize),
+            $this->_height,
+            'UTF-8'
+        );
+    }
 }

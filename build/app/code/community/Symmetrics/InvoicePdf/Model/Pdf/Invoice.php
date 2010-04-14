@@ -65,13 +65,19 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             $this->insertOrder(
                 $page, 
                 $order, 
-                Mage::getStoreConfigFlag(
-                    self::XML_PATH_SALES_PDF_INVOICE_PUT_ORDER_ID, 
+                Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigFlag(
+                    self::PDF_INVOICE_PUT_ORDER_ID, 
                     $order->getStoreId()
                 )
             );
-            
+
             $this->setSubject($page, Mage::helper('sales')->__('Invoice'));
+
+            $page = $this->newPage($settings);
+            $page = $this->newPage($settings);
+            $page = $this->newPage($settings);
+            $page = $this->newPage($settings);
+            
         }
         
         
