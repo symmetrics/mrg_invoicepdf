@@ -56,7 +56,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             $page = $this->newPage($settings);
             
             /* Add image */
-//            $this->insertLogo($page, $invoice->getStore());
+            $this->insertLogo($page, $invoice->getStore());
 
             /* Add address */
 //            $this->insertAddressFooter($page, $invoice->getStore());

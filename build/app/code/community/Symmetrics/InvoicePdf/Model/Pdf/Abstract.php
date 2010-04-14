@@ -223,6 +223,8 @@
         $foldMarkHeight *= 2;
         $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
 
+        $page->drawLine(20, $page->getHeight() / 2, 25, $page->getHeight() / 2);
+
         return $page;
     }
     
@@ -240,11 +242,37 @@
         if ($image) {
             $image = Mage::getStoreConfig('system/filesystem/media', $store) . '/sales/store/logo/' . $image;
             if (is_file($image)) {
+                $size = getimagesize($image);
+                $imageWidth = $size[0];
+                $imageHeight = $size[1];
+                
                 $image = Zend_Pdf_Image::imageWithPath($image);
-                $page->drawImage($image, 25, 800, 125, 825);
+                $logoPosition = Mage::getStoreConfig('sales/identity/logoposition', $store);
+                
+                switch($logoPosition) {
+                    case 'center':
+                        $startLogoAt = self::PAGE_POSITION_LEFT;
+                        $startLogoAt += ((self::PAGE_POSITION_RIGHT - self::PAGE_POSITION_LEFT) / 2 );
+                        $startLogoAt -= $imageWidth / 2;
+                        break;
+                    case 'right':
+                        $startLogoAt = self::PAGE_POSITION_RIGHT - $imageWidth;
+                        break;
+                    default:
+                        $startLogoAt = self::PAGE_POSITION_LEFT;
+                        break;
+                }
+
+                $imageTopLeft = $startLogoAt;
+                $imageTop = self::PAGE_POSITION_TOP - $imageHeight;
+                $imageBottomRight = $imageTopLeft + $imageWidth;
+                $imageBottom = $imageTop + $imageHeight;
+
+                $page->drawImage($image, $imageTopLeft, $imageTop, $imageBottomRight, $imageBottom);
             }
         }
-        //return $page;
+
+        return $page;
     }
 
     /**
@@ -297,53 +325,56 @@
         $page->drawLine($this->_width, $this->_height, $page->getWidth() - $this->_width, $this->_height);
         $page->setLineWidth(0);
 
-        $config = null;
-        if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
-            $data = Mage::getStoreConfig('general/imprint', $store);
-            $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
-        } else {
-            $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
-        }
-        
-        
-        foreach ($data as $key => $value){
-            if ($value == '') {
-                continue;
+        if (Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigFlag('showfooter', $store)) {
+            $config = null;
+            if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
+                $data = Mage::getStoreConfig('general/imprint', $store);
+                $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
             } else {
-                
-                if ($config) {
-                    /* get labels from fields in system.xml */
-                    $element = $config->getNode('sections/general/groups/imprint/fields/' . $key);
-                    $element = $element[0];
-                    $elementData = $element->asArray();
-                    if (isset($elementData['hide_in_invoice_pdf'])) {
-                        /* don`t show this field */
-                        continue;
-                    } else {
-                        /* TODO: translate */
-                        $label = Mage::helper('imprint')->__($elementData['label']) . ':';
-                        $this->_insertAddressFooterItem(
-                            $page,
-                            trim(strip_tags($label)),
-                            trim(strip_tags($value))
-                        );
-                    }
+                $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
+            }
 
+
+            foreach ($data as $key => $value){
+                if ($value == '') {
+                    continue;
                 } else {
-                    $this->_insertAddressFooterItem($page, trim(strip_tags($value)));
-                }
-                // $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
-                
-                $heightCount++;                
-                if ($heightCount == 4) {
-                    $this->_width += 100;
-                    $this->_height = self::PAGE_POSITION_BOTTOM;
-                    $heightCount = 0;
+
+                    if ($config) {
+                        /* get labels from fields in system.xml */
+                        $element = $config->getNode('sections/general/groups/imprint/fields/' . $key);
+                        $element = $element[0];
+                        $elementData = $element->asArray();
+                        if (isset($elementData['hide_in_invoice_pdf'])) {
+                            /* don`t show this field */
+                            continue;
+                        } else {
+                            /* TODO: translate */
+                            $label = Mage::helper('imprint')->__($elementData['label']) . ':';
+                            $this->_insertAddressFooterItem(
+                                $page,
+                                trim(strip_tags($label)),
+                                trim(strip_tags($value))
+                            );
+                        }
+
+                    } else {
+                        $this->_insertAddressFooterItem($page, trim(strip_tags($value)));
+                    }
+                    // $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
+
+                    $heightCount++;
+                    if ($heightCount == 4) {
+                        $this->_width += 100;
+                        $this->_height = self::PAGE_POSITION_BOTTOM;
+                        $heightCount = 0;
+                    }
                 }
             }
         }
         $this->_setFontRegular($page);
         $this->_width = self::PAGE_POSITION_LEFT;
+        
         return $page;
     }
 
