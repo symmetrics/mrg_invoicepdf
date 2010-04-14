@@ -37,4 +37,46 @@
 class Symmetrics_InvoicePdf_Helper_Data
     extends Mage_Core_Helper_Abstract
 {
+    /**
+     * const to store Sales Pdf Invoice Config xPath
+     */
+    const SALES_PDF_INVOICE = 'sales_pdf/invoice';
+
+    /**
+     * Get the config from sales pdf invoice setings
+     *
+     * @param integer $store store to get from
+     *
+     * @return array
+     */
+    public function getSalesPdfInvoiceConfig($store)
+    {
+        return Mage::getStoreConfig(self::SALES_PDF_INVOICE, $store);
+    }
+
+    /**
+     * Get the config from sales pdf invoice setings for given key
+     *
+     * @param string  $key   key to get
+     * @param integer $store store to get from
+     *
+     * @return mixed
+     */
+    public function getSalesPdfInvoiceConfigKey($key, $store)
+    {
+        return Mage::getStoreConfig(self::SALES_PDF_INVOICE . '/' . $key, $store);
+    }
+
+    /**
+     * Get the config from sales pdf invoice setings flag for given key
+     *
+     * @param string  $key   key to get
+     * @param integer $store store to get from
+     *
+     * @return mixed
+     */
+    public function getSalesPdfInvoiceConfigFlag($key, $store)
+    {
+        return Mage::getStoreConfigFlag(self::SALES_PDF_INVOICE . '/' .  $key, $store);
+    }
 }
