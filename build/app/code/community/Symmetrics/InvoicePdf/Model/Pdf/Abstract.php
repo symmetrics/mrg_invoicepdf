@@ -54,6 +54,8 @@
     const PAGE_POSITION_LEFT = 40;
     const PAGE_POSITION_RIGHT = 555;
     const PAGE_POSITION_TOP = 800;
+    const PAGE_POSITION_BOTTOM = 47;
+    
     
     abstract public function getPdf();
     
@@ -199,7 +201,7 @@
      * Create new page and assign to PDF object
      *
      * @param array $settings
-     
+     *
      * @return Zend_Pdf_Page
      */
     public function newPage(Varien_Object $settings)
@@ -246,6 +248,36 @@
     }
 
     /**
+     * insert a address footer item
+     *
+     * @param Zend_Pdf_Page $page
+     * @param string        $key
+     * @param string        $value
+     */
+    protected function _insertAddressFooterItem($page, $key, $value = null)
+    {
+        $fontSize = 5;
+        $font = $this->_setFontRegular($page, $fontSize);
+        $this->_newLine($font, 5);
+        
+        $page->drawText(
+            $key,
+            $this->_width,
+            $this->_height,
+            'UTF-8'
+        );
+        
+        if ($value) {
+            $page->drawText(
+                $value,
+                $this->_width + 40,
+                $this->_height,
+                'UTF-8'
+            );
+        }
+    }
+
+    /**
      * Insert the store address to the Pdf
      *
      * @param &$page Zend_Pdf_Page Page to insert address
@@ -256,34 +288,62 @@
     protected function insertAddressFooter(&$page, $store = null)
     {
         $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-        $this->_setFontRegular($page, 5);
 
-        $footerLinePos = 47;
-        
+        $this->_height = self::PAGE_POSITION_BOTTOM;
+        $this->_width = 20;
         $heightCount = 0;
-        $lineSpacing = 6;
-        $width = 20;
         
         $page->setLineWidth(0.4);
-        $page->drawLine($width, $footerLinePos, $page->getWidth() - $width, $footerLinePos);
-        
+        $page->drawLine($this->_width, $this->_height, $page->getWidth() - $this->_width, $this->_height);
         $page->setLineWidth(0);
-        // TODO: Chech if imprint is installed
-        foreach (explode("\n", Mage::getStoreConfig('sales/identity/address', $store)) as $value){
-            if ($value!=='') {
-                $height = 40 - $lineSpacing * $heightCount;
-                $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
 
+        $config = null;
+        if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
+            $data = Mage::getStoreConfig('general/imprint', $store);
+            $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
+        } else {
+            $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
+        }
+        
+        
+        foreach ($data as $key => $value){
+            if ($value == '') {
+                continue;
+            } else {
+                
+                if ($config) {
+                    /* get labels from fields in system.xml */
+                    $element = $config->getNode('sections/general/groups/imprint/fields/' . $key);
+                    $element = $element[0];
+                    $elementData = $element->asArray();
+                    if (isset($elementData['hide_in_invoice_pdf'])) {
+                        /* don`t show this field */
+                        continue;
+                    } else {
+                        /* TODO: translate */
+                        $label = Mage::helper('imprint')->__($elementData['label']) . ':';
+                        $this->_insertAddressFooterItem(
+                            $page,
+                            trim(strip_tags($label)),
+                            trim(strip_tags($value))
+                        );
+                    }
+
+                } else {
+                    $this->_insertAddressFooterItem($page, trim(strip_tags($value)));
+                }
+                // $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
+                
                 $heightCount++;                
                 if ($heightCount == 4) {
-                    $width += 100;
+                    $this->_width += 100;
+                    $this->_height = self::PAGE_POSITION_BOTTOM;
                     $heightCount = 0;
                 }
             }
         }
-        
         $this->_setFontRegular($page);
-        
+        $this->_width = self::PAGE_POSITION_LEFT;
         return $page;
     }
 
