@@ -64,8 +64,8 @@
     protected function _construct()
     {
         $this->_setPdf(new Zend_Pdf());
-        $this->_height = 0;
-        $this->_width = 0;
+        $this->_height = self::PAGE_POSITION_TOP;
+        $this->_width = self::PAGE_POSITION_LEFT;
     }
     
     /**
@@ -164,7 +164,15 @@
 
         return $this->_pdf;
     }
-    
+
+    protected function _newLine($font, $fontSize, $invert = false, $spacingSize = 1.2)
+    {
+        if ($invert) {
+            $this->_height += $this->heightForFontUsingFontSize($font, $fontSize) * $spacingSize;
+        } else {
+            $this->_height -= $this->heightForFontUsingFontSize($font, $fontSize) * $spacingSize;
+        }
+    }
 
     protected function _setFontRegular($object, $size = 10)
     {
@@ -323,16 +331,16 @@
                     $this->_height, 
                     'UTF-8'
                 );
-                $this->_height += 14;
+                $this->_newLine($font, 8, true);
             }
         } else { 
             $page->drawText(
                 $value, 
                 self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($value, $font, 8),
-                $this->_height, 
+                $this->_height,
                 'UTF-8'
             );
-            $this->_height += 14;
+            $this->_newLine($font, 8, true);
         }
         
     }
@@ -347,8 +355,11 @@
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
         $this->_height = 600;
+        $storeId = $order->getStoreId();
 
-        
+        /* @var $helper Symmetrics_InvoicePdf_Helper_Data */
+        $helper = Mage::helper('invoicepdf'); //->getSalesPdfInvoiceConfig($order->getStoreId());
+
         $this->_insertOrderInfoRow(
             $page,
             Mage::helper('sales')->__('Order Date: '),
@@ -358,42 +369,90 @@
                 false
             )
         );
+        
+        $customerid = $order->getBillingAddress()->getCustomerId();
+        if (!empty($customerid)) {
+            $customerid = $helper->getSalesPdfInvoiceConfigKey('customeridprefix', $storeId) . $customerid;
+        } else {
+            $customerid = '-';
+        }
+        $this->_insertOrderInfoRow(
+            $page,
+            $helper->__('Customer number:'),
+            $customerid
+        );
 
-        if ($putOrderId) {
+        if ($helper->getSalesPdfInvoiceConfigFlag('showcustomerip', $storeId)) {
             $this->_insertOrderInfoRow(
                 $page,
-                Mage::helper('sales')->__('Order # '),
-                $order->getRealOrderId()
+                $helper->__('Customer IP:'),
+                $order->getRemoteIp()
             );
         }
         
         /* Payment */
-        $paymentInfo = Mage::helper('payment')->getInfoBlock($order->getPayment())
-            ->setIsSecureMode(true)
-            ->toPdf();
+        if ($helper->getSalesPdfInvoiceConfigFlag('showpayment', $storeId)) {
+            $paymentInfo = Mage::helper('payment')->getInfoBlock($order->getPayment())
+                ->setIsSecureMode(true)
+                ->toPdf();
 
-        $payment = explode('{{pdf_row_separator}}', $paymentInfo);
-        foreach ($payment as $key => $value){
-            if (strip_tags(trim($value)) == ''){
-                unset($payment[$key]);
+            $payment = explode('{{pdf_row_separator}}', $paymentInfo);
+            foreach ($payment as $key => $value){
+                if (strip_tags(trim($value)) == ''){
+                    unset($payment[$key]);
+                }
             }
+            reset($payment);
+
+            $this->_insertOrderInfoRow(
+                $page,
+                Mage::helper('sales')->__('Payment Method:'),
+                $payment
+            );
         }
-        reset($payment);
-        
-        $this->_insertOrderInfoRow(
-            $page,
-            Mage::helper('sales')->__('Payment Method:'),
-            $payment
-        );
-        
+
+        if ($helper->getSalesPdfInvoiceConfigFlag('showcarrier', $storeId)) {
+            $this->_insertOrderInfoRow(
+                $page,
+                $helper->__('Shipping method:'),
+                $order->getShippingDescription()
+            );
+        }
+
+        if ($putOrderId) {
+            $this->_insertOrderInfoRow(
+                $page,
+                $helper->__('Order # '),
+                $order->getRealOrderId()
+            );
+        }
     }
     
     protected function _insertBillingAddress(&$page, $billingAddress)
     {
         $billingAddress = $this->_formatAddress($billingAddress->format('pdf'));
-        $this->_height = 725;
+
+        $font = $this->_setFontRegular($page, 7);
+        $greyScale9 = new Zend_Pdf_Color_GrayScale(0.5);
+        $page->setFillColor($greyScale9);
+
+        $this->_height = 730;
         $this->_width = 40;
-        $font = $this->_setFontRegular($page, 10);
+        $senderAddress = Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigKey('senderaddress', null);
+        if ($senderAddress) {
+            $page->drawText(
+                $senderAddress,
+                $this->_width,
+                $this->_height,
+                'UTF-8'
+            );
+            // $this->_height -= 15;
+            $this->_newLine($font, 7, false, 1.8);
+        }
+        
+        $font = $this->_setFontRegular($page, 9);
+        $black = new Zend_Pdf_Color_GrayScale(0);
+        $page->setFillColor($black);
         
         foreach ($billingAddress as $addressItem) {
             $page->drawText(
@@ -403,7 +462,8 @@
                 'UTF-8'
             );
             
-            $this->_height -= 14;
+            //$this->_height -= 12;
+            $this->_newLine($font, 9);
         }
     }
     
@@ -451,7 +511,7 @@
         $page->setFillColor($greyScale9);
         $page->drawRectangle($this->_width ,$this->_height, self::PAGE_POSITION_RIGHT, $this->_height - $columHeight, $fillType);
 
-        $this->_height -= $fontHeight;
+        $this->_newLine($font, $fontSize, false, 1);
         $black = new Zend_Pdf_Color_GrayScale(0);
         $page->setFillColor($black);
 
