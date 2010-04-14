@@ -215,7 +215,12 @@
         if (count($pdf->pages) > 1) {
             $this->insertTableHeader($page);
         }
-        
+
+        $foldMarkHeight = $page->getHeight() / 3;
+        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
+        $foldMarkHeight *= 2;
+        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
+
         return $page;
     }
     
@@ -354,7 +359,7 @@
      */
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
-        $this->_height = 600;
+        $this->_height = 570;
         $storeId = $order->getStoreId();
 
         /* @var $helper Symmetrics_InvoicePdf_Helper_Data */
@@ -436,8 +441,8 @@
         $greyScale9 = new Zend_Pdf_Color_GrayScale(0.5);
         $page->setFillColor($greyScale9);
 
-        $this->_height = 730;
-        $this->_width = 40;
+        $this->_height = 675;
+        $this->_width = self::PAGE_POSITION_LEFT;
         $senderAddress = Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigKey('senderaddress', null);
         if ($senderAddress) {
             $page->drawText(
@@ -476,7 +481,7 @@
         $page->drawText(
             $title,
             self::PAGE_POSITION_LEFT,
-            600,
+            535,
             'UTF-8'
         );
         $this->_setFontRegular($page);
@@ -492,7 +497,7 @@
         $this->_insertBillingAddress($page, $order->getBillingAddress());
 
         
-        $this->_height = 590;
+        $this->_height = 525;
         $this->_width = 40;
         $this->insertTableHeader($page);
     }
