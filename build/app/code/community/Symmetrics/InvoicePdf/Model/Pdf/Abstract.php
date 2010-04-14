@@ -51,6 +51,9 @@
     const XML_PATH_SALES_PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
     const XML_PATH_SALES_PDF_CREDITMEMO_PUT_ORDER_ID = 'sales_pdf/creditmemo/put_order_id';
     
+    const PAGE_POSITION_LEFT = 40;
+    const PAGE_POSITION_RIGHT = 555;
+    
     abstract public function getPdf();
     
     /**
@@ -170,7 +173,7 @@
      * Create new page and assign to PDF object
      *
      * @param array $settings
-     
+     *
      * @return Zend_Pdf_Page
      */
     public function newPage(Varien_Object $settings)
@@ -215,6 +218,7 @@
      */
     protected function insertAddressFooter(&$page, $store = null)
     {
+        $isImprint = false;
         $page->setFillColor(new Zend_Pdf_Color_GrayScale(0));
         $this->_setFontRegular($page, 5);
 
@@ -228,12 +232,36 @@
         $page->drawLine($width, $footerLinePos, $page->getWidth() - $width, $footerLinePos);
         
         $page->setLineWidth(0);
-        // TODO: Chech if imprint is installed
-        foreach (explode("\n", Mage::getStoreConfig('sales/identity/address', $store)) as $value){
-            if ($value!=='') {
+        
+        if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
+            $data = Mage::getStoreConfig('general/imprint', $store);
+            $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
+        } else {
+            $data = explode('\n', Mage::getStoreConfig('sales/identity/address', $store));
+        }
+        
+        foreach ($data as $key => $value){
+            if ($value == '') {
+                continue;
+            } else {
                 $height = 40 - $lineSpacing * $heightCount;
+                
+                if ($config) {
+                    /* get labels from fields in system.xml */
+                    $element = $config->getNode('sections/general/groups/imprint/fields/' . $key);
+                    $element = $element[0];
+                    $elementData = $element->asArray();
+                    if (isset($elementData['hide_in_invoice_pdf'])) {
+                        /* don`t show this field */
+                        continue;
+                    } else {
+                        /* TODO: translate */
+                        $label = Mage::helper('imprint')->__($elementData['label']);
+                        $value = $label . ': ' . $value;
+                    }
+                }
                 $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
-
+                
                 $heightCount++;                
                 if ($heightCount == 4) {
                     $width += 100;
