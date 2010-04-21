@@ -52,16 +52,23 @@
                 </observers>
             </sales_order_place_after>
         </events>
-        <pdf>
+        <invoicepdf>
+            <invoice>
+                <default>invoicepdf/pdf_items_invoice_default</default>
+                <!-- <grouped>sales/order_pdf_items_invoice_grouped</grouped> -->
+            </invoice>
             <totals>
                 <tax>
                     <sort_order>550</sort_order>
                     <font_size>7</font_size>
                     <font_weight>regular</font_weight>
                 </tax>
-                <subtotal>
-                    <font_size>10</font_size>
-                    <font_weight>regular</font_weight>
+                <subtotal translate="title">
+                    <title>Subtotal</title>
+                    <source_field>subtotal</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>1</display_zero>
+                    <sort_order>100</sort_order>
                 </subtotal>
                 <shipping>
                     <font_size>10</font_size>
@@ -71,7 +78,7 @@
                     <font_weight>bold</font_weight>
                 </grand_total>
             </totals>
-        </pdf>
+        </invoicepdf>
         <models>
             <!--
             <bundle>

@@ -32,14 +32,16 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
- 
 class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Model_Pdf_Abstract 
 {
     protected $_invoice;
     
     public function getPdf($invoices = array())
     {
-        $pdf = $this->_pdf;
+        $this->_beforeGetPdf();
+        $this->_initRenderer('invoice');
+        
+        $pdf = $this->_getPdf();
         
         foreach ($invoices as $invoice) {
             if ($invoice->getStoreId()) {
@@ -58,9 +60,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             /* Add image */
             $this->insertLogo($page, $invoice->getStore());
 
-            /* Add address */
-//            $this->insertAddressFooter($page, $invoice->getStore());
-
             /* Add head */
             $this->insertOrder(
                 $page, 
@@ -73,16 +72,26 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
 
             $this->setSubject($page, Mage::helper('sales')->__('Invoice'));
 
-            $page = $this->newPage($settings);
-            $page = $this->newPage($settings);
-            $page = $this->newPage($settings);
-            $page = $this->newPage($settings);
+            /* Add body */
+            foreach ($invoice->getAllItems() as $item){
+                if ($item->getOrderItem()->getParentItem()) {
+                    continue;
+                }
+
+                /* Draw item */
+                $page = $this->_drawItem($item, $page, $order);
+            }
+
+            /* Add totals */
+            // $page = $this->insertTotals($page, $invoice);
+
+            if ($invoice->getStoreId()) {
+                Mage::app()->getLocale()->revert();
+            }
             
         }
         
-        
-//        var_dump($pdfPage->getWidth());
-//        var_dump($pdfPage->getHeight());
+        $this->_afterGetPdf();
         return $this->_pdf;
     }
     

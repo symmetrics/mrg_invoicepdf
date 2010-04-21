@@ -45,7 +45,18 @@
     protected $_height;
     
     protected $_width;
-    
+
+    protected $_posCount;
+
+    /**
+     * Item renderers with render type key
+     *
+     * model    => the model name
+     * renderer => the renderer model
+     *
+     * @var array
+     */
+    protected $_renderers = array();
     
     const PDF_INVOICE_PUT_ORDER_ID = 'put_order_id';
     const PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
@@ -68,6 +79,8 @@
         $this->_setPdf(new Zend_Pdf());
         $this->_height = self::PAGE_POSITION_TOP;
         $this->_width = self::PAGE_POSITION_LEFT;
+
+        $this->_posCount = 0;
     }
     
     /**
@@ -196,6 +209,42 @@
         $object->setFont($font, $size);
         return $font;
     }
+
+    protected function _initRenderer($type)
+    {
+        $node = Mage::getConfig()->getNode('global/invoicepdf/'.$type);
+        foreach ($node->children() as $renderer) {
+            $this->_renderers[$renderer->getName()] = array(
+                'model'     => (string)$renderer,
+                'renderer'  => null
+            );
+        }
+    }
+
+    /**
+     * Retrieve renderer model
+     *
+     * @param string $type Type of renderer to get
+     *
+     * @throws Mage_Core_Exception
+     * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
+     */
+    protected function _getRenderer($type)
+    {
+        if (!isset($this->_renderers[$type])) {
+            $type = 'default';
+        }
+
+        if (!isset($this->_renderers[$type])) {
+            Mage::throwException(Mage::helper('sales')->__('Invalid renderer model'));
+        }
+
+        if (is_null($this->_renderers[$type]['renderer'])) {
+            $this->_renderers[$type]['renderer'] = Mage::getSingleton($this->_renderers[$type]['model']);
+        }
+
+        return $this->_renderers[$type]['renderer'];
+    }
     
     /**
      * Create new page and assign to PDF object
@@ -218,6 +267,7 @@
             $this->insertTableHeader($page);
         }
 
+        // Draw fold marks
         $foldMarkHeight = $page->getHeight() / 3;
         $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
         $foldMarkHeight *= 2;
@@ -661,5 +711,83 @@
             $this->_height,
             'UTF-8'
         );
+
+        $this->_newLine($font, $fontSize);
+    }
+
+    /**
+     * Insert a table Row
+     *
+     * @param Zend_Pdf_Page                                  $page
+     * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data
+     *
+     * @return Zend_Pdf_Page
+     */
+    public function insertTableRow(&$page, Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data)
+    {
+        // TODO: Fist calc high
+        $neededHeight = $data->calculateHeight();
+
+        // Draw Pos. Nr.
+        $this->_posCount++;
+        $this->_setFontBold($page, 8);
+        $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');
+
+        // check if height is abialable
+        foreach ($data->getAllRows() as $item) {
+            $columns = $item->getAllColumns();
+            foreach ($columns as $column) {
+                $font = $column->getFont();
+                $fontSize = $column->getFontSize();
+                $value = $column->getValue();
+                $align = $column->getAlign();
+                $padding = $column->getPadding();
+
+                if ($align == 'right') {
+                    $padding = self::PAGE_POSITION_RIGHT - $padding;
+                    $padding -= $this->widthForStringUsingFontSize($value, $font, $fontSize);
+                } else {
+                    $padding = $this->_width + $padding;
+                }
+
+                $page->setFont($font, $fontSize);
+                $page->drawText($value, $padding, $this->_height, 'UTF-8');
+            }
+
+            $this->_height -= $item->calculateHeight();
+        }
+
+        $this->_height -= 10;
+
+        return $page;
+    }
+
+    protected function _darwCloumnItem(Varien_Object $item)
+    {
+        
+    }
+
+    /**
+     * Draw Item process
+     *
+     * @param  $item
+     * @param Zend_Pdf_Page $page
+     * @param Mage_Sales_Model_Order $order
+     * 
+     * @return Zend_Pdf_Page
+     */
+    protected function _drawItem(Varien_Object $item, Zend_Pdf_Page $page, Mage_Sales_Model_Order $order)
+    {
+        $type = $item->getOrderItem()->getProductType();
+        $renderer = $this->_getRenderer($type);
+        $renderer->setOrder($order);
+        $renderer->setItem($item);
+        $renderer->setPdf($this);
+        $renderer->setPage($page);
+        $renderer->setRenderedModel($this);
+
+        $renderer->draw();
+
+        return $renderer->getPage();
     }
 }
