@@ -263,7 +263,7 @@
         $this->_height = self::PAGE_POSITION_TOP;
         /* @var $pdf Zend_Pdf */
         $pdf->pages[] = $page;
-        if (count($pdf->pages) > 1) {
+        if (count($pdf->pages) > 1 && ($settings->hasDrawTableHeader()) ? $settings->getDrawTableHeader() : false) {
             $this->insertTableHeader($page);
         }
 
@@ -274,6 +274,18 @@
         $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
 
         $page->drawLine(20, $page->getHeight() / 2, 25, $page->getHeight() / 2);
+
+        // draw page number
+        $font = $this->_setFontRegular($page, 8);
+        $pageText = Mage::helper('invoicepdf')->__('Page %d', count($pdf->pages));
+        $pageTextSize = $this->widthForStringUsingFontSize($pageText, $font, 8);
+        $pageTextHeight = $this->heightForFontUsingFontSize($font, 8);
+        $page->drawText(
+            $pageText,
+            self::PAGE_POSITION_RIGHT - $pageTextSize,
+            self::PAGE_POSITION_BOTTOM + $pageTextHeight * 0.4,
+            'UTF-8'
+        );
 
         return $page;
     }
@@ -720,22 +732,32 @@
      *
      * @param Zend_Pdf_Page                                  $page
      * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data
+     * @param boolean                                        $drawTableHeader
      *
      * @return Zend_Pdf_Page
      */
-    public function insertTableRow(&$page, Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data)
+    public function insertTableRow(&$page, Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data, $drawTableHeader = false)
     {
         // TODO: Fist calc high
         $neededHeight = $data->calculateHeight();
 
+        if ($this->_height - $neededHeight < self::PAGE_POSITION_BOTTOM) {
+            $settings = new Varien_Object();
+            $settings->setDrawTableHeader($drawTableHeader);
+            $page = $this->newPage($settings);
+        }
+
         // Draw Pos. Nr.
-        $this->_posCount++;
+        
         $this->_setFontBold($page, 8);
-        $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');
+        if ($data->hasTriggerPosNumber()) {
+            $this->_posCount++;
+            $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');
+        }
 
         // check if height is abialable
-        foreach ($data->getAllRows() as $item) {
-            $columns = $item->getAllColumns();
+        foreach ($data->getAllRows() as $row) {
+            $columns = $row->getAllColumns();
             foreach ($columns as $column) {
                 $font = $column->getFont();
                 $fontSize = $column->getFontSize();
@@ -750,11 +772,21 @@
                     $padding = $this->_width + $padding;
                 }
 
+                $currentPos = 0;
+                $height = $this->_height;
+                
                 $page->setFont($font, $fontSize);
-                $page->drawText($value, $padding, $this->_height, 'UTF-8');
+                if (is_array($value)) {
+                    foreach ($value as $valueRow) {
+                        $page->drawText($valueRow, $padding, $height, 'UTF-8');
+                        $height -= $this->heightForFontUsingFontSize($font, $fontSize)
+                            * Symmetrics_InvoicePdf_Model_Pdf_Items_Item::COLUMN_SPACING;
+                    }
+                } else {
+                    $page->drawText($value, $padding, $height, 'UTF-8');
+                }
             }
-
-            $this->_height -= $item->calculateHeight();
+            $this->_height -= $row->calculateHeight();
         }
 
         $this->_height -= 10;
@@ -782,6 +814,19 @@
         $renderer = $this->_getRenderer($type);
         $renderer->setOrder($order);
         $renderer->setItem($item);
+        $renderer->setPdf($this);
+        $renderer->setPage($page);
+        $renderer->setRenderedModel($this);
+
+        $renderer->draw();
+
+        return $renderer->getPage();
+    }
+    
+    public function insertTotals(&$page, $source)
+    {
+        $renderer = Mage::getModel('invoicepdf/pdf_items_totals');
+        $renderer->setSource($source);
         $renderer->setPdf($this);
         $renderer->setPage($page);
         $renderer->setRenderedModel($this);

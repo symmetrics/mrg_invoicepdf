@@ -82,10 +82,18 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
                 $page = $this->_drawItem($item, $page, $order);
             }
 
+            $font = $this->_setFontRegular($page);
+            $this->_newLine($font, 10);
+            /* Add additional info */
+            $page = $this->_insertAdditionalInfo($page, $order);
             /* Add totals */
-            // $page = $this->insertTotals($page, $invoice);
+            $page = $this->insertTotals($page, $invoice);
 
-            if ($invoice->getStoreId()) {
+            /* Insert info text */
+            $page = $this->_insertInfoText($page, $order);
+
+
+           if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->revert();
             }
             
@@ -103,5 +111,41 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             Mage::helper('sales')->__('Invoice # '),
             $this->_invoice->getIncrementId()
         );
+    }
+
+    protected function _insertAdditionalInfo(&$page, $order)
+    {
+        $helper = Mage::helper('invoicepdf');
+
+        $renderer = Mage::getModel('invoicepdf/pdf_items_invoice_additional');
+        $renderer->setOrder($order);
+        $renderer->setPdf($this);
+        $renderer->setPage($page);
+        $renderer->setRenderedModel($this);
+
+        $renderer->draw();
+
+        $this->_height += $renderer->getHeight();
+        
+        return $renderer->getPage();
+    }
+
+    protected function _insertInfoText(&$page, $order)
+    {
+        $helper = Mage::helper('invoicepdf');
+
+        if (!$helper->getSalesPdfInvoiceConfigFlag('showinfotxt', $order->getStore())) {
+            return $page;
+        }
+
+        $renderer = Mage::getModel('invoicepdf/pdf_items_invoice_info');
+        $renderer->setOrder($order);
+        $renderer->setPdf($this);
+        $renderer->setPage($page);
+        $renderer->setRenderedModel($this);
+
+        $renderer->draw();
+
+        return $renderer->getPage();
     }
 }

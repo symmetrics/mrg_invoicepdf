@@ -47,10 +47,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
        
         $sku = $this->getSku($item);
-        $tableRowItem->addColumn("sku", $sku, 45);
+        $tableRowItem->addColumn("sku", $sku, 45 , 'left', 50);
         
         $name = $item->getName();
-        $tableRowItem->addColumn("name", $name, 110);
+        $tableRowItem->addColumn("name", $name, 110, 'left', 260);
 
         $price = $order->formatPriceTxt($item->getPrice());
         $tableRowItem->addColumn("price", $price, 160, 'right');
@@ -71,8 +71,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
         if ($options) {
             foreach ($options as $option) {
                 $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
+                /* @var $tableRowOptionItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
                 // draw options label
-                $tableRowOptionItem->addColumn('option_label', $option['label'], 110);
+                $labelFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+                $tableRowOptionItem->addColumn('option_label', $option['label'], 110, 'left', 0, $labelFont, 7);
 
                 $this->addRow($tableRowOptionItem);
 
@@ -81,13 +83,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
                     $_printValue = isset($option['print_value']) ? $option['print_value'] : strip_tags($option['value']);
                     $values = explode(', ', $_printValue);
 
-                    $tableRowOptionItem->addColumn('option_value', $_printValue, 115);
+                    $valueFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
+                    $tableRowOptionItem->addColumn('option_value', $_printValue, 115, 'left', 0 , $valueFont, 6);
                     $this->addRow($tableRowOptionItem);
                 }
             }
         }
 
-        $pdf->insertTableRow($page, $this);
+        $this->setTriggerPosNumber(true);
+
+        $page = $pdf->insertTableRow($page, $this);
+        $this->setPage($page);
         $this->clearRows();
     }
 }
