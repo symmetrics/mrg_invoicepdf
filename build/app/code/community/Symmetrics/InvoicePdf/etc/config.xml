@@ -52,6 +52,13 @@
         </events>
     </adminhtml>
     <global>
+        <blocks>
+            <adminhtml>
+                <rewrite>
+                    <sales_invoice_grid>Symmetrics_InvoicePdf_Block_Sales_Invoice_Grid</sales_invoice_grid>
+                </rewrite>
+            </adminhtml>
+        </blocks>
         <events>
             <sales_order_place_after>
                 <observers>
