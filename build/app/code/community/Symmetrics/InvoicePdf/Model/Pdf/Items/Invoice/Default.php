@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract Pdf Rendering class
+ * invoice rendering class for default products
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -35,6 +35,11 @@
 class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
     extends Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
 {
+    /**
+     * method to draw the invoice
+     *
+     * @return void
+     */
     public function draw()
     {
         $order  = $this->getOrder();
@@ -47,7 +52,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
        
         $sku = $this->getSku($item);
-        $tableRowItem->addColumn("sku", $sku, 45 , 'left', 50);
+        $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
         
         $name = $item->getName();
         $tableRowItem->addColumn("name", $name, 110, 'left', 260);
@@ -80,11 +85,12 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
 
                 if ($option['value']) {
                     $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
-                    $_printValue = isset($option['print_value']) ? $option['print_value'] : strip_tags($option['value']);
+                    $_printValue = isset($option['print_value'])
+                        ? $option['print_value'] : strip_tags($option['value']);
                     $values = explode(', ', $_printValue);
 
                     $valueFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
-                    $tableRowOptionItem->addColumn('option_value', $_printValue, 115, 'left', 0 , $valueFont, 6);
+                    $tableRowOptionItem->addColumn('option_value', $_printValue, 115, 'left', 0, $valueFont, 6);
                     $this->addRow($tableRowOptionItem);
                 }
             }
