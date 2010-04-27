@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract Pdf Rendering class
+ * Class to handle Column items
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -42,14 +42,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
     protected $_columns;
 
     /**
-     * type of Item
-     *
-     * @var integer
+     * column spacing
      */
-    protected $_type;
-
-    const ITEM_TYPE_PRODUCT = 0;
-    const ITEM_TYPE_OPTIONS = 1;
     const COLUMN_SPACING = 1.2;
 
     /**
@@ -60,27 +54,18 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
     public function __construct()
     {
         $this->_columns = new Varien_Object();
-        $this->_type = self::ITEM_TYPE_PRODUCT;
-    }
-
-    public function getType()
-    {
-        return $this->_type;
-    }
-
-    public function setTyle($type)
-    {
-        $this->_type = $type;
     }
 
     /**
      * add a Coumn
      *
-     * @param string        $key
-     * @param string        $value
-     * @param integer       $paddingLeft
-     * @param Zend_Pdf_Font $font
-     * @param integer       $fontSize
+     * @param string        $key      given key for column
+     * @param string        $value    string to set for given column
+     * @param float         $padding  padding of current column
+     * @param string        $align    align of current column
+     * @param float         $maxWidth max width for current column
+     * @param Zend_Pdf_Font $font     font of current column
+     * @param integer       $fontSize font size of current column
      *
      * @return Symmetrics_InvoicePdf_Model_Pdf_Items_Item
      */
@@ -113,6 +98,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
         return count($this->_columns->getData());
     }
 
+    /**
+     * clear all coumns
+     *
+     * @return void
+     */
     public function clearColumns()
     {
         $this->_columns = new Varien_Object();
@@ -121,7 +111,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
     /**
      * get a column for a specified key
      *
-     * @param sring $key
+     * @param sring $key key to get
      *
      * @return Varien_Object
      */
@@ -133,7 +123,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
     /**
      * unset a column for specified key
      *
-     * @param string $key
+     * @param string $key key to get
+     *
+     * @return void
      */
     public function unsetColumn($key)
     {
@@ -143,7 +135,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
     /**
      * check if a column exists
      *
-     * @param stirng $key
+     * @param stirng $key key to check
      *
      * @return boolean
      */
@@ -152,11 +144,21 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
         return $this->_columns->hasData($key);
     }
 
+    /**
+     * get all collums of this item
+     *
+     * @return array
+     */
     public function getAllColumns()
     {
         return $this->_columns->getData();
     }
 
+    /**
+     * calculate item height for his content
+     *
+     * @return float
+     */
     public function calculateHeight()
     {
         $columnHeight = 0;
@@ -170,8 +172,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
             $textWidth = $this->_widthForStringUsingFontSize('T', $font, $fontSize);
 
             if (!is_array($value)) {
-                if($column->getWidth() != 0) {
-                    $value = wordwrap($value, $column->getWidth()/$textWidth ,"\n", false);
+                if ($column->getWidth() != 0) {
+                    $value = wordwrap($value, $column->getWidth()/$textWidth, "\n", false);
                     $value = explode("\n", $value);
                 }
             }
@@ -195,9 +197,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
      * Returns the total height in points of the font using the specified font and
      * size.
      *
-     * @param string $string
-     * @param Zend_Pdf_Resource_Font $font
-     * @param float $fontSize Font size in points
+     * @param Zend_Pdf_Resource_Font $font     font to get size for
+     * @param float                  $fontSize font size in points
+     *
      * @return float
      */
     protected function _heightForFontUsingFontSize($font, $fontSize)
@@ -217,14 +219,23 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
      * Similar calculations exist inside the layout manager class, but widths are
      * generally calculated only after determining line fragments.
      *
-     * @param string $string
-     * @param Zend_Pdf_Resource_Font $font
-     * @param float $fontSize Font size in points
+     * @param string                 $string   string to get size for
+     * @param Zend_Pdf_Resource_Font $font     font to get size for
+     * @param float                  $fontSize font size in points
+     *
      * @return float
      */
     protected function _widthForStringUsingFontSize($string, $font, $fontSize)
     {
-        $drawingString = '"libiconv"' == ICONV_IMPL ? iconv('UTF-8', 'UTF-16BE//IGNORE', $string) : @iconv('UTF-8', 'UTF-16BE', $string);
+        $drawingString = '"libiconv"' == ICONV_IMPL ? iconv(
+            'UTF-8',
+            'UTF-16BE//IGNORE',
+            $string
+        ) : @iconv(
+            'UTF-8',
+            'UTF-16BE',
+            $string
+        );
 
         $characters = array();
         for ($i = 0; $i < strlen($drawingString); $i++) {
@@ -237,6 +248,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Item
 
     }
 
+    /**
+     * rount a Value up to given precision
+     *
+     * @param float $value     value to round up
+     * @param int   $precision precision to round up
+     *
+     * @return float
+     */
     public function roundUp($value, $precision = 0)
     {
         // If the precision is 0 then default the factor to 1, otherwise
