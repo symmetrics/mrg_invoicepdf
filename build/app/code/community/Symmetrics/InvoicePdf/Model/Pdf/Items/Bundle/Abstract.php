@@ -22,7 +22,7 @@
  */
 
 /**
- *
+ * Abstract class to render Bundles 
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -38,7 +38,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Getting all available childs for Invoice, Shipmen or Creditmemo item
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item item to get childs
+     * 
      * @return array
      */
     public function getChilds($item)
@@ -74,7 +75,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve is Shipment Separately flag for Item
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item item to check
+     * 
      * @return bool
      */
     public function isShipmentSeparately($item = null)
@@ -121,7 +123,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve is Child Calculated
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item item to check
+     * 
      * @return bool
      */
     public function isChildCalculated($item = null)
@@ -135,7 +138,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
             if ($parentItem) {
                 $options = $parentItem->getProductOptions();
                 if ($options) {
-                    if (isset($options['product_calculations']) && $options['product_calculations'] == Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
+                    if (isset($options['product_calculations']) && 
+                        $options['product_calculations'] ==
+                        Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
                         return true;
                     } else {
                         return false;
@@ -144,7 +149,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
             } else {
                 $options = $item->getProductOptions();
                 if ($options) {
-                    if (isset($options['product_calculations']) && $options['product_calculations'] == Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
+                    if (isset($options['product_calculations']) && 
+                        $options['product_calculations'] ==
+                        Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
                         return false;
                     } else {
                         return true;
@@ -166,7 +173,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve Bundle Options
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item item Options (currently not in use)
+     * 
      * @return array
      */
     public function getBundleOptions($item = null)
@@ -183,7 +191,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve Selection attributes
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item Item to get attributes
+     * 
      * @return mixed
      */
     public function getSelectionAttributes($item)
@@ -202,7 +211,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve Order options
      *
-     * @param Varien_Object $item
+     * @param Varien_Object $item item Options (currently not in use)
+     *
      * @return array
      */
     public function getOrderOptions($item = null)
@@ -241,7 +251,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Retrieve Value HTML
      *
-     * @param Mage_Sales_Order_Item $item
+     * @param Mage_Sales_Order_Item $item item to get Html
+     *
      * @return string
      */
     public function getValueHtml($item)
@@ -265,7 +276,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     /**
      * Can show price info for item
      *
-     * @param Mage_Sales_Order_Item $item
+     * @param Mage_Sales_Order_Item $item item to check
+     * 
      * @return bool
      */
     public function canShowPriceInfo($item)
