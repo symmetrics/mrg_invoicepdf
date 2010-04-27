@@ -22,7 +22,7 @@
  */
 
 /**
- *
+ * rendering class to draw bundle products to the invoice
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -35,6 +35,11 @@
 class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
     extends Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
 {
+    /**
+     * method to draw bundle products to the invoice
+     *
+     * @return void
+     */
     public function draw()
     {
         $order  = $this->getOrder();
@@ -54,7 +59,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             // draw SKUs
             if (!$_item->getOrderItem()->getParentItem()) {
                 $sku = $this->getSku($_item);
-                $tableRowItem->addColumn("sku", $sku, 45 , 'left', 50);
+                $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
             }
 
 
@@ -92,7 +97,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     /* @var $tableRowOptionItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
 
                     $labelFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-                    $tableRowOptionItem->addColumn('option_label', $attributes['option_label'], 20, 'left', 0, $labelFont, 7);
+                    $tableRowOptionItem->addColumn(
+                        'option_label',
+                        $attributes['option_label'],
+                        20,
+                        'left',
+                        0,
+                        $labelFont,
+                        7
+                    );
 
                     $this->addRow($tableRowOptionItem);
 
