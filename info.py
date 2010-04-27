@@ -5,7 +5,7 @@
 # =============================================================================
 NAME = 'symmetrics_module_invoicepdf'
 
-TAGS = ('magento', 'module', 'symmetrics', 'germanconfig', 'locpack')
+TAGS = ('magento', 'module', 'symmetrics', 'pdf', 'invoice', 'german')
 
 LICENSE = 'AFL 3.0'
 
@@ -17,17 +17,17 @@ INSTALL_PATH = ''
 # responsibilities
 # =============================================================================
 TEAM_LEADER = {
-    'Sergej Braznikov': 'sb@symmetrics.de'
+    'Torsten Walluhn': 'tw@symmetrics.de',
 }
 
 MAINTAINER = {
-    'Eugen Gitin': 'eg@symmetrics.de'
+    'Torsten Walluhn': 'tw@symmetrics.de',
 }
 
 AUTHORS = {
+    'Torsten Walluhn': 'tw@symmetrics.de',
     'Eugen Gitin': 'eg@symmetrics.de',
     'Eric Reiche': 'er@symmetrics.de',
-    'Torsten Walluhn': 'tw@symmetrics.de'
 }
 
 # =============================================================================
