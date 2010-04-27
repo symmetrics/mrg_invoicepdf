@@ -31,21 +31,35 @@
  * @copyright 2010 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
- */
- 
- abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
- {
+ */ 
+abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
+{
     /**
      * Zend PDF object
      *
      * @var Zend_Pdf
      */
     protected $_pdf;
-    
+
+    /**
+     * pointer for current height on the pdf page
+     *
+     * @var float
+     */
     protected $_height;
-    
+
+    /**
+     * pointer for current width on the pdf page
+     *
+     * @var float
+     */
     protected $_width;
 
+    /**
+     * Counter for product positions
+     *
+     * @var integer
+     */
     protected $_posCount;
 
     /**
@@ -67,12 +81,17 @@
     const PAGE_POSITION_TOP = 800;
     const PAGE_POSITION_BOTTOM = 47;
     
-    
+    /**
+     * Abstract function to render the PDF
+     *
+     * @return Zend_Pdf
+     */
     abstract public function getPdf();
     
     /**
      * Cunstructor to initialize the PDF object
      *
+     * @return void
      */
     protected function _construct()
     {
@@ -92,14 +111,16 @@
      * Similar calculations exist inside the layout manager class, but widths are
      * generally calculated only after determining line fragments.
      *
-     * @param string $string
-     * @param Zend_Pdf_Resource_Font $font
-     * @param float $fontSize Font size in points
+     * @param string                 $string   string to calculate width for
+     * @param Zend_Pdf_Resource_Font $font     Font to calculate height
+     * @param float                  $fontSize Font size in points
+     *
      * @return float
      */
     public function widthForStringUsingFontSize($string, $font, $fontSize)
     {
-        $drawingString = '"libiconv"' == ICONV_IMPL ? iconv('UTF-8', 'UTF-16BE//IGNORE', $string) : @iconv('UTF-8', 'UTF-16BE', $string);
+        $drawingString = '"libiconv"' == ICONV_IMPL ?
+            iconv('UTF-8', 'UTF-16BE//IGNORE', $string) : @iconv('UTF-8', 'UTF-16BE', $string);
 
         $characters = array();
         for ($i = 0; $i < strlen($drawingString); $i++) {
@@ -116,9 +137,9 @@
      * Returns the total height in points of the font using the specified font and
      * size.
      *
-     * @param string $string
-     * @param Zend_Pdf_Resource_Font $font
-     * @param float $fontSize Font size in points
+     * @param Zend_Pdf_Resource_Font $font     Font to calculate height
+     * @param float                  $fontSize Font size in points
+     * 
      * @return float
      */
     public function heightForFontUsingFontSize($font, $fontSize)
@@ -134,7 +155,8 @@
      *
      * @return void
      */
-    protected function _beforeGetPdf() {
+    protected function _beforeGetPdf()
+    {
         $translate = Mage::getSingleton('core/translate');
         /* @var $translate Mage_Core_Model_Translate */
         $translate->setTranslateInline(false);
@@ -145,7 +167,8 @@
      *
      * @return void
      */
-    protected function _afterGetPdf() {
+    protected function _afterGetPdf()
+    {
         $translate = Mage::getSingleton('core/translate');
         /* @var $translate Mage_Core_Model_Translate */
         $translate->setTranslateInline(true);
@@ -154,7 +177,7 @@
     /**
      * Set PDF object
      *
-     * @param Zend_Pdf $pdf
+     * @param Zend_Pdf $pdf pdf top set
      *
      * @return Mage_Sales_Model_Order_Pdf_Abstract
      */
@@ -180,6 +203,16 @@
         return $this->_pdf;
     }
 
+    /**
+     * make a new line with given font, size and spaceing
+     *
+     * @param Zend_Pdf_Font $font        font for new line
+     * @param float         $fontSize    size for new line
+     * @param boolean       $invert      invert the new line (if true it will be upwards)
+     * @param float         $spacingSize spacing of the font
+     *
+     * @return void
+     */
     protected function _newLine($font, $fontSize, $invert = false, $spacingSize = 1.2)
     {
         if ($invert) {
@@ -189,6 +222,14 @@
         }
     }
 
+    /**
+     * Set regular font
+     *
+     * @param Zend_Pdf_Page $object Page to set font for
+     * @param integer       $size   Size to set
+     *
+     * @return Zend_Pdf_Font
+     */
     protected function _setFontRegular($object, $size = 10)
     {
         $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
@@ -196,6 +237,14 @@
         return $font;
     }
 
+    /**
+     * set bold font
+     *
+     * @param Zend_Pdf_Page $object Page to set font for
+     * @param integer       $size   Size to set
+     *
+     * @return Zend_Pdf_Font
+     */
     protected function _setFontBold($object, $size = 10)
     {
         $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
@@ -203,6 +252,14 @@
         return $font;
     }
 
+    /**
+     * set italic font
+     *
+     * @param Zend_Pdf_Page $object Page to set font for
+     * @param integer       $size   Size to set
+     * 
+     * @return Zend_Pdf_Font
+     */
     protected function _setFontItalic($object, $size = 10)
     {
         $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_ITALIC);
@@ -210,6 +267,13 @@
         return $font;
     }
 
+    /**
+     * Init the given renderer
+     *
+     * @param string $type type of renderer to init
+     *
+     * @return void
+     */
     protected function _initRenderer($type)
     {
         $node = Mage::getConfig()->getNode('global/invoicepdf/'.$type);
@@ -249,7 +313,12 @@
     /**
      * Create new page and assign to PDF object
      *
-     * @param array $settings
+     * @param Varien_Object $settings settings to get
+     * Allowed properties are
+     *  $settings->setPageSize($pageSize);
+     * '$pageSize' is a Size from Zend_Pdf_Page
+     *  $settings->setDrawTableHeader(true);
+     * to draw the table header
      *
      * @return Zend_Pdf_Page
      */
@@ -293,8 +362,8 @@
     /**
      * Insert the store logo to the Pdf
      *
-     * @param &$page Zend_Pdf_Page Page to insert logo
-     * @param $store integer       store Id to get logo
+     * @param Zend_Pdf_Page         &$page Page to insert logo
+     * @param Mage_Core_Model_Store $store Store to get the logo
      *
      * @return Zend_Pdf_Page
      */
@@ -340,9 +409,11 @@
     /**
      * insert a address footer item
      *
-     * @param Zend_Pdf_Page $page
-     * @param string        $key
-     * @param string        $value
+     * @param Zend_Pdf_Page $page  page to insert the item
+     * @param string        $key   key of item
+     * @param string        $value value of item
+     *
+     * @return void
      */
     protected function _insertAddressFooterItem($page, $key, $value = null)
     {
@@ -370,8 +441,8 @@
     /**
      * Insert the store address to the Pdf
      *
-     * @param &$page Zend_Pdf_Page Page to insert address
-     * @param $store integer       store Id to get address
+     * @param Zend_Pdf_Page         &$page Page to insert address
+     * @param Mage_Core_Model_Store $store Store to get the address
      *
      * @return Zend_Pdf_Page
      */
@@ -397,7 +468,7 @@
             }
 
 
-            foreach ($data as $key => $value){
+            foreach ($data as $key => $value) {
                 if ($value == '') {
                     continue;
                 } else {
@@ -443,7 +514,8 @@
     /**
      * Format address
      *
-     * @param string $address
+     * @param string $address address to format
+     * 
      * @return array
      */
     protected function _formatAddress($address)
@@ -463,7 +535,7 @@
     /**
      * Insert a Order information row
      *
-     * @param Zend_Pdf_Page $page  given Page to insert row
+     * @param Zend_Pdf_Page &$page given Page to insert row
      * @param string        $key   key to write
      * @param string        $value value to write
      *
@@ -506,9 +578,11 @@
     /**
      * Inserts the Order Information to given page
      *
-     * @param Zend_Pdf_Page          $page       given page to insert order info
+     * @param Zend_Pdf_Page          &$page      given page to insert order info
      * @param Mage_Sales_Model_Order $order      order to get info from
      * @param boolean                $putOrderId print order id
+     *
+     * @return void
      */
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
@@ -555,8 +629,8 @@
                 ->toPdf();
 
             $payment = explode('{{pdf_row_separator}}', $paymentInfo);
-            foreach ($payment as $key => $value){
-                if (strip_tags(trim($value)) == ''){
+            foreach ($payment as $key => $value) {
+                if (strip_tags(trim($value)) == '') {
                     unset($payment[$key]);
                 }
             }
@@ -585,7 +659,15 @@
             );
         }
     }
-    
+
+    /**
+     * insert billing address to given page
+     *
+     * @param Zend_Pdf_Page                  &$page          page to insert the billing address
+     * @param Mage_Sales_Model_Order_Address $billingAddress billing address to get data
+     *
+     * @return void
+     */
     protected function _insertBillingAddress(&$page, $billingAddress)
     {
         $billingAddress = $this->_formatAddress($billingAddress->format('pdf'));
@@ -624,7 +706,15 @@
             $this->_newLine($font, 9);
         }
     }
-    
+
+    /**
+     * Set a Subject to given page
+     *
+     * @param Zend_Pdf_Page &$page page to set the title
+     * @param string        $title title to set
+     *
+     * @return void
+     */
     protected function setSubject(&$page, $title)
     {
         $this->_setFontBold($page, 16);
@@ -639,7 +729,16 @@
         );
         $this->_setFontRegular($page);
     }
-    
+
+    /**
+     * draw the oder info to given page
+     *
+     * @param Zend_Pdf_Page          &$page      page to draw the order info
+     * @param Mage_Sales_Model_Order $order      order to get info from
+     * @param boolean                $putOrderId put the order id
+     *
+     * @return void
+     */
     protected function insertOrder(&$page, $order, $putOrderId = true)
     {
         /* @var $order Mage_Sales_Model_Order */
@@ -654,7 +753,14 @@
         $this->_width = 40;
         $this->insertTableHeader($page);
     }
-    
+
+    /**
+     * insert the table header to given page
+     *
+     * @param Zend_Pdf_Page &$page page to insert the table header
+     *
+     * @return void
+     */
     protected function insertTableHeader(&$page)
     {
         
@@ -667,7 +773,13 @@
         $fillType = Zend_Pdf_Page::SHAPE_DRAW_FILL;
         
         $page->setFillColor($greyScale9);
-        $page->drawRectangle($this->_width ,$this->_height, self::PAGE_POSITION_RIGHT, $this->_height - $columHeight, $fillType);
+        $page->drawRectangle(
+            $this->_width,
+            $this->_height,
+            self::PAGE_POSITION_RIGHT,
+            $this->_height - $columHeight,
+            $fillType
+        );
 
         $this->_newLine($font, $fontSize, false, 1);
         $black = new Zend_Pdf_Color_GrayScale(0);
@@ -730,13 +842,16 @@
     /**
      * Insert a table Row
      *
-     * @param Zend_Pdf_Page                                  $page
-     * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data
-     * @param boolean                                        $drawTableHeader
+     * @param Zend_Pdf_Page                                  &$page           Page to insert table row
+     * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data            data to insert in the row
+     * @param boolean                                        $drawTableHeader flag to draw the table header
      *
      * @return Zend_Pdf_Page
      */
-    public function insertTableRow(&$page, Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data, $drawTableHeader = false)
+    public function insertTableRow(
+        &$page,
+        Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data,
+        $drawTableHeader = false)
     {
         // TODO: Fist calc high
         $neededHeight = $data->calculateHeight();
@@ -794,17 +909,12 @@
         return $page;
     }
 
-    protected function _darwCloumnItem(Varien_Object $item)
-    {
-        
-    }
-
     /**
      * Draw Item process
      *
-     * @param  $item
-     * @param Zend_Pdf_Page $page
-     * @param Mage_Sales_Model_Order $order
+     * @param Varien_Object          $item  item to draw
+     * @param Zend_Pdf_Page          $page  page to draw on
+     * @param Mage_Sales_Model_Order $order order do draw from
      * 
      * @return Zend_Pdf_Page
      */
@@ -822,7 +932,15 @@
 
         return $renderer->getPage();
     }
-    
+
+    /**
+     * Insert the totals block to given page
+     *
+     * @param Zend_Pdf_Page            &$page  page to insert the block
+     * @param Mage_Core_Model_Abstract $source source to set
+     * 
+     * @return Zend_Pdf_Page
+     */
     public function insertTotals(&$page, $source)
     {
         $renderer = Mage::getModel('invoicepdf/pdf_items_totals');
