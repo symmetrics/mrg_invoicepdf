@@ -22,7 +22,7 @@
  */
 
 /**
- *
+ * rendering class to draw the info text block to the invoice
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
@@ -35,6 +35,11 @@
 class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Info
     extends Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
 {
+    /**
+     * method to draw the info text block to the invoice
+     *
+     * @return void
+     */
     public function draw()
     {
         $order  = $this->getOrder();
