@@ -56,7 +56,6 @@
             <invoice>
                 <default>invoicepdf/pdf_items_invoice_default</default>
                 <bundle>invoicepdf/pdf_items_bundle_invoice</bundle>
-                <!-- <grouped>sales/order_pdf_items_invoice_grouped</grouped> -->
             </invoice>
             <totals>
                 <subtotal translate="title">
@@ -113,27 +112,6 @@
             </totals>
         </invoicepdf>
         <models>
-            <!--
-            <bundle>
-                <rewrite>
-                    <sales_order_pdf_items_invoice>Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice</sales_order_pdf_items_invoice>
-                </rewrite>
-            </bundle>
-            <sales>
-                <rewrite>
-                    <order_pdf_invoice>Symmetrics_InvoicePdf_Model_Pdf_Invoice</order_pdf_invoice>
-                    <order_pdf_items_invoice_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_invoice_default>
-                    <order_pdf_items_invoice_grouped>Symmetrics_InvoicePdf_Model_Pdf_Items_Grouped</order_pdf_items_invoice_grouped>
-                    <order_pdf_creditmemo>Symmetrics_InvoicePdf_Model_Pdf_Creditmemo</order_pdf_creditmemo>
-                    <order_pdf_items_creditmemo_default>Symmetrics_InvoicePdf_Model_Pdf_Items_Default</order_pdf_items_creditmemo_default>
-                </rewrite>
-            </sales>
-            <tax>
-                <rewrite>
-                    <sales_pdf_grandtotal>Symmetrics_InvoicePdf_Model_Tax_Pdf_Grandtotal</sales_pdf_grandtotal>
-                </rewrite>
-            </tax> 
-            -->
             <invoicepdf>
                 <class>Symmetrics_InvoicePdf_Model</class>
             </invoicepdf>
