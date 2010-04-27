@@ -44,7 +44,9 @@ zu machen.
 *** H: Wenn attach invoice installiert ist, werden die automatisch generierten
         Rechnungen auch an die Benachrichtigungs-Emails angehangen.
 
-** TECHNINCAL
+** TECHNICAL
+Die technische Information muss noch ergäntzt werden.
+Dies folgt in kürze.
 
 ** PROBLEMS
 Rechnungen werden nach manueller Generierung nicht automatisch verschickt
@@ -65,7 +67,4 @@ Rechnungen werden nach manueller Generierung nicht automatisch verschickt
 *** F: Ändern Sie die Optionen und prüfen Sie, ob die Zahlungsmethode bzw. Versandmethode
 		auf der Rechnung angezeigt werden.
 *** G: Laden Sie ein Logo hoch und prüfen Sie, ob es auf der Rechnung erscheint.
-
-** CATCHABLE
-
-** STRESS
+*** H: keine testcase vorhanden
