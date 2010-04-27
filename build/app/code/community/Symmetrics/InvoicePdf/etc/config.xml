@@ -39,6 +39,17 @@
                 </Symmetrics_InvoicePdf>
             </modules>
         </translate>
+        <events>
+            <controller_action_layout_render_before_adminhtml_sales_order_invoice_view>
+                <observers>
+                    <symmetrics_invoicepdf_model_observer>
+                        <type>singleton</type>
+                        <class>Symmetrics_InvoicePdf_Model_Observer</class>
+                        <method>adminhtmlInvoiceView</method>
+                    </symmetrics_invoicepdf_model_observer>
+                </observers>
+            </controller_action_layout_render_before_adminhtml_sales_order_invoice_view>
+        </events>
     </adminhtml>
     <global>
         <events>

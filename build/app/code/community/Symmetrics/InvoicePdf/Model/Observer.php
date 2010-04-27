@@ -40,7 +40,7 @@ class Symmetrics_InvoicePdf_Model_Observer extends Varien_Object
      * 
      * @param Varien_Observer $observer observer object
      * 
-     * @return void
+     * @return Symmetrics_InvoicePdf_Model_Observer
      */
     public function createInvoice($observer)
     {
@@ -71,5 +71,42 @@ class Symmetrics_InvoicePdf_Model_Observer extends Varien_Object
                 Mage::log($e->getMessage());
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Change Magento Print button in invoice admin view with Symmetrics_InvoicePdf Print Button
+     *
+     * @param Varien_Observer $observer observer object
+     *
+     * @return Symmetrics_InvoicePdf_Model_Observer
+     */
+    public function adminhtmlInvoiceView($observer)
+    {
+        $currentInvoice = Mage::registry('current_invoice');
+
+        $layout = Mage::getSingleton('core/layout');
+        /* @var $layout Mage_Core_Model_Layout */
+
+        $route = "symmetrics/invoicepdf/print";
+        $params = array('invoice_id' => $currentInvoice->getId());
+
+        // sales_invoice_view
+        $invoiceBlock = $layout->getBlock('sales_invoice_view');
+        /* @var $invoiceBlock Mage_Adminhtml_Block_Sales_Order_Invoice_View */
+
+        $invoiceBlock->removeButton('print');
+
+        $invoiceBlock->addButton(
+            'invoicepdf',
+            array(
+                'label'     => Mage::helper('sales')->__('Print'),
+                'class'     => 'save',
+                'onclick'   => 'setLocation(\'' . Mage::getUrl($route, $params) . '\')'
+            )
+        );
+
+        return $this;
     }
 }
