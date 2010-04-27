@@ -60,4 +60,33 @@ class Symmetrics_InvoicePdf_InvoicePdfController
             $this->_forward('noRoute');
         }
     }
+
+    /**
+     * Action to print multible invoices as PDF
+     *
+     * @return void
+     */
+    public function pdfinvoicesAction()
+    {
+        $invoicesIds = $this->getRequest()->getPost('invoice_ids');
+        if (!empty($invoicesIds)) {
+            $invoices = Mage::getResourceModel('sales/order_invoice_collection')
+                ->addAttributeToSelect('*')
+                ->addAttributeToFilter('entity_id', array('in' => $invoicesIds))
+                ->load();
+            if (!isset($pdf)) {
+                $pdf = Mage::getModel('invoicepdf/pdf_invoice')->getPdf($invoices);
+            } else {
+                $pages = Mage::getModel('invoicepdf/pdf_invoice')->getPdf($invoices);
+                $pdf->pages = array_merge($pdf->pages, $pages->pages);
+            }
+
+            return $this->_prepareDownloadResponse(
+                'invoice' . Mage::getSingleton('core/date')->date('Y-m-d_H-i-s') . '.pdf',
+                $pdf->render(),
+                'application/pdf'
+            );
+        }
+        $this->_redirect('*/*/');
+    }
 }
