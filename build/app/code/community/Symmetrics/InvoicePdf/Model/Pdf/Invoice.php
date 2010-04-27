@@ -32,10 +32,22 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
-class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Model_Pdf_Abstract 
+class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Model_Pdf_Abstract
 {
+    /**
+     * Container to store the current invoice
+     *
+     * @var Mage_Sales_Model_Order_Invoice
+     */
     protected $_invoice;
-    
+
+    /**
+     * function to render the invoice/s as PDF
+     *
+     * @param array $invoices array of invices
+     *
+     * @return Zend_Pdf
+     */
     public function getPdf($invoices = array())
     {
         $this->_beforeGetPdf();
@@ -73,7 +85,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             $this->setSubject($page, Mage::helper('sales')->__('Invoice'));
 
             /* Add body */
-            foreach ($invoice->getAllItems() as $item){
+            foreach ($invoice->getAllItems() as $item) {
                 if ($item->getOrderItem()->getParentItem()) {
                     continue;
                 }
@@ -93,7 +105,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             $page = $this->_insertInfoText($page, $order);
 
 
-           if ($invoice->getStoreId()) {
+            if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->revert();
             }
             
@@ -102,7 +114,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         $this->_afterGetPdf();
         return $this->_pdf;
     }
-    
+
+    /**
+     * Insert the invoice increment id and the Order info from its parent class
+     *
+     * @param Zend_Pdf_Page          &$page      given page to insert order info
+     * @param Mage_Sales_Model_Order $order      order to get info from
+     * @param boolean                $putOrderId print order id
+     *
+     * @return void
+     */
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
         parent::_insertOrderInfo(&$page, $order, $putOrderId);
@@ -113,6 +134,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         );
     }
 
+    /**
+     * Insert additional info to the current invoice
+     *
+     * @param Zend_Pdf_Page          &$page given page to insert the addition info
+     * @param Mage_Sales_Model_Order $order order to get info from
+     *
+     * @return Zend_Pdf_Page
+     */
     protected function _insertAdditionalInfo(&$page, $order)
     {
         $helper = Mage::helper('invoicepdf');
@@ -130,6 +159,14 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         return $renderer->getPage();
     }
 
+    /**
+     * Insert info text to the current invoice
+     *
+     * @param Zend_Pdf_Page          &$page given page to insert info text
+     * @param Mage_Sales_Model_Order $order order to get info from
+     *
+     * @return Zend_Pdf_Page
+     */
     protected function _insertInfoText(&$page, $order)
     {
         $helper = Mage::helper('invoicepdf');
