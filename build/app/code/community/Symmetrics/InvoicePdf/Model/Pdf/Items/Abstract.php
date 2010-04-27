@@ -12,25 +12,25 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Magento to newer
- * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
- *
- * @category    Mage
- * @package     Mage_Sales
- * @copyright   Copyright (c) 2009 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  Symmetrics
+ * @package   Symmetrics_InvoicePdf
+ * @author    symmetrics gmbh <info@symmetrics.de>
+ * @author    Torsten Walluhn <tw@symmetrics.de>
+ * @copyright 2010 Symmetrics Gmbh
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @link      http://www.symmetrics.de/
  */
 
-
 /**
- * Sales Order Pdf Items renderer Abstract
+ * Abstract Class to render Items such als Products, Totals and others
  *
- * @category   Mage
- * @package    Mage_Sales
- * @author     Magento Core Team <core@magentocommerce.com>
+ * @category  Symmetrics
+ * @package   Symmetrics_InvoicePdf
+ * @author    Symmetrics GmbH <info@symmetrics.de>
+ * @author    Torsten Walluhn <tw@symmetrics.de>
+ * @copyright 2010 symmetrics gmbh
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @link      http://www.symmetrics.de/
  */
 abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_Model_Abstract
 {
@@ -55,7 +55,13 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
      */
     protected $_item;
 
+    /**
+     * container of given items
+     *
+     * @var array
+     */
     protected $_items = array();
+    
     /**
      * Pdf object
      *
@@ -73,7 +79,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Set order model
      *
-     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Order $order order to set
+     * 
      * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
      */
     public function setOrder(Mage_Sales_Model_Order $order)
@@ -85,8 +92,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Set Source model
      *
-     * @param Mage_Core_Model_Abstract $source
-     * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
+     * @param Mage_Core_Model_Abstract $source source to set
+     * 
+     * @return Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
      */
     public function setSource(Mage_Core_Model_Abstract $source)
     {
@@ -97,8 +105,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Set item object
      *
-     * @param Varien_Object $item
-     * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
+     * @param Varien_Object $item item to set
+     *
+     * @return Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
      */
     public function setItem(Varien_Object $item)
     {
@@ -109,8 +118,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Set Pdf model
      *
-     * @param Mage_Sales_Model_Order_Pdf_Abstract $pdf
-     * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
+     * @param Symmetrics_InvoicePdf_Model_Pdf_Abstract $pdf model to set
+     *
+     * @return Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
      */
     public function setPdf(Symmetrics_InvoicePdf_Model_Pdf_Abstract $pdf)
     {
@@ -121,8 +131,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Set current page
      *
-     * @param Zend_Pdf_Page $page
-     * @return Mage_Sales_Model_Order_Pdf_Items_Abstract
+     * @param Zend_Pdf_Page $page Pdf page to set
+     *
+     * @return Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
      */
     public function setPage(Zend_Pdf_Page $page)
     {
@@ -201,27 +212,55 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
         return $this->_pdfPage;
     }
 
-    
+    /**
+     * add a Row to items
+     *
+     * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Item $item item to add
+     *
+     * @return void
+     */
     public function addRow(Symmetrics_InvoicePdf_Model_Pdf_Items_Item $item)
     {
         $this->_items[] = $item;
     }
 
+    /**
+     * get row of given line number
+     *
+     * @param int $lineNumber line number
+     * 
+     * @return mixed
+     */
     public function getRow($lineNumber = 0)
     {
         return $this->_items[$lineNumber];
     }
 
+    /**
+     * get all rows
+     *
+     * @return array
+     */
     public function getAllRows()
     {
         return $this->_items;
     }
 
+    /**
+     * get count of all rows
+     *
+     * @return int
+     */
     public function getRowCount()
     {
         return count($this->_items);
     }
 
+    /**
+     * clear all rows
+     *
+     * @return void
+     */
     public function clearRows()
     {
         $this->_items = array();
@@ -230,10 +269,15 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
     /**
      * Draw item line
      *
+     * @return void
      */
     abstract public function draw();
 
-
+    /**
+     * calculate height off all current items
+     *
+     * @return float
+     */
     public function calculateHeight()
     {
         $pdf = $this->getPdf();
@@ -246,43 +290,13 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
         return $maxHeight;
     }
 
-    protected function _formatOptionValue($value)
-    {
-        $order = $this->getOrder();
-
-        $resultValue = '';
-        if (is_array($value)) {
-            if (isset($value['qty'])) {
-                $resultValue .= sprintf('%d', $value['qty']) . ' x ';
-            }
-
-            $resultValue .= $value['title'];
-
-            if (isset($value['price'])) {
-                $resultValue .= " " . $order->formatPrice($value['price']);
-            }
-            return $resultValue;
-        } else {
-            return $value;
-        }
-    }
-
     /**
-     * @deprecated To be Removed on next release
+     * get Options of current product
      *
      * @return array
      */
-    protected function _parseDescription()
+    public function getItemOptions()
     {
-        $description = $this->getItem()->getDescription();
-        if (preg_match_all('/<li.*?>(.*?)<\/li>/i', $description, $matches)) {
-            return $matches[1];
-        }
-
-        return array($description);
-    }
-
-    public function getItemOptions() {
         $result = array();
         if ($options = $this->getItem()->getOrderItem()->getProductOptions()) {
             if (isset($options['options'])) {
@@ -298,12 +312,18 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
         return $result;
     }
 
+    /**
+     * get Sku for given prodcut
+     *
+     * @param Mage_Core_Model_Abstract $item item to get sky
+     * 
+     * @return string
+     */
     public function getSku($item)
     {
         if ($item->getOrderItem()->getProductOptionByCode('simple_sku')) {
             return $item->getOrderItem()->getProductOptionByCode('simple_sku');
-        }
-        else {
+        } else {
             return $item->getSku();
         }
     }
