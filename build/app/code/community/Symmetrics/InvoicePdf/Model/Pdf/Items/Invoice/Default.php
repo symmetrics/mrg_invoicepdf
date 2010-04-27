@@ -36,7 +36,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
     extends Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract
 {
     /**
-     * method to draw the invoice
+     * method to draw default products to the invoice
      *
      * @return void
      */
