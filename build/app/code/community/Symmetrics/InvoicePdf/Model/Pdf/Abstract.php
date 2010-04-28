@@ -80,6 +80,9 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     const PAGE_POSITION_RIGHT = 555;
     const PAGE_POSITION_TOP = 800;
     const PAGE_POSITION_BOTTOM = 47;
+
+    const MAX_LOGO_WIDTH = 500;
+    const MAX_LOGO_HEIGHT = 50;
     
     /**
      * Abstract function to render the PDF
@@ -376,10 +379,30 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 $size = getimagesize($image);
                 $imageWidth = $size[0];
                 $imageHeight = $size[1];
-                
+
+                // calcualte image ratio
+                $imageRatio = 1;
+                if ($imageWidth > $imageHeight) {
+                    $imageRatio = $imageWidth / $imageHeight;
+                } elseif ($imageHeight > $imageWidth) {
+                    $imageRatio = $imageHeight / $imageWidth;
+                }
+
+                // calculate new image size
+                if ($imageHeight > self::MAX_LOGO_HEIGHT or $imageWidth > self::MAX_LOGO_WIDTH) {
+                    if ($imageHeight > self::MAX_LOGO_HEIGHT) {
+                        $imageHeight = self::MAX_LOGO_HEIGHT;
+                        $imageWidth = round(self::MAX_LOGO_HEIGHT * $imageRatio);
+                    }
+                    if ($imageWidth > self::MAX_LOGO_WIDTH) {
+                        $imageWidth = self::MAX_LOGO_WIDTH;
+                        $imageHeight = round(self::MAX_LOGO_WIDTH * $imageRatio);
+                    }
+                }
+
                 $image = Zend_Pdf_Image::imageWithPath($image);
                 $logoPosition = Mage::getStoreConfig('sales/identity/logoposition', $store);
-                
+
                 switch($logoPosition) {
                     case 'center':
                         $startLogoAt = self::PAGE_POSITION_LEFT;
