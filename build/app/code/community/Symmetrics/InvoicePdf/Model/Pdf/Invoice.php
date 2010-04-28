@@ -108,7 +108,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->revert();
             }
-            
         }
         
         $this->_afterGetPdf();

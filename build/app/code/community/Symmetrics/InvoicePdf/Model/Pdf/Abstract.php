@@ -568,34 +568,43 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     {
         $font = $this->_setFontRegular($page, 8);
         
-        $page->drawText(
-            $key, 
-            self::PAGE_POSITION_RIGHT - 170,
-            $this->_height, 
-            'UTF-8'
-        );
+
+        $keyPos = self::PAGE_POSITION_RIGHT - 170;
+        $keyWidth = $this->widthForStringUsingFontSize($key, $font, 8);
+        $valuePos = self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($value, $font, 8);
+        $valueWidth = $this->widthForStringUsingFontSize($value, $font, 8);
+
+        $keyRightPos = $keyPos + $keyWidth + 4;
+        $avilValueSpace = self::PAGE_POSITION_RIGHT - $keyRightPos - 10;
         
-        if (is_array($value)) {
-            foreach ($value as $valueRow) {
-                $valueRow  = trim($valueRow);
-                $page->drawText(
-                    $valueRow, 
-                    self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($valueRow, $font, 8),
-                    $this->_height, 
-                    'UTF-8'
-                );
+        $textWidth = $this->widthForStringUsingFontSize('T', $font, 8);
+        $value = wordwrap($value, $avilValueSpace/$textWidth, "\n", false);
+        $value = explode("\n", $value);
+
+        $value = array_reverse($value);
+
+        $count = 0;
+        foreach($value as $item) {
+            if ($count > 0) {
                 $this->_newLine($font, 8, true);
             }
-        } else { 
+            
             $page->drawText(
-                $value, 
-                self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($value, $font, 8),
+                $item,
+                self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($item, $font, 8),
                 $this->_height,
                 'UTF-8'
             );
-            $this->_newLine($font, 8, true);
+            $count++;
         }
         
+        $page->drawText(
+            $key,
+            self::PAGE_POSITION_RIGHT - 170,
+            $this->_height,
+            'UTF-8'
+        );
+        $this->_newLine($font, 8, true);
     }
 
     /**
@@ -655,9 +664,12 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             foreach ($payment as $key => $value) {
                 if (strip_tags(trim($value)) == '') {
                     unset($payment[$key]);
+                } else {
+                    $payment[$key] = strip_tags(trim($value));
                 }
             }
             reset($payment);
+            $payment = implode(' ', $payment);
 
             $this->_insertOrderInfoRow(
                 $page,
