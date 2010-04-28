@@ -150,11 +150,17 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         $renderer->setPdf($this);
         $renderer->setPage($page);
         $renderer->setRenderedModel($this);
+        $renderer->setHeight($this->_height);
 
         $renderer->draw();
 
-        $this->_height += $renderer->getHeight();
-        
+        if ($this->_height < $renderer->getHeight()) {
+            // reset the height of the additional block
+            $this->_height = $renderer->getHeight();
+        } else {
+            // addition info was rendered on a new page
+            $this->_height = self::PAGE_POSITION_TOP;
+        }
         return $renderer->getPage();
     }
 

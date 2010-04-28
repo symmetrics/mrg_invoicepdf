@@ -45,6 +45,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         $order  = $this->getOrder();
         $pdf    = $this->getPdf();
         $page   = $this->getPage();
+        $height = $this->getHeight();
 
         $helper = Mage::helper('invoicepdf');
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
@@ -81,7 +82,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         }
 
         $page = $pdf->insertTableRow($page, $this);
-        $this->setHeight($this->calculateHeight());
+        $this->setHeight($height);
         $this->setPage($page);
         $this->clearRows();
     }
