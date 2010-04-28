@@ -584,7 +584,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $value = array_reverse($value);
 
         $count = 0;
-        foreach($value as $item) {
+        foreach ($value as $item) {
             if ($count > 0) {
                 $this->_newLine($font, 8, true);
             }
