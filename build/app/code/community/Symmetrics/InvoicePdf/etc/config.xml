@@ -32,6 +32,12 @@
     <adminhtml>
         <translate>
             <modules>
+                <Mage_Sales>
+                    <files>
+                        <default>Mage_Sales.csv</default>
+                        <invoicepdf>Symmetrics_InvoicePdf.csv</invoicepdf>
+                    </files>
+                </Mage_Sales>
                 <Symmetrics_InvoicePdf>
                     <files>
                         <default>Symmetrics_InvoicePdf.csv</default>
@@ -191,6 +197,23 @@
             </invoicepdf>
         </routers>
     </admin>
+    <frontend>
+        <translate>
+            <modules>
+                <Mage_Sales>
+                    <files>
+                        <default>Mage_Sales.csv</default>
+                        <invoicepdf>Symmetrics_InvoicePdf.csv</invoicepdf>
+                    </files>
+                </Mage_Sales>
+                <Symmetrics_InvoicePdf>
+                    <files>
+                        <default>Symmetrics_InvoicePdf.csv</default>
+                    </files>
+                </Symmetrics_InvoicePdf>
+            </modules>
+        </translate>
+    </frontend>
     <default>
         <sales_pdf>
             <invoice>

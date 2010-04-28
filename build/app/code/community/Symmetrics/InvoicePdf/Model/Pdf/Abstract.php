@@ -610,7 +610,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         }
         $this->_insertOrderInfoRow(
             $page,
-            $helper->__('Customer number:'),
+            $helper->__('Customer #:'),
             $customerid
         );
 
@@ -646,7 +646,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         if ($helper->getSalesPdfInvoiceConfigFlag('showcarrier', $storeId)) {
             $this->_insertOrderInfoRow(
                 $page,
-                $helper->__('Shipping method:'),
+                Mage::helper('sales')->__('Shipping Method:'),
                 $order->getShippingDescription()
             );
         }

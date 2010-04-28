@@ -54,7 +54,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         $this->_initRenderer('invoice');
         
         $pdf = $this->_getPdf();
-        
+
         foreach ($invoices as $invoice) {
             if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->emulate($invoice->getStoreId());
