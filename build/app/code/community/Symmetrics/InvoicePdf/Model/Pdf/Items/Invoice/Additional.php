@@ -60,22 +60,23 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         }
 
         $paddingLegt = 10;
+        $maxWidth = 380;
 
         if (!empty($maturity)) {
-            $tableRowItem->addColumn('maturity', $maturity, $paddingLegt, 'left', 250, null, 10);
+            $tableRowItem->addColumn('maturity', $maturity, $paddingLegt, 'left', $maxWidth, null, 10);
         }
         
         $this->addRow($tableRowItem);
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         $notice = $helper->__('Invoice date is equal to delivery date');
-        $tableRowItem->addColumn('notice', $notice, $paddingLegt, 'left', 250, null, 10);
+        $tableRowItem->addColumn('notice', $notice, $paddingLegt, 'left', $maxWidth, null, 10);
 
         $this->addRow($tableRowItem);
 
         $note = $maturitySetting = $helper->getSalesPdfInvoiceConfigKey('note', $order->getStore());
         if (!empty($note)) {
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
-            $tableRowItem->addColumn('note', $note, $paddingLegt, 'left', 250, null, 10);
+            $tableRowItem->addColumn('note', $note, $paddingLegt, 'left', $maxWidth, null, 10);
             $this->addRow($tableRowItem);
         }
 
