@@ -57,13 +57,10 @@ EXCLUDES = {
 }
 
 DEPENDS_ON_FILES = (
-    'app/code/core/Mage/Bundle/Model/Sales/Order/Pdf/Items/Invoice.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Abstract.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Invoice.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Creditmemo.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Invoice/Default.php',
-    'app/code/core/Mage/Sales/Model/Order/Pdf/Items/Creditmemo/Default.php',
     'app/code/core/Mage/Tax/Model/Sales/Pdf/Grandtotal.php',
+    'app/code/core/Mage/Tax/Model/Sales/Pdf/Shipping.php',
+    'app/code/core/Mage/Tax/Model/Sales/Pdf/Subtotal.php',
+    'app/code/core/Mage/Tax/Model/Sales/Pdf/Tax.php',
 )
 
 PEAR_KEY = ''
@@ -71,5 +68,5 @@ PEAR_KEY = ''
 
 COMPATIBLE_WITH = {
     'magento': ['1.4.0.0', '1.4.0.1'],
-    'magento_enterprise': ['1.7.0.0-rc1'],
+    'magento_enterprise': ['1.7.0.0'],
 }
