@@ -61,6 +61,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Block
             $this->addRow($tableRowItem);
         }
 
+        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
         $infoText = $helper->getSalesPdfInvoiceConfigKey('infobox', $order->getStore());
         if (!empty($infoText)) {
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
@@ -69,7 +70,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Block
             $this->addRow($tableRowItem);
         }
 
-        $page = $pdf->insertTableRow($page, $this, false, true, 2.4);
+        $page = $pdf->insertTableRow($page, $this, false, true);
         $this->setPage($page);
         $this->clearRows();
     }

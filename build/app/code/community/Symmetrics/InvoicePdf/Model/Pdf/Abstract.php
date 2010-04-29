@@ -907,7 +907,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
         $rowFont = $this->_setFontBold($page, 8);
         if ($drawBorder) {
-            $this->_newLine($rowFont, $borderSize);
+            $this->_newLine($rowFont, $borderSize * 3);
         }
         
         if ($data->hasTriggerPosNumber()) {
