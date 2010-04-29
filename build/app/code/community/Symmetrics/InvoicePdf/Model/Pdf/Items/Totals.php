@@ -54,12 +54,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
         $page = $this->getPage();
         $pdf = $this->getPdf();
 
-
         $order = $source->getOrder();
         $totals = $this->_getTotalsList($source);
 
-        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-
+        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
 
         $index = 1;
         foreach ($totals as $total) {
@@ -94,7 +92,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
                 }
             }
         }
-        
         $page = $pdf->insertTableRow($page, $this);
         $this->setPage($page);
     }

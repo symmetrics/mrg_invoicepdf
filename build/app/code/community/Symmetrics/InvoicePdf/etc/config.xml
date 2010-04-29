@@ -124,7 +124,7 @@
                     <title>Grand Total</title>
                     <source_field>grand_total</source_field>
                     <model>tax/sales_pdf_grandtotal</model>
-                    <font_size>12</font_size>
+                    <font_size>10</font_size>
                     <display_zero>1</display_zero>
                     <sort_order>700</sort_order>
                 </grand_total>
