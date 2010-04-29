@@ -904,8 +904,12 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         // Draw Pos. Nr.
 
         $tableTop = $this->_height + 8;
+
+        $rowFont = $this->_setFontBold($page, 8);
+        if ($drawBorder) {
+            $this->_newLine($rowFont, $borderSize);
+        }
         
-        $this->_setFontBold($page, 8);
         if ($data->hasTriggerPosNumber()) {
             $this->_posCount++;
             $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');

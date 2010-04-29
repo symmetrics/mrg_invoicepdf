@@ -118,7 +118,10 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <default>1</default>
-                            <comment>Kein HTML! Bitte Zeilenumbrüche einfügen!</comment>
+                            <comment>No HTML. Please insert line breaks.</comment>
+                            <depends>
+                                <showinfotxt>1</showinfotxt>
+                            </depends>
                         </infotxt>
                         <showinfobox translate="label">
                             <label>Zeige Infobox</label>
@@ -138,6 +141,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <default>1</default>
+                            <depends>
+                                <showinfobox>1</showinfobox>
+                            </depends>
                         </infoboxhl>
                         <infobox translate="label comment">
                             <label>Infobox</label>
@@ -147,7 +153,10 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <default>1</default>
-                            <comment>Kein HTML! Bitte Zeilenumbrüche einfügen!</comment>
+                            <comment>No HTML. Please insert line breaks.</comment>
+                            <depends>
+                                <showinfobox>1</showinfobox>
+                            </depends>
                         </infobox>
                         <showcarrier translate="label">
                             <label>Show shipping method</label>

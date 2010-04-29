@@ -104,6 +104,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             /* Insert info text */
             $page = $this->_insertInfoText($page, $order);
 
+            /* Insert info box */
+            $page = $this->_insertInfoBlock($page, $order);
 
             if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->revert();
@@ -181,6 +183,33 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
         }
 
         $renderer = Mage::getModel('invoicepdf/pdf_items_invoice_info');
+        $renderer->setOrder($order);
+        $renderer->setPdf($this);
+        $renderer->setPage($page);
+        $renderer->setRenderedModel($this);
+
+        $renderer->draw();
+
+        return $renderer->getPage();
+    }
+
+    /**
+     * Insert info text to the current invoice
+     *
+     * @param Zend_Pdf_Page          &$page given page to insert info text
+     * @param Mage_Sales_Model_Order $order order to get info from
+     *
+     * @return Zend_Pdf_Page
+     */
+    protected function _insertInfoBlock(&$page, $order)
+    {
+        $helper = Mage::helper('invoicepdf');
+
+        if (!$helper->getSalesPdfInvoiceConfigFlag('showinfobox', $order->getStore())) {
+            return $page;
+        }
+
+        $renderer = Mage::getModel('invoicepdf/pdf_items_invoice_block');
         $renderer->setOrder($order);
         $renderer->setPdf($this);
         $renderer->setPage($page);
