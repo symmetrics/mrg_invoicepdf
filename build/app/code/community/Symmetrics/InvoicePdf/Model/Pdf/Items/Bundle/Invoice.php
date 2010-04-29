@@ -48,6 +48,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
         $page   = $this->getPage();
         $items = $this->getChilds($item);
 
+        $taxHelper = Mage::helper('tax');
+        /* @var $taxHelper Mage_Tax_Helper_Data */
+        $checkoutHelper = Mage::helper('checkout');
+        /* @var $checkoutHelper Mage_Checkout_Helper_Data */
 
         $_prevOptionId = '';
         $drawItems = array();
@@ -77,7 +81,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
 
             // draw prices
             if ($this->canShowPriceInfo($_item)) {
-                $price = $order->formatPriceTxt($_item->getPrice());
+                if ($taxHelper->displaySalesPriceInclTax()) {
+                    $price = $checkoutHelper->getPriceInclTax($item);
+                    $rowTotal = $checkoutHelper->getSubtotalInclTax($item);
+                } elseif ($taxHelper->displaySalesPriceExclTax()) {
+                    $price = $item->getPrice();
+                    $rowTotal = $item->getRowTotal();
+                } else {
+                    throw new Mage_Core_Exception('invalid Tax Settings');
+                }
+                $price = $order->formatPriceTxt($price);
                 $tableRowItem->addColumn("price", $price, 160, 'right');
 
                 $qty = $_item->getQty()*1;
@@ -86,7 +99,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                 $tax= $order->formatPriceTxt($_item->getTaxAmount());
                 $tableRowItem->addColumn("tax", $tax, 60, 'right');
 
-                $rowTotal = $order->formatPriceTxt($_item->getRowTotal());
+                $rowTotal = $order->formatPriceTxt($rowTotal);
                 $tableRowItem->addColumn("rowTotal", $rowTotal, 10, 'right');
             }
 

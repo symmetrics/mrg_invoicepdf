@@ -85,6 +85,7 @@
                 <subtotal translate="title">
                     <title>Subtotal</title>
                     <source_field>subtotal</source_field>
+                    <model>tax/sales_pdf_subtotal</model>
                     <font_size>8</font_size>
                     <display_zero>1</display_zero>
                     <sort_order>100</sort_order>
@@ -100,6 +101,7 @@
                 <shipping translate="title">
                     <title>Shipping &amp; Handling</title>
                     <source_field>shipping_amount</source_field>
+                    <model>tax/sales_pdf_shipping</model>
                     <font_size>8</font_size>
                     <display_zero>0</display_zero>
                     <sort_order>400</sort_order>
@@ -121,12 +123,13 @@
                 <grand_total translate="title">
                     <title>Grand Total</title>
                     <source_field>grand_total</source_field>
+                    <model>tax/sales_pdf_grandtotal</model>
                     <font_size>12</font_size>
                     <display_zero>1</display_zero>
                     <sort_order>700</sort_order>
                 </grand_total>
                 <tax translate="title">
-                    <title>Tax</title>
+                    <title>Tax amount</title>
                     <source_field>tax_amount</source_field>
                     <model>tax/sales_pdf_tax</model>
                     <font_size>8</font_size>
