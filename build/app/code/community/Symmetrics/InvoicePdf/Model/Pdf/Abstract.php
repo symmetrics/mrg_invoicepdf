@@ -880,13 +880,17 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      * @param Zend_Pdf_Page                                  &$page           Page to insert table row
      * @param Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data            data to insert in the row
      * @param boolean                                        $drawTableHeader flag to draw the table header
+     * @param boolean                                        $drawBorder      flag to draw a border around the row
+     * @param float                                          $borderSize      size of the border
      *
      * @return Zend_Pdf_Page
      */
     public function insertTableRow(
         &$page,
         Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract $data,
-        $drawTableHeader = false)
+        $drawTableHeader = false,
+        $drawBorder = false,
+        $borderSize = 1)
     {
         // TODO: Fist calc high
         $neededHeight = $data->calculateHeight();
@@ -898,12 +902,15 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         }
 
         // Draw Pos. Nr.
+
+        $tableTop = $this->_height + 8;
         
         $this->_setFontBold($page, 8);
         if ($data->hasTriggerPosNumber()) {
             $this->_posCount++;
             $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');
         }
+
 
         // check if height is abialable
         foreach ($data->getAllRows() as $row) {
@@ -937,6 +944,17 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 }
             }
             $this->_height -= $row->calculateHeight();
+        }
+
+        if ($drawBorder) {
+            $page->setLineWidth($borderSize);
+            $page->drawRectangle(
+                self::PAGE_POSITION_LEFT,
+                $tableTop,
+                self::PAGE_POSITION_RIGHT,
+                $this->_height + 8,
+                Zend_Pdf_Page::SHAPE_DRAW_STROKE
+            );
         }
 
         $this->_height -= 10;
