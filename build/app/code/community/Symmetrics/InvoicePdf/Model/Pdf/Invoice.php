@@ -101,6 +101,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
             /* Add totals */
             $page = $this->insertTotals($page, $invoice);
 
+
+            $this->_newLine($font, 20);
+
             /* Insert info text */
             $page = $this->_insertInfoText($page, $order);
 
