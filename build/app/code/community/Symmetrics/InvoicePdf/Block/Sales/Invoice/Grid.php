@@ -50,7 +50,7 @@ class Symmetrics_InvoicePdf_Block_Sales_Invoice_Grid
             'symmetrics_pdfinvoices_order',
             array(
                 'label'=> Mage::helper('sales')->__('PDF Invoices'),
-                'url'  => $this->getUrl('symmetrics/invoicepdf/pdfinvoices'),
+                'url'  => $this->getUrl('symmetrics/invoicePdf/pdfinvoices'),
             )
         );
 

@@ -89,7 +89,7 @@ class Symmetrics_InvoicePdf_Model_Observer extends Varien_Object
         $layout = Mage::getSingleton('core/layout');
         /* @var $layout Mage_Core_Model_Layout */
 
-        $route = "symmetrics/invoicepdf/print";
+        $route = "symmetrics/invoicePdf/print";
         $params = array('invoice_id' => $currentInvoice->getId());
 
         // sales_invoice_view
