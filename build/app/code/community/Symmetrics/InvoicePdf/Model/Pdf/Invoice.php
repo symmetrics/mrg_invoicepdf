@@ -130,7 +130,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
      */
     protected function _insertOrderInfo(&$page, $order, $putOrderId)
     {
-        parent::_insertOrderInfo(&$page, $order, $putOrderId);
+        parent::_insertOrderInfo($page, $order, $putOrderId);
         $this->_insertOrderInfoRow(
             $page,
             Mage::helper('sales')->__('Invoice # '),
