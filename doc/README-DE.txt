@@ -40,8 +40,85 @@ zu machen.
 	Slip Design" geändert werden kann.
 
 ** TECHNICAL
-Die technische Information muss noch ergäntzt werden.
-Dies folgt in kürze.
+Um die PDF darzustellen wird eine Abstrakte Klasse genutzt, 
+Symmetrics_InvoicePdf_Model_Pdf_Abstract. Diese Klasse stellt alle benötigten
+Methoden bereit. Dazu wird eine abstrakte Methode 'getPdf()' bereitgestellt, 
+welche dann von den ableitenden Klassen zum Rendern genutzt wird. Die Abstrakte
+Klasse kümmert sich auch um das Management, wie die Texte auf der Seite gerendert
+werden soll und fügt, wenn nötig, selbständig neue Seiten ein, falls dies nötig
+ist. Die Klasse an sich kann eine Schrift setzten '_setFont*', eine neue Zeile 
+anhand der Schriftgräße und des Textpaddings erstellen '_newLine(..)'. Um eine
+neue Seite zu erstellen, wird die Methode 'newPage(...)' benutzt. Diese Methode
+erstellt auch wenn gewollt einen Tabellen Header für die Produktauflistung, dazu
+rendert sie auch den Footer 'insertAddressFooter(..)', setzt eine Seitenzahl und
+fügt die Falz und Lockmarken ein. 
+Die 'insertAddressFooter(..)' nutzt die interne '_insertAddressFooterItem(..)' 
+Methode um die Values und Keys richtig dazustellen. Dazu liest sie auch ggf. die 
+Daten aus dem Imprint Modul aus.
+Das Logo wird mittels 'insertLogo(..)' eingefügt, diese Methode berücksichtigt
+die im Backend eingestellte Position und render ggf. das Logo auch klein.
+'_insertOrderInfo(..)' wird Verwendet um die Order Informationen, wie z.b.
+OrderId oder Shipping Method auszugeben. Diese Methode berücksichtige alle
+Einstellungen die im Backend gemacht wurden sind. Intern verwendet sie die 
+Methode '_insertOrderInfoRow(..)' um die einzelnen Informationen mit korrektem
+Abstand darzustellen. Sie gewährleistet, das der Text nicht in einander kollidiert.
+Mit '_insertBillingAddress' wird die Zahlungsadresse eingefügt, dazu fügt sie
+auch die Absenderadresse über den Empfänger hinzu.
+Mit 'setSubject(..)' wird ein Titel für die Seite festgelegt. 
+Die 'insertOrder(..)' Methode ist die Zentrale Methode um die Order info und
+die Regungsadresse einzufügen.
+'insertTableHeader(..)' wird wie schon erwähnt bei 'newPage(..)' verwendet.
+Diese Methode zeichnet den Tabellen Kopf.
+Mit 'insertTableRow(..)' wird eine Tabellen Zeile eingefügt. Dazu wird ein 
+Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract Objekt übergeben.
+Mittels dieser Informationen kann diese Methode genau errechnen, wie hoch
+die Zeile wird und bricht sie ggf. auf eine neue Seite um.
+Diese Abstrakte Klasse wird weiter unten besprochen.
+Mit '_drawItem(..)' werden die einzelnen Items gerendert, welche in der 
+config.xml registriert sind. Die zugehörige abstrakte Klasse wird weiter 
+unten besprochen.
+Um die Totals darzustellen wird 'insertTotals()' verwendet. Diese
+Methode ähnlet '_drawItem(..)' und verwendet die gleiche Grundfunktionalität.
+Um Items zu rendert (Produkte, Totals, bzw. alles mögliche), wird die Klasse
+'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' verwendet.
+Diese hat mehrere setter und getter Methode, die je nach Situation verwendet
+werden. Die wichtigsten Funktionen für die Darstellung sind die 'draw()',
+'calculateHeight()' und 'addRow(..)' Methoden.
+'draw()' ist eine Abstrakte Methode und wird von den einzelnen Items 
+implementiert. Mit 'calculateHeigth()' wird die größe berechnet, diese
+Methode wird dann in 'insertTableRow(..)' von Symmetrics_InvoicePdf_Model_Pdf_Abstract
+aufgerufen. Um aber erstmal ein Item abzulegen, wird die 'addRow(..)' Methode 
+verwendet. Diese Akzeptiert als Parameter nur eine Instanz der Klasse
+'Symmetrics_InvoicePdf_Model_Pdf_Items_Item'.
+Diese Klasse leitet sich von keiner anderen Klasse ab und dient als genereller
+Item Container. Sie hat fast die gleiche Funktionalität wie 
+'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' nur das sie Wertepaare
+speichert, welche als einzelne Spalte interpretiert werden.
+eine solche Spalte wird mit 'addColumn(..)' in den Container gepackt. 
+Diese klasse hat auch die Methode 'calculateHeigth()' welche von der
+gleichnamigen Methode in der Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
+aufgerufen wird. Nur ist hier der fall, dass die Höhe tatsächlich anhand
+der Schrift und des Textes berechnet wird.
+Um nun am ende aus diesem Klassenkonstrukt eine Rechnung dazustellen, wird die 
+Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' verwendet. Diese hat nur 
+eine 'getPdf()' Methode, welche überschrieben ist und 4 weitere Methode, 
+die zur Anzeige für zusätzliche Informationen dienen. Wobei eine die
+Methode '_insertOrderInfo()' überschiebt, um die InvoiceId auszugeben.
+In den restlichen Methode wird das gleiche Renderer Prinzip, wie z.b. bei
+den Produkten oder Totals verwendet.
+Diese Klasse wird dann in dem 'Symmetrics_InvoicePdf_InvoicePdfController'
+Controller aufgerufen um die Rechnung als Download anzubieten.
+'printAction()' ist für eine Invoice und 'pdfinvoicesAction()' ist für
+die Massaction.
+Um den 'Drucken' Knopf im Backend auszutauschen wird der 
+'Symmetrics_InvoicePdf_Model_Observer' verwendet. Dieser tauscht in der 
+'adminhtmlInvoiceView(..)' Methode den Button aus.
+Für die Massaction musste der Mage_Adminhtml_Block_Sales_Invoice_Grid
+mit Symmetrics_InvoicePdf_Block_Sales_Invoice_Grid überschrieben werden.
+Dies wird in der '_prepareMassaction()' Methode gemacht. Da diese nach dem
+Event Dispatch wie bei dem einzelnen "Drucken" Knopf passiert, konnte
+an dieser Stelle kein Obersver verwendet werden.
+
 
 ** PROBLEMS
 Rechnungen werden nach manueller Generierung nicht automatisch verschickt
