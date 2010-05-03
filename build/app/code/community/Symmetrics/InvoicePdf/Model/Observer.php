@@ -36,46 +36,6 @@
 class Symmetrics_InvoicePdf_Model_Observer extends Varien_Object
 {
     /**
-     * Create invoice after order was completed
-     * 
-     * @param Varien_Observer $observer observer object
-     * 
-     * @return Symmetrics_InvoicePdf_Model_Observer
-     */
-    public function createInvoice($observer)
-    {
-        if (Mage::getStoreConfig('sales_pdf/invoice/autoinvoice')) {
-            $order = $observer->getOrder();
-            $email = (bool) Mage::getStoreConfig('sales_pdf/invoice/autoinvoicemail');
-            if (!$order->getId()) {
-                 Mage::log('order does not exists');
-            }
-            if (!$order->canInvoice()) {
-                 Mage::log(Mage::helper('sales')->__('Can not create invoice for order.'));
-            }
-            $invoice = $order->prepareInvoice();
-            $invoice->register();
-            if ($email) {
-                $invoice->setEmailSent(true);
-            }
-            $invoice->getOrder()->setIsInProcess(true);
-            try {
-                $transactionSave = Mage::getModel('core/resource_transaction')
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder())
-                    ->save();
-                if ($email) {
-                    $invoice->sendEmail();
-                }
-            } catch (Mage_Core_Exception $e) {
-                Mage::log($e->getMessage());
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Change Magento Print button in invoice admin view with Symmetrics_InvoicePdf Print Button
      *
      * @param Varien_Observer $observer observer object
