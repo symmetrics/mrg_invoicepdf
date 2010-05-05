@@ -106,19 +106,12 @@ die zur Anzeige für zusätzliche Informationen dienen. Wobei eine die
 Methode '_insertOrderInfo()' überschiebt, um die InvoiceId auszugeben.
 In den restlichen Methode wird das gleiche Renderer Prinzip, wie z.b. bei
 den Produkten oder Totals verwendet.
-Diese Klasse wird dann in dem 'Symmetrics_InvoicePdf_InvoicePdfController'
-Controller aufgerufen um die Rechnung als Download anzubieten.
-'printAction()' ist für eine Invoice und 'pdfinvoicesAction()' ist für
-die Massaction.
-Um den 'Drucken' Knopf im Backend auszutauschen wird der 
-'Symmetrics_InvoicePdf_Model_Observer' verwendet. Dieser tauscht in der 
-'adminhtmlInvoiceView(..)' Methode den Button aus.
-Für die Massaction musste der Mage_Adminhtml_Block_Sales_Invoice_Grid
-mit Symmetrics_InvoicePdf_Block_Sales_Invoice_Grid überschrieben werden.
-Dies wird in der '_prepareMassaction()' Methode gemacht. Da diese nach dem
-Event Dispatch wie bei dem einzelnen "Drucken" Knopf passiert, konnte
-an dieser Stelle kein Obersver verwendet werden.
-
+Diese Klasse wird in den überschriebenen Action-Controller
+Symmetrics_InvoicePdf_Adminhtml_Sales_InvoiceController (Rechnungsübersicht -
+screenshot_rechnungsuebersicht.png) und
+Symmetrics_InvoicePdf_Adminhtml_Sales_Order_InvoiceController (Rechnunsdetails -
+screenshot_rechnungsdetails.png) verwendet um die Rechnung(en) als Download
+anzubieten.
 
 ** PROBLEMS
 Rechnungen werden nach manueller Generierung nicht automatisch verschickt
