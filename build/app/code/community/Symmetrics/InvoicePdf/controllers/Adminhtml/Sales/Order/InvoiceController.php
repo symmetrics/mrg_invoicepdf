@@ -21,19 +21,21 @@
  * @link      http://www.symmetrics.de/
  */
 
+include('Mage/Adminhtml/controllers/Sales/Order/InvoiceController.php');
+
 /**
- * Encashment Adminhtml Controller
+ * Overwriting sales order invoice controller in adminhtml
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
  * @author    symmetrics gmbh <info@symmetrics.de>
- * @author    Torsten Walluhn <tw@symmetrics.de>
+ * @author    Ngoc Anh Doan <nd@symmetrics.de>
  * @copyright 2010 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
-class Symmetrics_InvoicePdf_InvoicePdfController 
-    extends Mage_Adminhtml_Controller_Action
+class Symmetrics_InvoicePdf_Adminhtml_Sales_Order_InvoiceController
+    extends Mage_Adminhtml_Sales_Order_InvoiceController
 {
     /**
      * Action to print invoice as PDF
@@ -42,8 +44,8 @@ class Symmetrics_InvoicePdf_InvoicePdfController
      */
     public function printAction()
     {
-        if ($invoiceId = $this->getRequest()->getParam('invoice_id')) {
-            if ($invoice = Mage::getModel('sales/order_invoice')->load($invoiceId)) {
+        if (($invoiceId = $this->getRequest()->getParam('invoice_id'))) {
+            if (($invoice = Mage::getModel('sales/order_invoice')->load($invoiceId))) {
                 if ($invoice->getStoreId()) {
                     Mage::app()->setCurrentStore($invoice->getStoreId());
                 }
@@ -59,34 +61,5 @@ class Symmetrics_InvoicePdf_InvoicePdfController
         } else {
             $this->_forward('noRoute');
         }
-    }
-
-    /**
-     * Action to print multible invoices as PDF
-     *
-     * @return void
-     */
-    public function pdfinvoicesAction()
-    {
-        $invoicesIds = $this->getRequest()->getPost('invoice_ids');
-        if (!empty($invoicesIds)) {
-            $invoices = Mage::getResourceModel('sales/order_invoice_collection')
-                ->addAttributeToSelect('*')
-                ->addAttributeToFilter('entity_id', array('in' => $invoicesIds))
-                ->load();
-            if (!isset($pdf)) {
-                $pdf = Mage::getModel('invoicepdf/pdf_invoice')->getPdf($invoices);
-            } else {
-                $pages = Mage::getModel('invoicepdf/pdf_invoice')->getPdf($invoices);
-                $pdf->pages = array_merge($pdf->pages, $pages->pages);
-            }
-
-            return $this->_prepareDownloadResponse(
-                'invoice' . Mage::getSingleton('core/date')->date('Y-m-d_H-i-s') . '.pdf',
-                $pdf->render(),
-                'application/pdf'
-            );
-        }
-        $this->_redirect('*/*/');
     }
 }
