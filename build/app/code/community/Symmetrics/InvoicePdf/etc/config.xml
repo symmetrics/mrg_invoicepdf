@@ -15,10 +15,11 @@
  *
  * @category  Symmetrics
  * @package   Symmetrics_InvoicePdf
- * @author    Symmetrics GmbH <info@symmetrics.de>
+ * @author    symmetrics gmbh <info@symmetrics.de>
  * @author    Eugen Gitin <eg@symmetrics.de>
  * @author    Eric Reiche <er@symmetrics.de>
- * @copyright 2009 Symmetrics GmbH
+ * @author    Ngoc Anh Doan <nd@symmetrics.de>
+ * @copyright 2010 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
@@ -45,26 +46,8 @@
                 </Symmetrics_InvoicePdf>
             </modules>
         </translate>
-        <events>
-            <controller_action_layout_render_before_adminhtml_sales_order_invoice_view>
-                <observers>
-                    <symmetrics_invoicepdf_model_observer>
-                        <type>singleton</type>
-                        <class>Symmetrics_InvoicePdf_Model_Observer</class>
-                        <method>adminhtmlInvoiceView</method>
-                    </symmetrics_invoicepdf_model_observer>
-                </observers>
-            </controller_action_layout_render_before_adminhtml_sales_order_invoice_view>
-        </events>
     </adminhtml>
     <global>
-        <blocks>
-            <adminhtml>
-                <rewrite>
-                    <sales_invoice_grid>Symmetrics_InvoicePdf_Block_Sales_Invoice_Grid</sales_invoice_grid>
-                </rewrite>
-            </adminhtml>
-        </blocks>
         <invoicepdf>
             <invoice>
                 <default>invoicepdf/pdf_items_invoice_default</default>
@@ -187,6 +170,13 @@
                     <frontName>symmetrics</frontName>
                 </args>
             </invoicepdf>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Symmetrics_InvoicePdf before="Mage_Adminhtml">Symmetrics_InvoicePdf_Adminhtml</Symmetrics_InvoicePdf>
+                    </modules>
+                </args>
+            </adminhtml>
         </routers>
     </admin>
     <frontend>

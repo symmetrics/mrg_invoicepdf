@@ -28,6 +28,7 @@ AUTHORS = {
     'Torsten Walluhn': 'tw@symmetrics.de',
     'Eugen Gitin': 'eg@symmetrics.de',
     'Eric Reiche': 'er@symmetrics.de',
+    'Ngoc Anh Doan': 'nd@symmetrics.de',
 }
 
 # =============================================================================
@@ -61,6 +62,9 @@ DEPENDS_ON_FILES = (
     'app/code/core/Mage/Tax/Model/Sales/Pdf/Shipping.php',
     'app/code/core/Mage/Tax/Model/Sales/Pdf/Subtotal.php',
     'app/code/core/Mage/Tax/Model/Sales/Pdf/Tax.php',
+    'app/code/core/Mage/Adminhtml/controllers/Sales/'
+    'Order/InvoiceController.php',
+    'app/code/core/Mage/Adminhtml/controllers/Sales/InvoiceController.php',
 )
 
 PEAR_KEY = ''
