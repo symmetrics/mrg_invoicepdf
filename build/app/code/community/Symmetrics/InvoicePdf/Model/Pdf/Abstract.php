@@ -855,7 +855,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             'UTF-8'
         );
         
-        $taxLabel = Mage::helper('invoicepdf')->__('Tax');
+        $taxLabel = Mage::helper('invoicepdf')->__('Tax amount');
         $page->drawText(
             $taxLabel,
             self::PAGE_POSITION_RIGHT - 60 - $this->widthForStringUsingFontSize($taxLabel, $font, $fontSize),

@@ -101,7 +101,7 @@
                     <sort_order>700</sort_order>
                 </grand_total>
                 <tax translate="title">
-                    <title>Tax amount</title>
+                    <title>Total Tax Amount</title>
                     <source_field>tax_amount</source_field>
                     <model>tax/sales_pdf_tax</model>
                     <font_size>8</font_size>
