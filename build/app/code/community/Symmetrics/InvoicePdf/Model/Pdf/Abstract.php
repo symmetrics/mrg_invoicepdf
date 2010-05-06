@@ -31,7 +31,7 @@
  * @copyright 2010 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
- */ 
+ */
 abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 {
     /**
@@ -71,7 +71,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      * @var array
      */
     protected $_renderers = array();
-    
+
     const PDF_INVOICE_PUT_ORDER_ID = 'put_order_id';
     const PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
     const PDF_CREDITMEMO_PUT_ORDER_ID = 'sales_pdf/creditmemo/put_order_id';
@@ -83,14 +83,14 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
     const MAX_LOGO_WIDTH = 500;
     const MAX_LOGO_HEIGHT = 50;
-    
+
     /**
      * Abstract function to render the PDF
      *
      * @return Zend_Pdf
      */
     abstract public function getPdf();
-    
+
     /**
      * Cunstructor to initialize the PDF object
      *
@@ -104,7 +104,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
         $this->_posCount = 0;
     }
-    
+
     /**
      * Returns the total width in points of the string using the specified font and
      * size.
@@ -142,14 +142,14 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      *
      * @param Zend_Pdf_Resource_Font $font     Font to calculate height
      * @param float                  $fontSize Font size in points
-     * 
+     *
      * @return float
      */
     public function heightForFontUsingFontSize($font, $fontSize)
     {
         $height = $font->getLineHeight();
         $stringHeight = ($height / $font->getUnitsPerEm()) * $fontSize;
-        
+
         return $stringHeight;
     }
 
@@ -176,7 +176,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         /* @var $translate Mage_Core_Model_Translate */
         $translate->setTranslateInline(true);
     }
-    
+
     /**
      * Set PDF object
      *
@@ -189,7 +189,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $this->_pdf = $pdf;
         return $this;
     }
-    
+
     /**
      * Retrieve PDF object
      *
@@ -260,7 +260,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      *
      * @param Zend_Pdf_Page $object Page to set font for
      * @param integer       $size   Size to set
-     * 
+     *
      * @return Zend_Pdf_Font
      */
     protected function _setFontItalic($object, $size = 10)
@@ -312,7 +312,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
         return $this->_renderers[$type]['renderer'];
     }
-    
+
     /**
      * Create new page and assign to PDF object
      *
@@ -361,7 +361,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
         return $page;
     }
-    
+
     /**
      * Insert the store logo to the Pdf
      *
@@ -438,23 +438,23 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      *
      * @return void
      */
-    protected function _insertAddressFooterItem($page, $key, $value = null)
+    protected function _insertAddressFooterItem($page, $key, $value = null, $itemSpacing = 0)
     {
         $fontSize = 5;
         $font = $this->_setFontRegular($page, $fontSize);
         $this->_newLine($font, 5);
-        
+
         $page->drawText(
             $key,
             $this->_width,
             $this->_height,
             'UTF-8'
         );
-        
+
         if ($value) {
             $page->drawText(
                 $value,
-                $this->_width + 40,
+                $this->_width + $itemSpacing,
                 $this->_height,
                 'UTF-8'
             );
@@ -476,9 +476,11 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $this->_height = self::PAGE_POSITION_BOTTOM;
         $this->_width = 20;
         $heightCount = 0;
-        
+        $fontSize = 5;
+        $font = $this->_setFontRegular($page, $fontSize);
+
         $page->setLineWidth(0.4);
-        $page->drawLine($this->_width, $this->_height, $page->getWidth() - $this->_width, $this->_height);
+        $page->drawLine($this->_width, $this->_height, self::PAGE_POSITION_RIGHT, $this->_height);
         $page->setLineWidth(0);
 
         if (Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigFlag('showfooter', $store)) {
@@ -490,7 +492,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
             }
 
-
+            $itemCollector = array();
             foreach ($data as $key => $value) {
                 if ($value == '') {
                     continue;
@@ -505,32 +507,56 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                             /* don`t show this field */
                             continue;
                         } else {
-                            /* TODO: translate */
                             $label = Mage::helper('imprint')->__($elementData['label']) . ':';
-                            $this->_insertAddressFooterItem(
-                                $page,
-                                trim(strip_tags($label)),
-                                trim(strip_tags($value))
-                            );
+                            $itemCollector[$label] = $value;
                         }
 
                     } else {
-                        $this->_insertAddressFooterItem($page, trim(strip_tags($value)));
+                        array_push($itemCollector, $value);
                     }
-                    // $page->drawText(trim(strip_tags($value)), $width, $height, 'UTF-8');
 
                     $heightCount++;
-                    if ($heightCount == 4) {
-                        $this->_width += 100;
+                    if ($heightCount == 5) {
+                        $keyWidth = 0;
+                        $itemWidth = 0;
+
+                        // Calculate Column width
+                        foreach ($itemCollector as $itemKey => $itemValue) {
+                            $itemKey = strip_tags($itemKey);
+                            $itemValue = strip_tags($itemValue);
+                            if ($config) {
+                                if ($keyWidth < $this->widthForStringUsingFontSize($itemKey, $font, $fontSize)) {
+                                    $keyWidth = $this->widthForStringUsingFontSize($itemKey, $font, $fontSize);
+                                }
+                            }
+                            if ($itemWidth < $this->widthForStringUsingFontSize($itemValue, $font, $fontSize)) {
+                                $itemWidth = $this->widthForStringUsingFontSize($itemValue, $font, $fontSize);
+                            }
+                        }
+
+                        foreach ($itemCollector as $itemKey => $itemValue) {
+                            if ($config) {
+                                $this->_insertAddressFooterItem(
+                                    $page,
+                                    trim(strip_tags($itemKey)),
+                                    trim(strip_tags($itemValue)),
+                                    ($keyWidth + 15)
+                                );
+                            } else {
+                                $this->_insertAddressFooterItem($page, trim(strip_tags($itemValue)));
+                            }
+                        }
+                        $this->_width += $keyWidth + $itemWidth + 40;
                         $this->_height = self::PAGE_POSITION_BOTTOM;
                         $heightCount = 0;
+                        $itemCollector = array();
                     }
                 }
             }
         }
         $this->_setFontRegular($page);
         $this->_width = self::PAGE_POSITION_LEFT;
-        
+
         return $page;
     }
 
@@ -538,7 +564,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      * Format address
      *
      * @param string $address address to format
-     * 
+     *
      * @return array
      */
     protected function _formatAddress($address)
@@ -567,7 +593,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     protected function _insertOrderInfoRow(&$page, $key, $value)
     {
         $font = $this->_setFontRegular($page, 8);
-        
+
 
         $keyPos = self::PAGE_POSITION_RIGHT - 170;
         $keyWidth = $this->widthForStringUsingFontSize($key, $font, 8);
@@ -576,7 +602,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
         $keyRightPos = $keyPos + $keyWidth + 4;
         $avilValueSpace = self::PAGE_POSITION_RIGHT - $keyRightPos - 10;
-        
+
         $textWidth = $this->widthForStringUsingFontSize('T', $font, 8);
         $value = wordwrap($value, $avilValueSpace/$textWidth, "\n", false);
         $value = explode("\n", $value);
@@ -588,7 +614,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             if ($count > 0) {
                 $this->_newLine($font, 8, true);
             }
-            
+
             $page->drawText(
                 $item,
                 self::PAGE_POSITION_RIGHT - 10 - $this->widthForStringUsingFontSize($item, $font, 8),
@@ -597,7 +623,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             );
             $count++;
         }
-        
+
         $page->drawText(
             $key,
             self::PAGE_POSITION_RIGHT - 170,
@@ -633,7 +659,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 false
             )
         );
-        
+
         $customerid = $order->getBillingAddress()->getCustomerId();
         if (!empty($customerid)) {
             $customerid = $helper->getSalesPdfInvoiceConfigKey('customeridprefix', $storeId) . $customerid;
@@ -653,7 +679,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 $order->getRemoteIp()
             );
         }
-        
+
         /* Payment */
         if ($helper->getSalesPdfInvoiceConfigFlag('showpayment', $storeId)) {
             $paymentInfo = Mage::helper('payment')->getInfoBlock($order->getPayment())
@@ -724,11 +750,11 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             // $this->_height -= 15;
             $this->_newLine($font, 7, false, 1.8);
         }
-        
+
         $font = $this->_setFontRegular($page, 9);
         $black = new Zend_Pdf_Color_GrayScale(0);
         $page->setFillColor($black);
-        
+
         foreach ($billingAddress as $addressItem) {
             $page->drawText(
                 $addressItem,
@@ -736,7 +762,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 $this->_height,
                 'UTF-8'
             );
-            
+
             //$this->_height -= 12;
             $this->_newLine($font, 9);
         }
@@ -783,7 +809,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         /* Billing Address */
         $this->_insertBillingAddress($page, $order->getBillingAddress());
 
-        
+
         $this->_height = 525;
         $this->_width = 40;
         $this->insertTableHeader($page);
@@ -798,7 +824,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      */
     protected function insertTableHeader(&$page)
     {
-        
+
         $fontSize = 9;
         $font = $this->_setFontRegular($page, $fontSize);
         $fontHeight = $this->heightForFontUsingFontSize($font, $fontSize);
@@ -806,7 +832,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $columHeight = $fontHeight + 5;
         $greyScale9 = new Zend_Pdf_Color_GrayScale(0.9);
         $fillType = Zend_Pdf_Page::SHAPE_DRAW_FILL;
-        
+
         $page->setFillColor($greyScale9);
         $page->drawRectangle(
             $this->_width,
@@ -838,7 +864,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             $this->_height,
             'UTF-8'
         );
-         
+
         $singlePrice = Mage::helper('invoicepdf')->__('Price');
         $page->drawText(
             $singlePrice,
@@ -854,14 +880,14 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             $this->_height,
             'UTF-8'
         );
-        
+
         $taxLabel = Mage::helper('invoicepdf')->__('Tax amount');
         $page->drawText(
             $taxLabel,
             self::PAGE_POSITION_RIGHT - 60 - $this->widthForStringUsingFontSize($taxLabel, $font, $fontSize),
             $this->_height,
             'UTF-8'
-        ); 
+        );
 
         $totalLabel = Mage::helper('invoicepdf')->__('Total');
         $page->drawText(
@@ -909,7 +935,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         if ($drawBorder) {
             $this->_newLine($rowFont, $borderSize * 3);
         }
-        
+
         if ($data->hasTriggerPosNumber()) {
             $this->_posCount++;
             $page->drawText($this->_posCount, self::PAGE_POSITION_LEFT + 3, $this->_height, 'UTF-8');
@@ -935,7 +961,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 
                 $currentPos = 0;
                 $height = $this->_height;
-                
+
                 $page->setFont($font, $fontSize);
                 if (is_array($value)) {
                     foreach ($value as $valueRow) {
@@ -972,7 +998,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      * @param Varien_Object          $item  item to draw
      * @param Zend_Pdf_Page          $page  page to draw on
      * @param Mage_Sales_Model_Order $order order do draw from
-     * 
+     *
      * @return Zend_Pdf_Page
      */
     protected function _drawItem(Varien_Object $item, Zend_Pdf_Page $page, Mage_Sales_Model_Order $order)
@@ -995,7 +1021,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      *
      * @param Zend_Pdf_Page            &$page  page to insert the block
      * @param Mage_Core_Model_Abstract $source source to set
-     * 
+     *
      * @return Zend_Pdf_Page
      */
     public function insertTotals(&$page, $source)
