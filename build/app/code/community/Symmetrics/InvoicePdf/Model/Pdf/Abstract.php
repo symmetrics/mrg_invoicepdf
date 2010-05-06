@@ -432,9 +432,10 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     /**
      * insert a address footer item
      *
-     * @param Zend_Pdf_Page $page  page to insert the item
-     * @param string        $key   key of item
-     * @param string        $value value of item
+     * @param Zend_Pdf_Page $page        page to insert the item
+     * @param string        $key         key of item
+     * @param string        $value       value of item
+     * @param float         $itemSpacing Spacing between key and value
      *
      * @return void
      */
