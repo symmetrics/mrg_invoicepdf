@@ -5,7 +5,7 @@
 # =============================================================================
 NAME = 'symmetrics_module_invoicepdf'
 
-TAGS = ('magento', 'module', 'symmetrics', 'pdf', 'invoice', 'german')
+TAGS = ('magento', 'module', 'symmetrics', 'pdf', 'invoice', 'german', 'mrg')
 
 LICENSE = 'AFL 3.0'
 
@@ -50,8 +50,8 @@ installiert wird.
 # relations
 # =============================================================================
 REQUIRES = [
-    {'magento': '*', 'magento_enterprise': '*'}, 
-    {'symmetrics_config_german': '*'}, 
+    {'magento': '*', 'magento_enterprise': '*'},
+    {'symmetrics_config_german': '*'},
 ]
 
 EXCLUDES = {
