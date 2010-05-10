@@ -489,6 +489,11 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             if (Mage::getConfig()->getNode('modules/Symmetrics_Imprint')) {
                 $data = Mage::getStoreConfig('general/imprint', $store);
                 $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Imprint');
+                $moduleName = 'imprint';
+            } else if (Mage::getConfig()->getNode('modules/Symmetrics_Impressum')) {
+                $data = Mage::getStoreConfig('general/impressum', $store);
+                $config = Mage::getModel('Mage_Core_Model_Config_System')->load('Symmetrics_Impressum');
+                $moduleName = 'impressum';
             } else {
                 $data = explode("\n", Mage::getStoreConfig('sales/identity/address', $store));
             }
@@ -498,17 +503,16 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                 if ($value == '') {
                     continue;
                 } else {
-
                     if ($config) {
                         /* get labels from fields in system.xml */
-                        $element = $config->getNode('sections/general/groups/imprint/fields/' . $key);
+                        $element = $config->getNode('sections/general/groups/' . $moduleName . '/fields/' . $key);
                         $element = $element[0];
                         $elementData = $element->asArray();
                         if (isset($elementData['hide_in_invoice_pdf'])) {
                             /* don`t show this field */
                             continue;
                         } else {
-                            $label = Mage::helper('imprint')->__($elementData['label']) . ':';
+                            $label = Mage::helper($moduleName)->__($elementData['label']) . ':';
                             $itemCollector[$label] = $value;
                         }
 
@@ -517,7 +521,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                     }
 
                     $heightCount++;
-                    if ($heightCount == 5) {
+                    if ($heightCount % 5 == 0 || (count($data) - $heightCount < 5)) {
                         $keyWidth = 0;
                         $itemWidth = 0;
 
@@ -549,7 +553,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                         }
                         $this->_width += $keyWidth + $itemWidth + 40;
                         $this->_height = self::PAGE_POSITION_BOTTOM;
-                        $heightCount = 0;
                         $itemCollector = array();
                     }
                 }
