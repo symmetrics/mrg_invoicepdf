@@ -68,6 +68,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
                 foreach ($total->getTotalsForDisplay() as $totalData) {
                     $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
                     /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
+                    
+                    // cut last :
+                    $totalData['label'] = substr($totalData['label'], 0, -1);
+
                     $tableRowItem->addColumn(
                         'label_' . $index,
                         $totalData['label'],
@@ -92,6 +96,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
                 }
             }
         }
+
         $page = $pdf->insertTableRow($page, $this);
         $this->setPage($page);
     }
