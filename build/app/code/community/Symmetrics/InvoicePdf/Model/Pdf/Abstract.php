@@ -901,7 +901,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             'UTF-8'
         );
 
-        $this->_newLine($font, $fontSize);
+        $this->_newLine($font, $fontSize, false, 1.8);
     }
 
     /**
