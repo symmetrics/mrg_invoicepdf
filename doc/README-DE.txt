@@ -18,7 +18,7 @@ zu machen.
 	    die Rechnungen rechtlich konform und wie in Deutschland
 	    üblich aussehen. 
 *** B:  Folgende Felder wurden hinzugefügt: (befinden sich unter
-	    "Konfiguration -> Verkäufe -> PDF Ausdrucke" ):
+	    "Konfiguration  =>  Verkäufe  =>  PDF Ausdrucke" ):
         - Kundennummer-Präfix (Dafür haben wir im Backend ein Modul
         - geschaffen, welches das Setzen des Prefixes frei erlaubt,
         - je nach Anforderungen)
@@ -48,15 +48,17 @@ zu machen.
 	    angezeigt werden. Konfiguration ist wie üblich in der System
 	    Konfiguration.
 *** F:  Es werden Versandmethode und Zahlungsmethode optional angezeigt.
-*** G:  Das Modul fügt unter "Konfiguration -> Verkäufe -> Verkäufe -> 
+*** G:  Das Modul fügt unter "Konfiguration  =>  Verkäufe  =>  Verkäufe  =>  
         Rechnungs- und Lieferscheingestaltung" das Feld "Logoposition" 
         hinzu. Das Logo das man dort hochladen kann, wird vom Modul verwendet 
         und an der eingestellten Position in der Rechung dargestellt.
 
 ** TECHNICAL
-Um die PDF darzustellen wird eine Abstrakte Klasse genutzt, 
-Symmetrics_InvoicePdf_Model_Pdf_Abstract. Diese Klasse stellt alle benötigten
-Methoden bereit. Dazu wird eine abstrakte Methode 'getPdf()' bereitgestellt, 
+Um die PDF darzustellen wird die Abstrakte Klasse 
+Symmetrics_InvoicePdf_Model_Pdf_Abstract (Datei: app/code/community/
+Symmetrics/InvoicePdf/Model/Pdf/Abstract.php) genutzt.
+Diese Klasse stellt alle benötigten Methoden bereit. 
+Dazu wird eine abstrakte Methode 'getPdf()' bereitgestellt, 
 welche dann von den ableitenden Klassen zum Rendern genutzt wird. Die Abstrakte
 Klasse kümmert sich auch um das Management, wie die Texte auf der Seite gerendert
 werden sollen und fügt, wenn nötig, selbständig neue Seiten ein.
@@ -69,7 +71,7 @@ dazu rendert sie auch den Footer 'insertAddressFooter(..)', setzt eine Seitenzah
 und fügt die Falz und Lockmarken ein.
 
 Die Methode 'insertAddressFooter(..)' nutzt die interne '_insertAddressFooterItem(..)' 
- - Methode um die values und keys richtig dazustellen.
+- Methode um die values und keys richtig dazustellen.
 Die Daten werden ggf. aus dem Modul Symmetrics_Imprint oder aus Symmetrics_Impressum 
 ausgelesen (siehe FUNCTIONALITY C und D).
 
@@ -119,13 +121,13 @@ Item Container. Sie hat fast die gleiche Funktionalität wie
 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' nur das sie Wertepaare
 speichert, welche als einzelne Spalte interpretiert werden.
 Eine solche Spalte wird mit 'addColumn(..)' in den Container gepackt. 
-Diese Klasse hat auch die Methode 'calculateHeigth()' welche von der
+Diese Klasse beinhaltet auch die Methode 'calculateHeigth()' welche von der
 gleichnamigen Methode in der Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
 aufgerufen wird. Nur wird hier die Höhe tatsächlich anhand der Schrift 
 und des Textes berechnet.
 
-Um nun am Ende aus diesem Klassenkonstrukt eine Rechnung dazustellen, wird die 
-Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' verwendet. Diese hat nur 
+Um nun aus diesem Klassenkonstrukt eine Rechnung dazustellen, wird die 
+Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' verwendet. Diese beinhaltet nur 
 eine 'getPdf()' Methode, welche überschrieben ist und 4 weitere Methoden, 
 die zur Anzeige von zusätzlichen Informationen dienen. Wobei eine davon die
 Methode '_insertOrderInfo()' überschreibt, um die InvoiceId auszugeben.
@@ -133,40 +135,44 @@ In den restlichen Methoden wird das gleiche Renderer - Prinzip, wie z.b. bei
 den Produkten oder Totals verwendet.
 Diese Klasse wird in den überschriebenen Action-Controllern
 Symmetrics_InvoicePdf_Adminhtml_Sales_InvoiceController (Für Rechnungsübersicht, 
-siehe screenshots/screenshot_rechnungsuebersicht.png) und
+siehe doc/screenshots/screenshot_rechnungsuebersicht.png) und
 Symmetrics_InvoicePdf_Adminhtml_Sales_Order_InvoiceController (Für Rechnungsdetails,
-siehe screenshots/screenshot_rechnungsdetails.png) verwendet um die Rechnung(en) als Download
+siehe doc/screenshots/screenshot_rechnungsdetails.png) verwendet um die Rechnung(en) als Download
 anzubieten.
 
 ** PROBLEMS
-Rechnungen werden nach manueller Generierung nicht automatisch verschickt
+Rechnungen werden nach manueller Generierung nicht automatisch verschickt.
 
 * TESTCASES
 ** BASIC
 *** A:  Prüfen Sie, ob die Rechnung wie eine normale deutsche Rechnung aussieht.
-		Sie finden 2 Beispiele im /examples Ordner
-*** B:  Prüfen Sie, ob die Felder auf der Rechnung angezeigt werden, wenn diese 
-        eingeschaltet sind.
+		Sie finden 2 Beispiele im doc/examples Ordner.
+*** B:  Prüfen Sie, ob die verschiedenen Felder auf der Rechnung angezeigt werden, wenn diese 
+        aktiviert sind.
 *** C:  Gehen Sie im Backend unter 
-        "Verkäufe->Verkäufe->Rechnungs- und Lieferscheingestaltung->Adresse" 
-        und stellen Sie eine Adresse ein. Prüfen Sie, ob diese im Footer erscheint, 
-        wenn dieser aktiviert ist. Nun installieren Sie das Symmetrics_Impressum Modul 
-        und tragen Sie die Daten in der Systemkonfiguration ein. Prüfen Sie, ob die 
-        Daten so auf der Rechnung auftauchen, also alle ausgefüllten Felder aus diesem 
-        Modul übernommen werden, und nicht mehr die Daten aus
-        "Verkäufe->Verkäufe->Rechnungs- und Lieferscheingestaltung->Adresse".
+        "Verkäufe => Verkäufe => Rechnungs- und Lieferscheingestaltung => Adresse" 
+        und tragen Sie eine Adresse ein. Prüfen Sie, ob diese im Footer erscheint, 
+        wenn dieser aktiviert ist (Einstellung: "Zeige Footer"). 
+        Nun installieren Sie das Symmetrics_Impressum Modul und tragen Sie die Daten 
+        in den entsprechenden Feldern des Moduls in der Systemkonfiguration 
+        ein "Allgemein => Impressum". Prüfen Sie, ob die 
+        Daten korrekt auf der Rechnung erscheinen, also alle ausgefüllten Felder 
+        übernommen werden und nicht mehr die Daten aus dem Feld
+        "Verkäufe => Verkäufe => Rechnungs- und Lieferscheingestaltung => Adresse".
 *** D:  Deinstallieren Sie das Modul Symmetrics_Impressum und installieren Sie 
         Symmetrics_Imprint. Füllen Sie die Felder des Moduls in der Konfiguration 
         "Allgemein => Imprint" aus und prüfen Sie ob nun die Daten aus diesen Feldern
         im Footer erscheinen. Prüfen Sie auch ob, wenn beide 
-        Module installiert sind, die Daten aus Symmetrics_Imprint genommen werden.
+        Module installiert sind, die Daten aus Symmetrics_Imprint genommen werden und nicht 
+        aus Symmetrics_Impressum.
         Beachten Sie auch, das Felder die mit dem Tag <hide_in_invoice_pdf>
-        in der system.xml des Impressum oder Imprint - Moduls gekennzeichnet sind, 
+        in der system.xml des Impressum - oder Imprint - Moduls gekennzeichnet sind, 
         ignoriert und nicht in den Footer übernommen werden.
 *** E:  Füllen Sie die 5 Felder für die Infoboxen und Felder aus und prüfen Sie,
 	    ob sich die Rechnung entsprechend verändert.
-*** F:  Ändern Sie die Optionen und prüfen Sie, ob die Zahlungsmethode bzw. Versandmethode
-	    auf der Rechnung angezeigt werden.
+*** F:  Aktivieren / deaktiveren Sie die Einstellungen "Zeige Versandart" und 
+        "Zeige Zahlmethode" und prüfen Sie, ob die Versandart bzw. Zahlmethode auf 
+        der Rechnung korrekt angezeigt bzw. nicht angezeigt werden.
 *** G:  Prüfen Sie, ob das Feld Logoposition vorhanden ist und man zwischen den 
         Optionen "Links, mittig, Rechts" wählen kann. Laden Sie ein Logo hoch und 
         prüfen Sie, ob es auf der Rechnung erscheint. Prüfen Sie auch ob sich die 
