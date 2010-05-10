@@ -29,6 +29,7 @@ AUTHORS = {
     'Eugen Gitin': 'eg@symmetrics.de',
     'Eric Reiche': 'er@symmetrics.de',
     'Ngoc Anh Doan': 'nd@symmetrics.de',
+    'Siegfried Schmitz': 'ss@symmetrics.de',
 }
 
 # =============================================================================
