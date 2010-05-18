@@ -45,8 +45,8 @@ zu machen.
         ob das Modul Symmetrics_Impressum installiert ist. Wenn ja, werden die 
         Daten aus den Konfigurationsfeldern dieses Moduls geholt.
 *** E:  Es kann eine Infobox und ein Infotext auf der Rechnung
-	    angezeigt werden. Konfiguration ist wie üblich in der System
-	    Konfiguration.
+	    angezeigt werden. Konfiguration ist wie üblich in der 
+	     Systemkonfiguration.
 *** F:  Es werden Versandmethode und Zahlungsmethode optional angezeigt.
 *** G:  Das Modul fügt unter "Konfiguration  =>  Verkäufe  =>  Verkäufe  =>  
         Rechnungs- und Lieferscheingestaltung" das Feld "Logoposition" 
@@ -59,11 +59,11 @@ Symmetrics_InvoicePdf_Model_Pdf_Abstract (Datei: app/code/community/
 Symmetrics/InvoicePdf/Model/Pdf/Abstract.php) genutzt.
 Diese Klasse stellt alle benötigten Methoden bereit. 
 Dazu wird eine abstrakte Methode 'getPdf()' bereitgestellt, 
-welche dann von den ableitenden Klassen zum Rendern genutzt wird. Die Abstrakte
+welche dann von den ableitenden Klassen zum Rendern genutzt wird. Die abstrakte
 Klasse kümmert sich auch um das Management, wie die Texte auf der Seite gerendert
 werden sollen und fügt, wenn nötig, selbständig neue Seiten ein.
 
-Die Klasse an sich kann eine Schriftart setzten '_setFont*', und eine neue Zeile 
+Die Klasse, an sich, kann eine Schriftart setzen '_setFont*', und eine neue Zeile 
 anhand der Schriftgröße und des Textpaddings erstellen '_newLine(..)'. 
 Um eine neue Seite zu erstellen, wird die Methode 'newPage(...)' benutzt. 
 Diese Methode erstellt auch, wenn gewollt, einen Tabellen Header für die Produktauflistung, 
@@ -71,16 +71,16 @@ dazu rendert sie auch den Footer 'insertAddressFooter(..)', setzt eine Seitenzah
 und fügt die Falz und Lockmarken ein.
 
 Die Methode 'insertAddressFooter(..)' nutzt die interne '_insertAddressFooterItem(..)' 
-- Methode um die values und keys richtig dazustellen.
+- Methode um die values und keys richtig darzustellen.
 Die Daten werden ggf. aus dem Modul Symmetrics_Imprint oder aus Symmetrics_Impressum 
 ausgelesen (siehe FUNCTIONALITY C und D).
 
 Das Logo wird mittels 'insertLogo(..)' eingefügt, diese Methode berücksichtigt
-die im Backend eingestellte Position und rendert ggf. das Logo auch kleiner.
+die ,im Backend, eingestellte Position und rendert ggf. das Logo auch kleiner.
 
 Die Methode '_insertOrderInfo(..)' wird verwendet um die Order Informationen, wie z.b.
-die OrderId oder die Versandmethode auszugeben. Diese Methode berücksichtige alle
-Einstellungen die im Backend gemacht worden sind. 
+die OrderId oder die Versandmethode auszugeben. Diese Methode berücksichtigt alle
+Einstellungen die im Backend gemacht wurden. 
 Intern verwendet sie die Methode '_insertOrderInfoRow(..)' um die einzelnen 
 Informationen mit korrektem Abstand darzustellen. 
 Sie gewährleistet, das der Text nicht ineinander kollidiert.
@@ -106,7 +106,7 @@ Um die Totals darzustellen wird die Methode 'insertTotals()' verwendet. Diese
 Methode ähnelt '_drawItem(..)' und verwendet die gleiche Grundfunktionalität.
 Um Items zu rendern (Produkte, Totals, bzw. alles mögliche), wird die Klasse
 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' verwendet.
-Diese hat mehrere setter und getter Methoden, die je nach Situation verwendet
+Diese hat mehrere Setter und Getter Methoden, die je nach Situation verwendet
 werden. Die wichtigsten Funktionen für die Darstellung sind die 'draw()',
 'calculateHeight()' und 'addRow(..)' Methoden.
 'draw()' ist eine Abstrakte Methode und wird von den einzelnen Items 
@@ -126,7 +126,7 @@ gleichnamigen Methode in der Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstr
 aufgerufen wird. Nur wird hier die Höhe tatsächlich anhand der Schrift 
 und des Textes berechnet.
 
-Um nun aus diesem Klassenkonstrukt eine Rechnung dazustellen, wird die 
+Um nun aus diesem Klassenkonstrukt eine Rechnung darzustellen, wird die 
 Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' verwendet. Diese beinhaltet nur 
 eine 'getPdf()' Methode, welche überschrieben ist und 4 weitere Methoden, 
 die zur Anzeige von zusätzlichen Informationen dienen. Wobei eine davon die
@@ -175,6 +175,6 @@ Rechnungen werden nach manueller Generierung nicht automatisch verschickt.
         der Rechnung korrekt angezeigt bzw. nicht angezeigt werden.
 *** G:  Prüfen Sie, ob das Feld Logoposition vorhanden ist und man zwischen den 
         Optionen "Links, mittig, Rechts" wählen kann. Laden Sie ein Logo hoch und 
-        prüfen Sie, ob es auf der Rechnung erscheint. Prüfen Sie auch ob sich die 
-        Position des Logos korrekt verändert wenn sie die Einstellung "Logoposition" 
+        prüfen Sie, ob es auf der Rechnung erscheint. Prüfen Sie auch, ob sich die 
+        Position des Logos korrekt verändert, wenn Sie die Einstellung "Logoposition" 
         entsprechend verändern.
