@@ -42,10 +42,10 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
      */
     public function draw()
     {
-        $order  = $this->getOrder();
-        $item   = $this->getItem();
-        $pdf    = $this->getPdf();
-        $page   = $this->getPage();
+        $order = $this->getOrder();
+        $item  = $this->getItem();
+        $pdf   = $this->getPdf();
+        $page  = $this->getPage();
         $items = $this->getChilds($item);
 
         $taxHelper = Mage::helper('tax');
@@ -82,11 +82,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             // draw prices
             if ($this->canShowPriceInfo($_item)) {
                 if ($taxHelper->displaySalesPriceInclTax()) {
-                    $price = $checkoutHelper->getPriceInclTax($item);
-                    $rowTotal = $checkoutHelper->getSubtotalInclTax($item);
+                    $price = $checkoutHelper->getPriceInclTax($_item);
+                    $rowTotal = $checkoutHelper->getSubtotalInclTax($_item);
                 } elseif ($taxHelper->displaySalesPriceExclTax()) {
-                    $price = $item->getPrice();
-                    $rowTotal = $item->getRowTotal();
+                    $price = $_item->getPrice();
+                    $rowTotal = $_item->getRowTotal();
                 } else {
                     throw new Mage_Core_Exception('invalid Tax Settings');
                 }
