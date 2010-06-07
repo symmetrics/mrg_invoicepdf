@@ -664,7 +664,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
             )
         );
 
-        $customerid = $order->getBillingAddress()->getCustomerId();
+        $customerid = $order->getCustomerId();
         if (!empty($customerid)) {
             $customerid = $helper->getSalesPdfInvoiceConfigKey('customeridprefix', $storeId) . $customerid;
         } else {
