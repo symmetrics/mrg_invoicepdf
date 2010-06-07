@@ -76,14 +76,14 @@
                     <model>tax/sales_pdf_shipping</model>
                     <font_size>8</font_size>
                     <display_zero>0</display_zero>
-                    <sort_order>400</sort_order>
+                    <sort_order>300</sort_order>
                 </shipping>
                 <adjustment_positive translate="title">
                     <title>Adjustment Refund</title>
                     <source_field>adjustment_positive</source_field>
                     <font_size>8</font_size>
                     <display_zero>0</display_zero>
-                    <sort_order>500</sort_order>
+                    <sort_order>400</sort_order>
                 </adjustment_positive>
                 <adjustment_negative translate="title">
                     <title>Adjustment Fee</title>
@@ -106,7 +106,7 @@
                     <model>tax/sales_pdf_tax</model>
                     <font_size>8</font_size>
                     <display_zero>0</display_zero>
-                    <sort_order>300</sort_order>
+                    <sort_order>500</sort_order>
                 </tax>
             </totals>
         </invoicepdf>
