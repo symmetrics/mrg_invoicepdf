@@ -79,7 +79,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     const PAGE_POSITION_LEFT = 40;
     const PAGE_POSITION_RIGHT = 555;
     const PAGE_POSITION_TOP = 800;
-    const PAGE_POSITION_BOTTOM = 47;
+    const PAGE_POSITION_BOTTOM = 60;
 
     const MAX_LOGO_WIDTH = 500;
     const MAX_LOGO_HEIGHT = 50;
@@ -521,7 +521,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                     }
 
                     $heightCount++;
-                    if ($heightCount % 5 == 0 || (count($data) - $heightCount < 5)) {
+                    if ($heightCount % 6 == 0 || (count($data) - 1 == $heightCount)) {
                         $keyWidth = 0;
                         $itemWidth = 0;
 
