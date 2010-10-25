@@ -63,9 +63,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             // draw SKUs
             if (!$_item->getOrderItem()->getParentItem()) {
                 $sku = $this->getSku($_item);
-                $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
+                if (strlen($sku) > 14) {
+                    $skuArray = str_split($sku, 14);
+                    $tableRowItem->addColumn("sku", $skuArray, 45, 'left', 50);
+                } else {
+                    $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
+                }
             }
-
 
             /* in case Product name is longer than 80 chars - it is written in a few lines */
             if ($_item->getOrderItem()->getParentItem()) {
