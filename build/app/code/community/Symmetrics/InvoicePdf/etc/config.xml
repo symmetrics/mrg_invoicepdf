@@ -200,6 +200,8 @@
         <sales_pdf>
             <invoice>
                 <showfooter>1</showfooter>
+                <displaymaturity>1</displaymaturity>
+                <displayinvoicedate>1</displayinvoicedate>
             </invoice>
         </sales_pdf>
         <sales>

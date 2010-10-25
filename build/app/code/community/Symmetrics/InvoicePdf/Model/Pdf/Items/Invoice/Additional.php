@@ -53,11 +53,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         
         $fontSize = 10;
 
-        $maturitySetting = $helper->getSalesPdfInvoiceConfigKey('maturity', $order->getStore());
-        if ($maturitySetting != 0) {
-            $maturity = $helper->__('Invoice maturity: %s days', $maturitySetting);
-        } else {
-            $maturity = $helper->__('Invoice maturity: immediatly');
+        if ($helper->getSalesPdfInvoiceConfigKey('displaymaturity', $order->getStore())) {
+            $maturitySetting = $helper->getSalesPdfInvoiceConfigKey('maturity', $order->getStore());
+            if ($maturitySetting != 0) {
+                $maturity = $helper->__('Invoice maturity: %s days', $maturitySetting);
+            } else {
+                $maturity = $helper->__('Invoice maturity: immediatly');
+            }            
         }
 
         $paddingLegt = 10;
@@ -69,8 +71,11 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         
         $this->addRow($tableRowItem);
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
-        $notice = $helper->__('Invoice date is equal to delivery date');
-        $tableRowItem->addColumn('notice', $notice, $paddingLegt, 'left', $maxWidth, null, 10);
+        
+        if ($helper->getSalesPdfInvoiceConfigKey('displayinvoicedate', $order->getStore())) {
+            $notice = $helper->__('Invoice date is equal to delivery date');
+            $tableRowItem->addColumn('notice', $notice, $paddingLegt, 'left', $maxWidth, null, 10);
+        }
 
         $this->addRow($tableRowItem);
 
