@@ -43,6 +43,11 @@ class Symmetrics_InvoicePdf_Helper_Data
     const SALES_PDF_INVOICE = 'sales_pdf/invoice';
 
     /**
+     * const to store Sales Pdf Invoice Config xPath
+     */
+    const MAX_SKU_LENGTH = 14;
+    
+    /**
      * Get the config from sales pdf invoice setings
      *
      * @param integer $store store to get from
@@ -78,5 +83,80 @@ class Symmetrics_InvoicePdf_Helper_Data
     public function getSalesPdfInvoiceConfigFlag($key, $store)
     {
         return Mage::getStoreConfigFlag(self::SALES_PDF_INVOICE . '/' .  $key, $store);
+    }
+    
+    /**
+     * Return uploaded or default font.
+     * 
+     * @param string $type  Type (normal / bold / italic)
+     * @param string $store Store
+     *
+     * @return string
+     */
+    public function getFont($type = 'normal', $store = '')
+    {
+        if (Mage::getStoreConfigFlag(self::SALES_PDF_INVOICE . '/use_font_' . $type, $store)) {
+            $fontFile = Mage::getStoreConfig(self::SALES_PDF_INVOICE . '/font_' . $type, $store);
+            
+            if ($this->_checkFileExist($this->_getFontFileDir() . $fontFile)) {
+                return Zend_Pdf_Font::fontWithPath($this->_getFontFileDir() . $fontFile);
+            } 
+        } 
+        switch($type) {
+            case 'bold':
+                $font = Zend_Pdf_Font::FONT_HELVETICA_BOLD;
+                break;
+            case 'italic':
+                $font = Zend_Pdf_Font::FONT_HELVETICA_ITALIC;
+                break;
+            default:
+                $font = Zend_Pdf_Font::FONT_HELVETICA;
+                break;
+        }
+        return Zend_Pdf_Font::fontWithName($font);
+    }
+    
+    /**
+     * Returns fonts directory.
+     *
+     * @return string
+     */
+    protected function _getFontFileDir() 
+    {
+        return Mage::getBaseDir('media') . '/fonts/';
+    }
+    
+    /**
+     * Check if file exist.
+     * 
+     * @param string $file Path and filename.
+     *
+     * @return boolean
+     */
+    protected function _checkFileExist($file) 
+    {
+        $ioFile = new Varien_Io_File();
+        
+        if (!$ioFile->fileExists($file)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Split sku to array if length > maxlength.
+     * 
+     * @param string $sku SKU.
+     *
+     * @return string|array
+     */
+    public function getSplitSku($sku) 
+    {
+        if (strlen($sku) > self::MAX_SKU_LENGTH) {
+            return str_split($sku, self::MAX_SKU_LENGTH);
+        }
+        
+        return $sku;
     }
 }

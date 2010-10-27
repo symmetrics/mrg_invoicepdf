@@ -63,12 +63,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             // draw SKUs
             if (!$_item->getOrderItem()->getParentItem()) {
                 $sku = $this->getSku($_item);
-                if (strlen($sku) > 14) {
-                    $skuArray = str_split($sku, 14);
-                    $tableRowItem->addColumn("sku", $skuArray, 45, 'left', 50);
-                } else {
-                    $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
-                }
+                $sku = Mage::helper('invoicepdf')->getSplitSku($sku);
+                $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
             }
 
             /* in case Product name is longer than 80 chars - it is written in a few lines */
@@ -113,7 +109,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
                     /* @var $tableRowOptionItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
 
-                    $labelFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+                    //$labelFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+                    $labelFont = Mage::helper('invoicepdf')->getFont('bold');
                     $tableRowOptionItem->addColumn(
                         'option_label',
                         $attributes['option_label'],

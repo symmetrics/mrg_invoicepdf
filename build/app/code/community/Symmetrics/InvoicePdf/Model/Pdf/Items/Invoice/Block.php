@@ -50,7 +50,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Block
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
 
-        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+        // $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+        $font = Mage::helper('invoicepdf')->getFont('bold');
         $fontSize = 10;
 
         $infoTextHeadLine = $helper->getSalesPdfInvoiceConfigKey('infoboxhl', $order->getStore());
@@ -61,7 +62,8 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Block
             $this->addRow($tableRowItem);
         }
 
-        $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
+        //$font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
+        $font = Mage::helper('invoicepdf')->getFont();
         $infoText = $helper->getSalesPdfInvoiceConfigKey('infobox', $order->getStore());
         if (!empty($infoText)) {
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
