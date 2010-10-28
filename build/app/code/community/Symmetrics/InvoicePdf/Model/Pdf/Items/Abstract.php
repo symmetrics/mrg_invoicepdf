@@ -280,7 +280,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract extends Mage_Core_
      */
     public function calculateHeight()
     {
-        $pdf = $this->getPdf();
         $maxHeight = 0;
 
         foreach ($this->_items as $item) {

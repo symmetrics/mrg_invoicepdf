@@ -73,122 +73,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
     }
 
     /**
-     * Retrieve is Shipment Separately flag for Item
-     *
-     * @param Varien_Object $item item to check
-     * 
-     * @return bool
-     */
-    public function isShipmentSeparately($item = null)
-    {
-        if ($item) {
-            if ($item->getOrderItem()) {
-                $item = $item->getOrderItem();
-            }
-
-            $parentItem = $item->getParentItem();
-            if ($parentItem) {
-                $options = $parentItem->getProductOptions();
-                if ($options) {
-                    if (isset($options['shipment_type'])
-                        && $options['shipment_type'] == Mage_Catalog_Model_Product_Type_Abstract::SHIPMENT_SEPARATELY) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                $options = $item->getProductOptions();
-                if ($options) {
-                    if (isset($options['shipment_type'])
-                        && $options['shipment_type'] == Mage_Catalog_Model_Product_Type_Abstract::SHIPMENT_SEPARATELY) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        $options = $this->getOrderItem()->getProductOptions();
-        if ($options) {
-            if (isset($options['shipment_type'])
-                && $options['shipment_type'] == Mage_Catalog_Model_Product_Type_Abstract::SHIPMENT_SEPARATELY) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Retrieve is Child Calculated
-     *
-     * @param Varien_Object $item item to check
-     * 
-     * @return bool
-     */
-    public function isChildCalculated($item = null)
-    {
-        if ($item) {
-            if ($item->getOrderItem()) {
-                $item = $item->getOrderItem();
-            }
-
-            $parentItem = $item->getParentItem();
-            if ($parentItem) {
-                $options = $parentItem->getProductOptions();
-                if ($options) {
-                    if (isset($options['product_calculations']) && 
-                        $options['product_calculations'] ==
-                        Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                $options = $item->getProductOptions();
-                if ($options) {
-                    if (isset($options['product_calculations']) && 
-                        $options['product_calculations'] ==
-                        Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        $options = $this->getOrderItem()->getProductOptions();
-        if ($options) {
-            if (isset($options['product_calculations'])
-                && $options['product_calculations'] == Mage_Catalog_Model_Product_Type_Abstract::CALCULATE_CHILD) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Retrieve Bundle Options
-     *
-     * @param Varien_Object $item item Options (currently not in use)
-     * 
-     * @return array
-     */
-    public function getBundleOptions($item = null)
-    {
-        $options = $this->getOrderItem()->getProductOptions();
-        if ($options) {
-            if (isset($options['bundle_options'])) {
-                return $options['bundle_options'];
-            }
-        }
-        return array();
-    }
-
-    /**
      * Retrieve Selection attributes
      *
      * @param Varien_Object $item Item to get attributes
@@ -206,32 +90,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
             return unserialize($options['bundle_selection_attributes']);
         }
         return null;
-    }
-
-    /**
-     * Retrieve Order options
-     *
-     * @param Varien_Object $item item Options (currently not in use)
-     *
-     * @return array
-     */
-    public function getOrderOptions($item = null)
-    {
-        $result = array();
-
-        $options = $this->getOrderItem()->getProductOptions();
-        if ($options) {
-            if (isset($options['options'])) {
-                $result = array_merge($result, $options['options']);
-            }
-            if (isset($options['additional_options'])) {
-                $result = array_merge($result, $options['additional_options']);
-            }
-            if (!empty($options['attributes_info'])) {
-                $result = array_merge($options['attributes_info'], $result);
-            }
-        }
-        return $result;
     }
 
     /**
@@ -257,14 +115,17 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
      */
     public function getValueHtml($item)
     {
+        /* @var $helper Symmetrics_InvoicePdf_Helper_Bundle */
+        $helper = Mage::helper('invoicepdf/bundle');
         $result = strip_tags($item->getName());
-        if (!$this->isShipmentSeparately($item)) {
+        
+        if (!$helper->isShipmentSeparately($this->getOrderItem(), $item)) {
             $attributes = $this->getSelectionAttributes($item);
             if ($attributes) {
                 $result =  sprintf('%d', $attributes['qty']) . ' x ' . $result;
             }
         }
-        if (!$this->isChildCalculated($item)) {
+        if (!$helper->isChildCalculated($this->getOrderItem(), $item)) {
             $attributes = $this->getSelectionAttributes($item);
             if ($attributes) {
                 $result .= " " . strip_tags($this->getOrderItem()->getOrder()->formatPrice($attributes['price']));
@@ -282,8 +143,11 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Abstract
      */
     public function canShowPriceInfo($item)
     {
-        if (($item->getOrderItem()->getParentItem() && $this->isChildCalculated())
-                || (!$item->getOrderItem()->getParentItem() && !$this->isChildCalculated())) {
+        /* @var $helper Symmetrics_InvoicePdf_Helper_Bundle */
+        $helper = Mage::helper('invoicepdf/bundle');
+        
+        if (($item->getOrderItem()->getParentItem() && $helper->isChildCalculated($this->getOrderItem()))
+                || (!$item->getOrderItem()->getParentItem() && !$helper->isChildCalculated($this->getOrderItem()))) {
             return true;
         }
         return false;

@@ -52,8 +52,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
     {
         $this->_beforeGetPdf();
         $this->_initRenderer('invoice');
-        
-        $pdf = $this->_getPdf();
 
         foreach ($invoices as $invoice) {
             if ($invoice->getStoreId()) {
@@ -148,8 +146,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Invoice extends Symmetrics_InvoicePdf_Mode
      */
     protected function _insertAdditionalInfo(&$page, $order)
     {
-        $helper = Mage::helper('invoicepdf');
-
         $renderer = Mage::getModel('invoicepdf/pdf_items_invoice_additional');
         $renderer->setOrder($order);
         $renderer->setPdf($this);

@@ -54,7 +54,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
         /* @var $checkoutHelper Mage_Checkout_Helper_Data */
 
         $_prevOptionId = '';
-        $drawItems = array();
 
         foreach ($items as $_item) {
             $attributes = $this->getSelectionAttributes($_item);

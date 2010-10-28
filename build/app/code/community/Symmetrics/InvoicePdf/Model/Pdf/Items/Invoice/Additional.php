@@ -50,8 +50,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
         $helper = Mage::helper('invoicepdf');
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
-        
-        $fontSize = 10;
 
         if ($helper->getSalesPdfInvoiceConfigKey('displaymaturity', $order->getStore())) {
             $maturitySetting = $helper->getSalesPdfInvoiceConfigKey('maturity', $order->getStore());

@@ -31,6 +31,7 @@
  * @copyright 2010 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
+ * @SuppressWarnings(PHPMD)
  */
 abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
 {

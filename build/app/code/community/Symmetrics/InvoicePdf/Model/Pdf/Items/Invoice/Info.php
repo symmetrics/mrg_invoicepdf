@@ -50,8 +50,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Info
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
 
-        $fontSize = 10;
-
         $infoText = $helper->getSalesPdfInvoiceConfigKey('infotxt', $order->getStore());
         if (!empty($infoText)) {
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');

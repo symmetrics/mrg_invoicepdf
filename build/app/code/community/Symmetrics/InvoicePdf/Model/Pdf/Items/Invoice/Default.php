@@ -101,9 +101,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
                     $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
                     $_printValue = isset($option['print_value'])
                         ? $option['print_value'] : strip_tags($option['value']);
-                    $values = explode(', ', $_printValue);
 
-                    // $valueFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
                     $valueFont = Mage::helper('invoicepdf')->getFont();
                     $tableRowOptionItem->addColumn('option_value', $_printValue, 115, 'left', 0, $valueFont, 6);
                     $this->addRow($tableRowOptionItem);

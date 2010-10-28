@@ -55,7 +55,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
         $pdf = $this->getPdf();
 
         $order = $source->getOrder();
-        $totals = $this->_getTotalsList($source);
+        $totals = $this->_getTotalsList();
 
         // $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
         $font = Mage::helper('invoicepdf')->getFont();
@@ -105,37 +105,35 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
     /**
      * sort the total list by 'sort_order' key
      *
-     * @param array $a array to sort
-     * @param array $b array to sort
+     * @param array $left  array to sort
+     * @param array $right array to sort
      * 
      * @return array
      */
-    protected function _sortTotalsList($a, $b)
+    protected function _sortTotalsList($left, $right)
     {
-        if (!isset($a['sort_order']) || !isset($b['sort_order'])) {
+        if (!isset($left['sort_order']) || !isset($right['sort_order'])) {
             return 0;
         }
 
-        if ($a['sort_order'] == $b['sort_order']) {
+        if ($left['sort_order'] == $right['sort_order']) {
             return 0;
         }
 
-        return ($a['sort_order'] > $b['sort_order']) ? 1 : -1;
+        return ($left['sort_order'] > $right['sort_order']) ? 1 : -1;
     }
 
     /**
      * get the totals list for Source
-     *
-     * @param Mage_Core_Model_Abstract $source soruce to get the totales
      * 
      * @return array
      */
-    protected function _getTotalsList($source)
+    protected function _getTotalsList()
     {
         $totals = Mage::getConfig()->getNode('global/invoicepdf/totals')->asArray();
         usort($totals, array($this, '_sortTotalsList'));
         $totalModels = array();
-        foreach ($totals as $index => $totalInfo) {
+        foreach ($totals as $totalInfo) {
             if (!empty($totalInfo['model'])) {
                 $totalModel = Mage::getModel($totalInfo['model']);
                 if ($totalModel instanceof Mage_Sales_Model_Order_Pdf_Total_Default) {
