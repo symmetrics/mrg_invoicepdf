@@ -57,7 +57,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
         $order = $source->getOrder();
         $totals = $this->_getTotalsList();
 
-        // $font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
         $font = Mage::helper('invoicepdf')->getFont();
 
         $index = 1;

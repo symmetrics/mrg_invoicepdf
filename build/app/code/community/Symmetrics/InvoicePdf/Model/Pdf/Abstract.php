@@ -236,7 +236,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      */
     protected function _setFontRegular($object, $size = 10)
     {
-        //$font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
         $font = Mage::helper('invoicepdf')->getFont();
         $object->setFont($font, $size);
         return $font;
@@ -252,7 +251,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      */
     protected function _setFontBold($object, $size = 10)
     {
-        //$font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
         $font = Mage::helper('invoicepdf')->getFont('bold');
         $object->setFont($font, $size);
         return $font;
@@ -268,7 +266,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      */
     protected function _setFontItalic($object, $size = 10)
     {
-        //$font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_ITALIC);
         $font = Mage::helper('invoicepdf')->getFont('italic');
         $object->setFont($font, $size);
         return $font;

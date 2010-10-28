@@ -47,14 +47,15 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Info
         $page   = $this->getPage();
 
         $helper = Mage::helper('invoicepdf');
+        $font = $helper->getFont();
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
-
+        
         $infoText = $helper->getSalesPdfInvoiceConfigKey('infotxt', $order->getStore());
         if (!empty($infoText)) {
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
             $infoText = explode("\n", $infoText);
-            $tableRowItem->addColumn('note', $infoText, 0, 'left', 0, null, 10);
+            $tableRowItem->addColumn('note', $infoText, 0, 'left', 0, $font, 10);
             $this->addRow($tableRowItem);
         }
 

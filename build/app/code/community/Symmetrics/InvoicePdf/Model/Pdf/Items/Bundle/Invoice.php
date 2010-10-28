@@ -108,7 +108,6 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
                     /* @var $tableRowOptionItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
 
-                    //$labelFont = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
                     $labelFont = Mage::helper('invoicepdf')->getFont('bold');
                     $tableRowOptionItem->addColumn(
                         'option_label',
