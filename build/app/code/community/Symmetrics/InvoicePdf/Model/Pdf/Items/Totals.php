@@ -89,7 +89,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
 
                             $tableRowTaxItem->addColumn(
                                 'amount_' . $index,
-                                $info['amount'],
+                                $order->formatPriceTxt($info['amount']),
                                 10,
                                 'right',
                                 0,
