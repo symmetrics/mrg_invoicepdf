@@ -52,14 +52,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
         $checkoutHelper = Mage::helper('checkout');
         /* @var $checkoutHelper Mage_Checkout_Helper_Data */
 
+        $font = Mage::helper('invoicepdf')->getFont();
+        
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
        
         $sku = $this->getSku($item);
-        $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
+        $tableRowItem->addColumn("sku", $sku, 45, 'left', 50, $font);
         
         $name = $item->getName();
-        $tableRowItem->addColumn("name", $name, 110, 'left', 260);
+        $tableRowItem->addColumn("name", $name, 110, 'left', 260, $font);
 
         if ($taxHelper->displaySalesPriceInclTax()) {
             $price = $checkoutHelper->getPriceInclTax($item);
@@ -71,16 +73,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
             throw new Mage_Core_Exception('invalid Tax Settings');
         }
         $price = $order->formatPriceTxt($price);
-        $tableRowItem->addColumn("price", $price, 160, 'right');
+        $tableRowItem->addColumn("price", $price, 160, 'right', 0, $font);
 
         $qty = $item->getQty()*1;
-        $tableRowItem->addColumn("qty", $qty, 110, 'right');
+        $tableRowItem->addColumn("qty", $qty, 110, 'right', 0, $font);
 
         $tax= $order->formatPriceTxt($item->getTaxAmount());
-        $tableRowItem->addColumn("tax", $tax, 60, 'right');
+        $tableRowItem->addColumn("tax", $tax, 60, 'right', 0, $font);
 
         $rowTotal = $order->formatPriceTxt($rowTotal);
-        $tableRowItem->addColumn("rowTotal", $rowTotal, 10, 'right');
+        $tableRowItem->addColumn("rowTotal", $rowTotal, 10, 'right', 0, $font);
 
         $this->addRow($tableRowItem);
 

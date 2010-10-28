@@ -48,6 +48,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Info
 
         $helper = Mage::helper('invoicepdf');
         $font = $helper->getFont();
+        Mage::log('used font: ' . $font);
         $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
         /* @var $tableRowItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
         

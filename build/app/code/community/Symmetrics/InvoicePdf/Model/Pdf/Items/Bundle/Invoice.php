@@ -54,6 +54,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
         /* @var $checkoutHelper Mage_Checkout_Helper_Data */
 
         $_prevOptionId = '';
+        $font = Mage::helper('invoicepdf')->getFont();
 
         foreach ($items as $_item) {
             $attributes = $this->getSelectionAttributes($_item);
@@ -63,7 +64,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             if (!$_item->getOrderItem()->getParentItem()) {
                 $sku = $this->getSku($_item);
                 $sku = Mage::helper('invoicepdf')->getSplitSku($sku);
-                $tableRowItem->addColumn("sku", $sku, 45, 'left', 50);
+                $tableRowItem->addColumn("sku", $sku, 45, 'left', 50, $font);
             }
 
             /* in case Product name is longer than 80 chars - it is written in a few lines */
@@ -76,7 +77,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                 $maxWidth = 260;
                 $name = $_item->getName();
             }
-            $tableRowItem->addColumn("name", $name, $feed, 'left', $maxWidth);
+            $tableRowItem->addColumn("name", $name, $feed, 'left', $maxWidth, $font);
 
             // draw prices
             if ($this->canShowPriceInfo($_item)) {
@@ -90,16 +91,16 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                     throw new Mage_Core_Exception('invalid Tax Settings');
                 }
                 $price = $order->formatPriceTxt($price);
-                $tableRowItem->addColumn("price", $price, 160, 'right');
+                $tableRowItem->addColumn("price", $price, 160, 'right', 0, $font);
 
                 $qty = $_item->getQty()*1;
-                $tableRowItem->addColumn("qty", $qty, 110, 'right');
+                $tableRowItem->addColumn("qty", $qty, 110, 'right', 0, $font);
 
                 $tax= $order->formatPriceTxt($_item->getTaxAmount());
-                $tableRowItem->addColumn("tax", $tax, 60, 'right');
+                $tableRowItem->addColumn("tax", $tax, 60, 'right', 0, $font);
 
                 $rowTotal = $order->formatPriceTxt($rowTotal);
-                $tableRowItem->addColumn("rowTotal", $rowTotal, 10, 'right');
+                $tableRowItem->addColumn("rowTotal", $rowTotal, 10, 'right', 0, $font);
             }
 
             // draw Option Labels
