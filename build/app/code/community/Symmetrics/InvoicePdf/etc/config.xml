@@ -27,7 +27,7 @@
 <config>
     <modules>
         <Symmetrics_InvoicePdf>
-            <version>0.3.18</version>
+            <version>0.3.20</version>
         </Symmetrics_InvoicePdf>
     </modules>
     <adminhtml>
