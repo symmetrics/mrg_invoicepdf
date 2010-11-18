@@ -61,6 +61,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Default
         $sku = Mage::helper('invoicepdf')->getSplitSku($sku);
         $tableRowItem->addColumn("sku", $sku, 45, 'left', 50, $font);
         
+        
         $name = $item->getName();
         $tableRowItem->addColumn("name", $name, 110, 'left', 260, $font);
 

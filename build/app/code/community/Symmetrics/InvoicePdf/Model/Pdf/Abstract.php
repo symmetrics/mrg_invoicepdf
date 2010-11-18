@@ -77,10 +77,10 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     const PDF_SHIPMENT_PUT_ORDER_ID = 'sales_pdf/shipment/put_order_id';
     const PDF_CREDITMEMO_PUT_ORDER_ID = 'sales_pdf/creditmemo/put_order_id';
 
-    const PAGE_POSITION_LEFT = 40;
+    const PAGE_POSITION_LEFT = 60;
     const PAGE_POSITION_RIGHT = 555;
-    const PAGE_POSITION_TOP = 800;
-    const PAGE_POSITION_BOTTOM = 60;
+    const PAGE_POSITION_TOP = 790;
+    const PAGE_POSITION_BOTTOM = 90;
 
     const MAX_LOGO_WIDTH = 500;
     const MAX_LOGO_HEIGHT = 50;
@@ -482,7 +482,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $font = $this->_setFontRegular($page, $fontSize);
 
         $page->setLineWidth(0.4);
-        $page->drawLine($this->_width, $this->_height, self::PAGE_POSITION_RIGHT, $this->_height);
+        //$page->drawLine($this->_width, $this->_height, self::PAGE_POSITION_RIGHT, $this->_height);
         $page->setLineWidth(0);
 
         if (Mage::helper('invoicepdf')->getSalesPdfInvoiceConfigFlag('showfooter', $store)) {
@@ -552,7 +552,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                                 $this->_insertAddressFooterItem($page, trim(strip_tags($itemValue)));
                             }
                         }
-                        $this->_width += $keyWidth + $itemWidth + 40;
+                        $this->_width += $keyWidth + $itemWidth + self::PAGE_POSITION_LEFT;
                         $this->_height = self::PAGE_POSITION_BOTTOM;
                         $itemCollector = array();
                     }
@@ -737,7 +737,6 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     protected function _insertBillingAddress(&$page, $billingAddress)
     {
         $billingAddress = $this->_formatAddress($billingAddress->format('pdf'));
-
         $font = $this->_setFontRegular($page, 7);
         $greyScale9 = new Zend_Pdf_Color_GrayScale(0.5);
         $page->setFillColor($greyScale9);
@@ -790,7 +789,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $page->drawText(
             $title,
             self::PAGE_POSITION_LEFT,
-            535,
+            525,
             'UTF-8'
         );
         $this->_setFontRegular($page);
@@ -815,8 +814,8 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         $this->_insertBillingAddress($page, $order->getBillingAddress());
 
 
-        $this->_height = 525;
-        $this->_width = 40;
+        $this->_height = 515;
+        $this->_width = self::PAGE_POSITION_LEFT;
         $this->insertTableHeader($page);
     }
 
