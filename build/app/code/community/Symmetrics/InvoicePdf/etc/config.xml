@@ -27,7 +27,7 @@
 <config>
     <modules>
         <Symmetrics_InvoicePdf>
-            <version>0.3.26</version>
+            <version>0.3.28</version>
         </Symmetrics_InvoicePdf>
     </modules>
     <adminhtml>
@@ -220,7 +220,7 @@
 {{depend street4}}{{var street4}}|{{/depend}}
 {{if postcode}}{{var postcode}}{{/if}} {{if city}}{{var city}}  {{/if}}|
 {{var country}}|
-{{depend fax}}<br/>F: {{var fax}}{{/depend}}|]]></pdf>
+{{depend fax}}F: {{var fax}}{{/depend}}|]]></pdf>
             </address_templates>
         </customer>
     </default>
