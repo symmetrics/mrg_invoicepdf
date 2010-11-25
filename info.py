@@ -66,6 +66,7 @@ DEPENDS_ON_FILES = (
     'app/code/core/Mage/Adminhtml/controllers/Sales/'
     'Order/InvoiceController.php',
     'app/code/core/Mage/Adminhtml/controllers/Sales/InvoiceController.php',
+    'app/code/core/Mage/Adminhtml/controllers/Sales/OrderController.php',
 )
 
 PEAR_KEY = ''
