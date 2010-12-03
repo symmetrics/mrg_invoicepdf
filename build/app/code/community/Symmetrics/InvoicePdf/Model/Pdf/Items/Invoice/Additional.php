@@ -54,11 +54,13 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Invoice_Additional
 
         if ($helper->getSalesPdfInvoiceConfigKey('displaymaturity', $order->getStore())) {
             $maturitySetting = $helper->getSalesPdfInvoiceConfigKey('maturity', $order->getStore());
-            if ($maturitySetting != 0) {
-                $maturity = $helper->__('Invoice maturity: %s days', $maturitySetting);
-            } else {
-                $maturity = $helper->__('Invoice maturity: immediatly');
-            }            
+            if (!$maturity = $helper->getSalesPdfInvoiceConfigKey('altmaturitytext', $order->getStore())) {
+                if ($maturitySetting != 0) {
+                    $maturity = $helper->__('Invoice maturity: %s days', $maturitySetting);
+                } else {
+                    $maturity = $helper->__('Invoice maturity: immediatly');
+                }
+            }
         }
 
         $paddingLegt = 10;

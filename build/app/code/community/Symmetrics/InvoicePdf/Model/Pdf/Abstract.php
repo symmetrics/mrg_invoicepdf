@@ -328,6 +328,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
      */
     public function newPage(Varien_Object $settings)
     {
+        $helper = Mage::helper('invoicepdf');
         $pageSize = ($settings->hasPageSize()) ? $settings->getPageSize() : Zend_Pdf_Page::SIZE_A4;
         $page = $this->_getPdf()->newPage($pageSize);
         $this->insertAddressFooter($page, $settings->getStore());
@@ -341,13 +342,13 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
         }
 
         // Draw fold marks
-        $foldMarkHeight = $page->getHeight() / 3;
-        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
-        $foldMarkHeight *= 2;
-        $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
-
-        $page->drawLine(20, $page->getHeight() / 2, 25, $page->getHeight() / 2);
-
+        if ($helper->getSalesPdfInvoiceConfigKey('displayfoldmarks', $settings->getStore())) {
+            $foldMarkHeight = $page->getHeight() / 3;
+            $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
+            $foldMarkHeight *= 2;
+            $page->drawLine(20, $foldMarkHeight, 25, $foldMarkHeight);
+            $page->drawLine(20, $page->getHeight() / 2, 25, $page->getHeight() / 2);
+        }
         // draw page number
         $font = $this->_setFontRegular($page, 8);
         $pageText = Mage::helper('invoicepdf')->__('Page %d', count($pdf->pages));
