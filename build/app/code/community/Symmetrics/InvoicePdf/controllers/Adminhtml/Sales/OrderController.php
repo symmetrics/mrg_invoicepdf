@@ -48,8 +48,6 @@ class Symmetrics_InvoicePdf_Adminhtml_Sales_OrderController extends Mage_Adminht
         $flag = false;
         if (!empty($orderIds)) {
             foreach ($orderIds as $orderId) {
-                $order = Mage::getModel('sales/order')->load($orderId);
-
                 $invoices = Mage::getResourceModel('sales/order_invoice_collection')
                     ->addAttributeToSelect('*')
                     ->setOrderFilter($orderId)
