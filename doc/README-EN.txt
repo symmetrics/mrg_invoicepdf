@@ -1,180 +1,160 @@
 * DOCUMENTATION
 
 ** INSTALLATION
-Extrahieren Sie den Inhalt dieses Archivs in Ihr Magento Verzeichnis.
-Ggf. ist das Leeren/Auffrischen des Magento-Caches notwendig.
-Setzen Sie dann die Einstellungen in der System/Konfiguration.
-Wenn noch eine alte Version installiert ist, sollten die Dateien unter
-app/code/local/Symmetrics/InvoicePdf entfernt werden, bevor die neue Version
-installiert wird.
+Extract content of this archive to your Magento directory.
+It might be necessary to clear/refresh the Magento cache.
+Then set the settings in System/Configuration. If an old version is
+still installed, the files in app/code/local/Symmetrics/InvoicePdf
+should be deleted, before the new version is installed.
 
 ** USAGE
-Das Modul Symmetrics_InvoicePdf verändert die Standard
-PDF-Vorlage für Rechnungen, um sie in Deutschland rechtsgültig
-zu machen.
+The module Symmetrics_InvoicePdf changes the standard PDF
+template for invoices, in order to make them valid in Germany.
 
 ** FUNCTIONALITY
-*** A:  Modifiziert die PDF-Vorlage für Rechnungen so, dass
-	    die Rechnungen rechtlich konform und wie in Deutschland
-	    üblich aussehen. 
-*** B:  Folgende Felder wurden hinzugefügt: (befinden sich unter
-	    "Konfiguration  =>  Verkäufe  =>  PDF Ausdrucke" ):
-        - Kundennummer-Präfix (Dafür haben wir im Backend ein Modul
-        - geschaffen, welches das Setzen des Prefixes frei erlaubt,
-        - je nach Anforderungen)
-        - Fälligkeit der Rechnung
-        - Bemerkung
-        - Kundennummer Prefix
-        - Zeige Kunden-IP in Rechnung
-        - Zeige Footer
-        - Zeige Versandart
-        - Zeige Zahlmethode
-        - Zeige Infotext
+*** A:  Modifies the PDF template for invoices so that the invoices
+		look comliant with law and as usual in Germany
+*** B:  The following fields were added: (located under "Configuration
+		=> Sales => PDF print-outs"):
+       	- Customer number prefix (for this we have created a module in
+		backend which allows setting of prefixes depending on
+		requirements)
+        - Due date of invoice
+        - Comment 
+        - Customer number prefix
+        - Show customer IP in invoice
+        - Show footer
+        - Show shipping method
+        - Show payment method
+        - Show infotext
         - Infotext
-        - Zeige Infobox
-        - Infobox Überschrift
+        - Show infobox
+        - Infobox title
         - Infobox
-*** C:  Wenn das Modul Symmetrics_Imprint installiert ist, werden 
-        die Daten für den Footer aus den Konfigurationsfeldern dieses 
-        Moduls ausgelesen und damit alle Betreiberinformationen angezeigt:
-		- Vollständige Anschrift
-		- Kommunikationsdaten wie Telefon, Fax, E-Mail usw.
-		- Vollständige Kontoverbindung
-		- Vollständige Steuerinformationen
-*** D:  Ist das Modul Symmetrics_Imprint nicht installiert, wird geprüft 
-        ob das Modul Symmetrics_Impressum installiert ist. Wenn ja, werden die 
-        Daten aus den Konfigurationsfeldern dieses Moduls geholt.
-*** E:  Es kann eine Infobox und ein Infotext auf der Rechnung
-	    angezeigt werden. Konfiguration ist wie üblich in der 
-	     Systemkonfiguration.
-*** F:  Es werden Versandmethode und Zahlungsmethode optional angezeigt.
-*** G:  Das Modul fügt unter "Konfiguration  =>  Verkäufe  =>  Verkäufe  =>  
-        Rechnungs- und Lieferscheingestaltung" das Feld "Logoposition" 
-        hinzu. Das Logo das man dort hochladen kann, wird vom Modul verwendet 
-        und an der eingestellten Position in der Rechung dargestellt.
+*** C:  When Symmetrics_Imprint module is installed, the data for footer are
+		read from the configuration fields of this module and so all
+		owner information is shown:
+		- Full address
+		- Communication data such as phone, fax, e-mail etc.
+		- Full bank account 
+		- Full tax information
+*** D:  If Symmetrics_Imprint module is not installed it is checked if
+		Symmetrics_Impressum module is installed. If yes, the data from
+		configuration fields of this module are taken.
+*** E:  An infobox and infotext can be shown on the invoice. 
+		 Configuration is as usual in the system configuration.
+*** F:  Shipping methods and payment methods are shown optionally.
+*** G:  The module adds field "Logo position" in "Configuration => Sales 
+		=> Sales => Invoice and Packing Slip Design". The logo that one can
+		upload there is used by module and displayed on the set position
+		in invoice.
 
 ** TECHNICAL
-Um die PDF darzustellen wird die Abstrakte Klasse 
-Symmetrics_InvoicePdf_Model_Pdf_Abstract (Datei: app/code/community/
-Symmetrics/InvoicePdf/Model/Pdf/Abstract.php) genutzt.
-Diese Klasse stellt alle benötigten Methoden bereit. 
-Dazu wird eine abstrakte Methode 'getPdf()' bereitgestellt, 
-welche dann von den ableitenden Klassen zum Rendern genutzt wird. Die abstrakte
-Klasse kümmert sich auch um das Management, wie die Texte auf der Seite gerendert
-werden sollen und fügt, wenn nötig, selbständig neue Seiten ein.
+In order to display PDF the abstract class
+Symmetrics_InvoicePdf_Model_Pdf_Abstract (file: app/code/community/
+Symmetrics/InvoicePdf/Model/Pdf/Abstract.php) is used.
+This class provides all necessary methods. For this an abstract method
+'getPdf()' is provided which is then used by deriving classes for rendering. The
+abstract class takes care also about the management, how texts should be rendered 
+on page, and when necessary adds new pages by itself.  
 
-Die Klasse, an sich, kann eine Schriftart setzen '_setFont*', und eine neue Zeile 
-anhand der Schriftgröße und des Textpaddings erstellen '_newLine(..)'. 
-Um eine neue Seite zu erstellen, wird die Methode 'newPage(...)' benutzt. 
-Diese Methode erstellt auch, wenn gewollt, einen Tabellen Header für die Produktauflistung, 
-dazu rendert sie auch den Footer 'insertAddressFooter(..)', setzt eine Seitenzahl 
-und fügt die Falz und Lockmarken ein.
+The class by itself can set font '_setFont*', and create a new line with the help
+of the font size and text paddings '_newLine(..)'.  In order to create a new page,
+'newPage(...)' method is used. Also, if it is wanted, this method creates table 
+headers for the product listing, for this it also renders the footer 
+'insertAddressFooter(..)', sets a page number and adds a seam and lockmarks.
 
-Die Methode 'insertAddressFooter(..)' nutzt die interne '_insertAddressFooterItem(..)' 
-- Methode um die values und keys richtig darzustellen.
-Die Daten werden ggf. aus dem Modul Symmetrics_Imprint oder aus Symmetrics_Impressum 
-ausgelesen (siehe FUNCTIONALITY C und D).
+The method 'insertAddressFooter(..)' uses the internal '_insertAddressFooterItem(..)' 
+method in order to display values and keys correctly.
+Should the occasion arise, the data are read from Symmetrics_Imprint 
+or from Symmetrics_Impressum  module (see FUNCTIONALITY C and D).
 
-Das Logo wird mittels 'insertLogo(..)' eingefügt, diese Methode berücksichtigt
-die ,im Backend, eingestellte Position und rendert ggf. das Logo auch kleiner.
+The logo is added through 'insertLogo(..)', this method takes into consideration
+the postion set in backend and when necessary renders the logo also smaller.
 
-Die Methode '_insertOrderInfo(..)' wird verwendet um die Order Informationen, wie z.b.
-die OrderId oder die Versandmethode auszugeben. Diese Methode berücksichtigt alle
-Einstellungen die im Backend gemacht wurden. 
-Intern verwendet sie die Methode '_insertOrderInfoRow(..)' um die einzelnen 
-Informationen mit korrektem Abstand darzustellen. 
-Sie gewährleistet, das der Text nicht ineinander kollidiert.
-Mit der Methode '_insertBillingAddress' wird die Zahlungsadresse eingefügt, 
-zusätzlich fügt sie die Absenderadresse über dem Empfänger hinzu.
-Die Methode 'setSubject(..)' legt einen Titel für die Seite fest.
-Die 'insertOrder(..)' Methode ist die zentrale Methode um die Order Info und
-die Rechnungsadresse einzufügen.
-Die 'insertTableHeader(..)' - Methode wird, wie schon erwähnt, 
-bei 'newPage(..)' verwendet. Diese Methode zeichnet den Tabellenkopf.
+The method '_insertOrderInfo(..)' is used in order to output the order
+information, such as for example the orderID or shipping method. This
+method takes into consideration all settings that were made in backend.
+Internally it uses the method '_insertOrderInfoRow(..)' in order to
+represent separate infromation with correct spacing. It ensures that 
+the text does not collide into each other. With the method '_insertBillingAddress'
+the billing address is added, besides it adds the sender's address through the
+recepient. The method 'setSubject(..)' sets a title for page. The 'insertOrder(..)'
+method is the central method for adding order info and the billing address.
+The 'insertTableHeader(..)' method is used, as already mentioned, for 'newPage(..)'.
+This method makes a table header.
 
-Mit der Methode 'insertTableRow(..)' wird eine Tabellenzeile eingefügt. 
-Dazu wird ein Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract Objekt übergeben.
-Mittels dieser Informationen kann diese Methode genau errechnen, wie hoch
-die Zeile wird und bricht sie ggf. auf eine neue Seite um.
-Diese Abstrakte Klasse wird weiter unten beschrieben.
+With the method 'insertTableRow(..)' a table line is added.
+For this Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract object is passed.
+With the help of this information this method can accurately calculate
+how large the line is, and when necessary wraps it on a new page.
+This abstract class is described further below.
 
-Mit der '_drawItem(..)' - Methode werden die einzelnen Items gerendert, 
-welche in der config.xml registriert sind. Die zugehörige abstrakte 
-Klasse wird weiter unten beschrieben.
+With the '_drawItem(..)' method separate items are rendered, which are
+registered in config.xml. The associated abstract class will be described
+further below.
 
-Um die Totals darzustellen wird die Methode 'insertTotals()' verwendet. Diese
-Methode ähnelt '_drawItem(..)' und verwendet die gleiche Grundfunktionalität.
-Um Items zu rendern (Produkte, Totals, bzw. alles mögliche), wird die Klasse
-'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' verwendet.
-Diese hat mehrere Setter und Getter Methoden, die je nach Situation verwendet
-werden. Die wichtigsten Funktionen für die Darstellung sind die 'draw()',
-'calculateHeight()' und 'addRow(..)' Methoden.
-'draw()' ist eine Abstrakte Methode und wird von den einzelnen Items 
-implementiert. Mit 'calculateHeigth()' wird die Größe berechnet, diese
-Methode wird dann in 'insertTableRow(..)' von Symmetrics_InvoicePdf_Model_Pdf_Abstract
-aufgerufen. 
-Um aber erstmal ein Item abzulegen, wird die 'addRow(..)' Methode 
-verwendet. Diese akzeptiert als Parameter nur eine Instanz der Klasse
-'Symmetrics_InvoicePdf_Model_Pdf_Items_Item'.
-Diese Klasse leitet sich von keiner anderen Klasse ab und dient als genereller
-Item Container. Sie hat fast die gleiche Funktionalität wie 
-'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract' nur das sie Wertepaare
-speichert, welche als einzelne Spalte interpretiert werden.
-Eine solche Spalte wird mit 'addColumn(..)' in den Container gepackt. 
-Diese Klasse beinhaltet auch die Methode 'calculateHeigth()' welche von der
-gleichnamigen Methode in der Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
-aufgerufen wird. Nur wird hier die Höhe tatsächlich anhand der Schrift 
-und des Textes berechnet.
+In order to show totals 'insertTotals()'  method is used. This method is similar to
+'_drawItem(..)' and uses the same basic functionality. In order to render items
+(products, totals, or everything possible), 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
+class is used. It has more setter and getter methods, which are used depending on a
+situation. For the most important functions for the representation are
+'draw()', 'calculateHeight()' und 'addRow(..)' methods. 'draw()' is an abstract
+method and is implemented by separate items. With 'calculateHeigth()' the size is
+calculated, this method is then called in 'insertTableRow(..)'  of
+Symmetrics_InvoicePdf_Model_Pdf_Abstract.
+In order to add an item at first, 'addRow(..)' method is used. It accepts as parameter
+only one instance of class 'Symmetrics_InvoicePdf_Model_Pdf_Items_Item'.
+This class is derived from no other class and serves as a general item container.
+It has almost the same functionality as 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
+only that it saves the value pairs, which are interpreted as a separate column. One
+such column is wrapped up in container with 'addColumn(..)'. This class contains also
+the method 'calculateHeigth()' which is called by the method of the same name in the
+class 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'. Now the size is actually
+calculated with the help of font and text.
 
-Um nun aus diesem Klassenkonstrukt eine Rechnung darzustellen, wird die 
-Klasse 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' verwendet. Diese beinhaltet nur 
-eine 'getPdf()' Methode, welche überschrieben ist und 4 weitere Methoden, 
-die zur Anzeige von zusätzlichen Informationen dienen. Wobei eine davon die
-Methode '_insertOrderInfo()' überschreibt, um die InvoiceId auszugeben.
-In den restlichen Methoden wird das gleiche Renderer - Prinzip, wie z.b. bei
-den Produkten oder Totals verwendet.
-Diese Klasse wird in den überschriebenen Action-Controllern
-Symmetrics_InvoicePdf_Adminhtml_Sales_InvoiceController (Für Rechnungsübersicht, 
-siehe doc/screenshots/screenshot_rechnungsuebersicht.png) und
-Symmetrics_InvoicePdf_Adminhtml_Sales_Order_InvoiceController (Für Rechnungsdetails,
-siehe doc/screenshots/screenshot_rechnungsdetails.png) verwendet um die Rechnung(en) als Download
-anzubieten.
+In order to represent an ivoice from this class structure, 
+'Symmetrics_InvoicePdf_Model_Pdf_Invoice' class is used. It contains only one 'getPdf()'
+mehtod, which is overwritten and 4 other methods that serve for display of additional
+information. Whereby one of it rewrites the  '_insertOrderInfo()' method, in order to
+output the invoiceID. In the other methods the same renderer principle as used
+for example for products or totals.
+This class is used in the overwritten action controllers
+Symmetrics_InvoicePdf_Adminhtml_Sales_InvoiceController (for invoice overview, 
+see doc/screenshots/screenshot_rechnungsuebersicht.png) in order to offfer 
+the invoices as download.
+
 
 ** PROBLEMS
-Rechnungen werden nach manueller Generierung nicht automatisch verschickt.
+Invoices are not automatically sent after the manual generation.
 
 * TESTCASES
 ** BASIC
-*** A:  Prüfen Sie, ob die Rechnung wie eine normale deutsche Rechnung aussieht.
-		Sie finden 2 Beispiele im doc/examples Ordner.
-*** B:  Prüfen Sie, ob die verschiedenen Felder auf der Rechnung angezeigt werden, wenn diese 
-        aktiviert sind.
-*** C:  Gehen Sie im Backend unter 
-        "Verkäufe => Verkäufe => Rechnungs- und Lieferscheingestaltung => Adresse" 
-        und tragen Sie eine Adresse ein. Prüfen Sie, ob diese im Footer erscheint, 
-        wenn dieser aktiviert ist (Einstellung: "Zeige Footer"). 
-        Nun installieren Sie das Symmetrics_Impressum Modul und tragen Sie die Daten 
-        in den entsprechenden Feldern des Moduls in der Systemkonfiguration 
-        ein "Allgemein => Impressum". Prüfen Sie, ob die 
-        Daten korrekt auf der Rechnung erscheinen, also alle ausgefüllten Felder 
-        übernommen werden und nicht mehr die Daten aus dem Feld
-        "Verkäufe => Verkäufe => Rechnungs- und Lieferscheingestaltung => Adresse".
-*** D:  Deinstallieren Sie das Modul Symmetrics_Impressum und installieren Sie 
-        Symmetrics_Imprint. Füllen Sie die Felder des Moduls in der Konfiguration 
-        "Allgemein => Imprint" aus und prüfen Sie ob nun die Daten aus diesen Feldern
-        im Footer erscheinen. Prüfen Sie auch ob, wenn beide 
-        Module installiert sind, die Daten aus Symmetrics_Imprint genommen werden und nicht 
-        aus Symmetrics_Impressum.
-        Beachten Sie auch, das Felder die mit dem Tag <hide_in_invoice_pdf>
-        in der system.xml des Impressum - oder Imprint - Moduls gekennzeichnet sind, 
-        ignoriert und nicht in den Footer übernommen werden.
-*** E:  Füllen Sie die 5 Felder für die Infoboxen und Felder aus und prüfen Sie,
-	    ob sich die Rechnung entsprechend verändert.
-*** F:  Aktivieren / deaktiveren Sie die Einstellungen "Zeige Versandart" und 
-        "Zeige Zahlmethode" und prüfen Sie, ob die Versandart bzw. Zahlmethode auf 
-        der Rechnung korrekt angezeigt bzw. nicht angezeigt werden.
-*** G:  Prüfen Sie, ob das Feld Logoposition vorhanden ist und man zwischen den 
-        Optionen "Links, mittig, Rechts" wählen kann. Laden Sie ein Logo hoch und 
-        prüfen Sie, ob es auf der Rechnung erscheint. Prüfen Sie auch, ob sich die 
-        Position des Logos korrekt verändert, wenn Sie die Einstellung "Logoposition" 
-        entsprechend verändern.
+*** A:  Check if the invoice looks as a normal German invoice.
+		You can find 2 examples in doc/examples directory.
+*** B:  Check if different fields are shown in the invoice, when they are activated.
+*** C:  Go in backend to "Configuration => Sales  => Sales => Invoice and Packing Slip Design
+		=> Address" and enter an address. Check if it appears in footer when it is activated 
+		(setting: "show footer"). Now install the Symmetrics_Impressum module and
+		enter data in the corresponding fields of module in the system configuration
+		"General => Impressum". Check if data appear correctly on the invoice, i.e. all
+		filled in fields have been taken over correctly and no more the data from field
+		"Configuration => Sales  => Sales => Invoice and Packing Slip Design
+		=> Address"
+*** D:  Uninstall the module Symmetrics_Impressum  and install Symmetrics_Imprint.
+		Fill in the fields of module in the configuration "General => Imprint" and
+		if data from these fields now appear in footer. Also check whether
+		when both modules are installed, the data from Symmetrics_Imprint are taken
+		and not from Symmetrics_Impressum.
+		Also pay attention that fields that are marked with tag <hide_in_invoice_pdf>
+		in the system.xml of impressum or imprint moduls, are ignored and not taken
+		over in footer.
+*** E:  Fill in 5 fields for the info boxes and fields and check if the invoice
+		is changed respectively.
+*** F:  Activate / deactivate settings "show shipping method" and "show payment
+		method" and check if shippint method or payment method is correctly shown
+		or not shown on the invoice.
+*** G: 	Check if Logo position field is available and one can choose between the
+		options "left, center, right". Upload a logo and check if it appears on
+		invoice. Also check if logo position is changed correctly when you 
+		change the "Logo position" setting accordingly.
