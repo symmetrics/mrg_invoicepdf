@@ -81,6 +81,11 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
     const PAGE_POSITION_RIGHT = 555;
     const PAGE_POSITION_TOP = 790;
     const PAGE_POSITION_BOTTOM = 90;
+    
+    /**
+     * @const FOOTER_SPACING Vertical padding between footer blocks.
+     */
+    const FOOTER_SPACING = 30;
 
     const MAX_LOGO_WIDTH = 500;
     const MAX_LOGO_HEIGHT = 50;
@@ -553,7 +558,7 @@ abstract class Symmetrics_InvoicePdf_Model_Pdf_Abstract extends Varien_Object
                                 $this->_insertAddressFooterItem($page, trim(strip_tags($itemValue)));
                             }
                         }
-                        $this->_width += $keyWidth + $itemWidth + self::PAGE_POSITION_LEFT;
+                        $this->_width += $keyWidth + $itemWidth + self::FOOTER_SPACING;
                         $this->_height = self::PAGE_POSITION_BOTTOM;
                         $itemCollector = array();
                     }
