@@ -32,10 +32,10 @@ template for invoices, in order to make them valid in Germany.
         - Infobox title
         - Infobox
 *** C:  When Symmetrics_Imprint module is installed, the data for footer are
-		read from the configuration fields of this module and so all
+		read from the configuration fields of this module and so the entire
 		owner information is shown:
 		- Full address
-		- Communication data such as phone, fax, e-mail etc.
+		- Contact data such as phone, fax, e-mail etc.
 		- Full bank account 
 		- Full tax information
 *** D:  If Symmetrics_Imprint module is not installed it is checked if
@@ -98,8 +98,8 @@ In order to show totals 'insertTotals()'  method is used. This method is similar
 '_drawItem(..)' and uses the same basic functionality. In order to render items
 (products, totals, or everything possible), 'Symmetrics_InvoicePdf_Model_Pdf_Items_Abstract'
 class is used. It has more setter and getter methods, which are used depending on a
-situation. For the most important functions for the representation are
-'draw()', 'calculateHeight()' und 'addRow(..)' methods. 'draw()' is an abstract
+situation. For the most important functions for the representation there are
+'draw()', 'calculateHeight()' and 'addRow(..)' methods. 'draw()' is an abstract
 method and is implemented by separate items. With 'calculateHeigth()' the size is
 calculated, this method is then called in 'insertTableRow(..)'  of
 Symmetrics_InvoicePdf_Model_Pdf_Abstract.
@@ -117,7 +117,7 @@ In order to represent an ivoice from this class structure,
 'Symmetrics_InvoicePdf_Model_Pdf_Invoice' class is used. It contains only one 'getPdf()'
 mehtod, which is overwritten and 4 other methods that serve for display of additional
 information. Whereby one of it rewrites the  '_insertOrderInfo()' method, in order to
-output the invoiceID. In the other methods the same renderer principle as used
+output the invoiceID. In other methods the same renderer principle is used as
 for example for products or totals.
 This class is used in the overwritten action controllers
 Symmetrics_InvoicePdf_Adminhtml_Sales_InvoiceController (for invoice overview, 
@@ -143,7 +143,7 @@ Invoices are not automatically sent after the manual generation.
 		=> Address"
 *** D:  Uninstall the module Symmetrics_Impressum  and install Symmetrics_Imprint.
 		Fill in the fields of module in the configuration "General => Imprint" and
-		if data from these fields now appear in footer. Also check whether
+		check if data from these fields now appear in footer. Also check whether
 		when both modules are installed, the data from Symmetrics_Imprint are taken
 		and not from Symmetrics_Impressum.
 		Also pay attention that fields that are marked with tag <hide_in_invoice_pdf>
