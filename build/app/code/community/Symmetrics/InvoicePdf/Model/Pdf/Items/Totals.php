@@ -72,42 +72,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
                     
                     // cut last :
                     $totalData['label'] = substr($totalData['label'], 0, -1);
-
-                    // Display full tax info if there`s more then one tax rate
-                    if ($total->getSourceField() == 'tax_amount' && count($fullTaxInfo) > 1) {
-                        foreach ($fullTaxInfo as $info) {
-                            $tableRowTaxItem = Mage::getModel('invoicepdf/pdf_items_item');
-                            $index++;
-                            $tableRowTaxItem->addColumn(
-                                'label_' . $index,
-                                $info['rates'][0]['title'],
-                                120, 'right',
-                                0,
-                                $font,
-                                8
-                            );
-
-                            $tableRowTaxItem->addColumn(
-                                'amount_' . $index,
-                                $order->formatPriceTxt($info['amount']),
-                                10,
-                                'right',
-                                0,
-                                $font,
-                                8
-                            );
-                            $this->addRow($tableRowTaxItem);
-                        }
-                    }
-                    
-                    $taxTitle = $totalData['label'];;
-                    
-                    // When there`s only one tax rate, display the rate behind the title.
-                    if ($total->getSourceField() == 'tax_amount') {
-                        if (count($fullTaxInfo) == 1) {
-                            $taxTitle .= ' (' . $fullTaxInfo[0]['percent'] . '%)';    
-                        }
-                    }
+                    $taxTitle = $totalData['label'];
                     
                     $tableRowItem->addColumn(
                         'label_' . $index,
