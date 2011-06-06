@@ -56,7 +56,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Totals
 
         $order = $source->getOrder();
         $totals = $this->_getTotalsList();
-        $fullTaxInfo = $order->getFullTaxInfo();
+        //$fullTaxInfo = $order->getFullTaxInfo();
         $font = Mage::helper('invoicepdf')->getFont();
 
         $index = 1;
