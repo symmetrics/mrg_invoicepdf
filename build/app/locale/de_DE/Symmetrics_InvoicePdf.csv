@@ -53,22 +53,13 @@
 "Display invoice date notice","Rechnungsdatum - Hinweis anzeigen"
 "Display invoice date notice","Rechnungsdatum - Hinweis anzeigen"
 "Allowed file type: .ttf", "Erlaubter Dateityp: .ttf"
-<<<<<<< local
-"Use uploaded font (normal)","Benutze hochgeladenen Font (normal)"
-"Use uploaded font (bold)","Benutze hochgeladenen Font (bold)"
-"Use uploaded font (italic)","Benutze hochgeladenen Font (italic)"
-"Unselect to use default font (normal)","'Nein' für standart Font (normal)"
-"Unselect to use default font (bold)","'Nein' für standart Font (bold)"
-"Unselect to use default font (italic)","'Nein' für standart Font (italic)"
-"Cash On Delivery fee","Nachnahme Gebühr"
-
-=======
 "Use uploaded font (normal)","Benutze hochgeladene Schriftart (normal)"
 "Use uploaded font (bold)","Benutze hochgeladene Schriftart (bold)"
 "Use uploaded font (italic)","Benutze hochgeladene Schriftart (kursiv)"
 "Unselect to use default font (normal)","'Nein' für standard Schriftart (normal)"
 "Unselect to use default font (bold)","'Nein' für standard Schriftart (bold)"
 "Unselect to use default font (italic)","'Nein' für standard Schriftart (kursiv)"
+"Cash On Delivery fee","Nachnahme Gebühr"
 "Font (normal)","Schriftart (normal)"
 "Font (bold)","Schriftart (bold)"
-"Font (italic)","Schriftart (kursiv)">>>>>>> other
+"Font (italic)","Schriftart (kursiv)"
