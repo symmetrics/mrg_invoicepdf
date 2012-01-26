@@ -59,7 +59,7 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
         foreach ($items as $_item) {
             $attributes = $this->getSelectionAttributes($_item);
             $tableRowItem = Mage::getModel('invoicepdf/pdf_items_item');
-            
+
             // draw SKUs
             if (!$_item->getOrderItem()->getParentItem()) {
                 $sku = $this->getSku($_item);
@@ -126,12 +126,50 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
                 }
             }
             $this->addRow($tableRowItem);
+
+            // Draw custom options.
+            $this->_drawCustomOption($_item);
         }
-        
+
         $this->setTriggerPosNumber(true);
 
         $page = $pdf->insertTableRow($page, $this);
         $this->setPage($page);
         $this->clearRows();
+    }
+
+    /**
+     * Draw a custom option for an order parent item.
+     *
+     * @param Mage_Sales_Model_Order_Invoice_Item $item Order item to draw the custom options for.
+     *
+     * @return null|void
+     */
+    protected function _drawCustomOption($item)
+    {
+        if ($item->getOrderItem()->getParentItem()) {
+            $options = $this->getItemOptions();
+            if ($options) {
+                foreach ($options as $option) {
+                    $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
+                    /* @var $tableRowOptionItem Symmetrics_InvoicePdf_Model_Pdf_Items_Item */
+                    // Draw options label.
+                    $labelFont = Mage::helper('invoicepdf')->getFont('bold');
+                    $tableRowOptionItem->addColumn('option_label', $option['label'], 20, 'left', 0, $labelFont, 7);
+
+                    $this->addRow($tableRowOptionItem);
+
+                    if ($option['value']) {
+                        $tableRowOptionItem = Mage::getModel('invoicepdf/pdf_items_item');
+                        $_printValue = isset($option['print_value'])
+                            ? $option['print_value'] : strip_tags($option['value']);
+
+                        $valueFont = Mage::helper('invoicepdf')->getFont();
+                        $tableRowOptionItem->addColumn('option_value', $_printValue, 30, 'left', 0, $valueFont, 6);
+                        $this->addRow($tableRowOptionItem);
+                    }
+                }
+            }
+        }
     }
 }
