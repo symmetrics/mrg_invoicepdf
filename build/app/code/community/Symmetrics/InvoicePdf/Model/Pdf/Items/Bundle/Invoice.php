@@ -28,7 +28,7 @@
  * @package   Symmetrics_InvoicePdf
  * @author    Symmetrics GmbH <info@symmetrics.de>
  * @author    Torsten Walluhn <tw@symmetrics.de>
- * @copyright 2010 symmetrics gmbh
+ * @copyright 2010-2012 symmetrics gmbh
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      http://www.symmetrics.de/
  */
@@ -127,9 +127,9 @@ class Symmetrics_InvoicePdf_Model_Pdf_Items_Bundle_Invoice
             }
             $this->addRow($tableRowItem);
 
-            // Draw custom options.
-            $this->_drawCustomOption($_item);
         }
+        // Draw custom options.
+        $this->_drawCustomOption($_item);
 
         $this->setTriggerPosNumber(true);
 
